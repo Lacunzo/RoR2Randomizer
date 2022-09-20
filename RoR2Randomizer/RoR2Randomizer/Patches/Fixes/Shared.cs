@@ -26,13 +26,15 @@ namespace RoR2Randomizer.Patches.Fixes
         public static void Physics_Raycast_LayerMaskDistanceFix_ILPatch(ILContext il)
         {
             ILCursor c = new ILCursor(il);
-            if (c.TryGotoNext(x => x.MatchImplicitConversion<LayerMask, int>(),
-                              x => x.MatchConvR4(),
-                              x => x.MatchCall(StaticReflectionCache.Physics_Raycast_Ray_outRaycastHit_float_MI)))
+            while (c.TryGotoNext(x => x.MatchImplicitConversion<LayerMask, int>(),
+                                 x => x.MatchConvR4(),
+                                 x => x.MatchCall(StaticReflectionCache.Physics_Raycast_Ray_outRaycastHit_float_MI)))
             {
                 c.Index++; // Skip to after implicit conversion call
-                c.Remove(); // Remove Conv_R4
-                c.Remove(); // Remove incorrect Physics.Raycast call
+
+                // Remove Conv_R4
+                // Remove incorrect Physics.Raycast call
+                c.RemoveRange(2);
 
                 c.EmitDelegate((Ray ray, out RaycastHit hit, int layerMask) =>
                 {
@@ -62,7 +64,7 @@ namespace RoR2Randomizer.Patches.Fixes
             ILCursor c = new ILCursor(il);
             while (c.TryGotoNext(x => x.MatchLdarg(0),
                                  x => x.MatchCall(StaticReflectionCache.EntityState_get_skillLocator),
-                                 x => x.MatchLdfld(out FieldReference field) && _skillFieldNames.Contains(field.Name)))
+                                 x => x.MatchLdfld(out FieldReference field) && Array.IndexOf(_skillFieldNames, field.Name) != -1))
             {
                 c.Index += 2; // Skip to ldfld instruction
                 c.Remove(); // Remove ldfld
@@ -87,9 +89,6 @@ namespace RoR2Randomizer.Patches.Fixes
                     }
                 });
             }
-
-            Log.Debug("Result of EntityState_SkillSlotResolver:");
-            Log.Debug(il.ToString());
         }
 
         public static void TryAddTemporaryComponentIfMissing<T>(CharacterBody body, ref T cachedComponent) where T : MonoBehaviour
@@ -102,6 +101,8 @@ namespace RoR2Randomizer.Patches.Fixes
 
         public static void Try_get_gameObject(ILCursor c)
         {
+            c.Remove(); // Remove get_gameObject
+
             c.EmitDelegate((Component comp) =>
             {
                 return comp ? comp.gameObject : null;

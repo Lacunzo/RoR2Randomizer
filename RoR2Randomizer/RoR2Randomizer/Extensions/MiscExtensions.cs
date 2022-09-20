@@ -11,10 +11,5 @@ namespace RoR2Randomizer.Extensions
         {
             return $"[{Language.GetString(variant.skillDef.skillNameToken)} ({variant.skillDef.skillName}, {((ScriptableObject)variant.skillDef).name}), (acticationState.stateType: {variant.skillDef.activationState.stateType?.FullName ?? "null"})]";
         }
-
-        public static bool TryFindChild(this ChildLocator locator, string name, out Transform child)
-        {
-            return child = locator.FindChild(name);
-        }
     }
 }

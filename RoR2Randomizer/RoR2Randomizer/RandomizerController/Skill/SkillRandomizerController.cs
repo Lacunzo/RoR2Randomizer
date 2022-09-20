@@ -2,17 +2,19 @@
 
 using RoR2;
 using RoR2.Skills;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Patches;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace RoR2Randomizer.RandomizerController
+namespace RoR2Randomizer.RandomizerController.Skill
 {
-    public class SkillRandomizerController : MonoBehaviour
+    public class SkillRandomizerController : Singleton<SkillRandomizerController>
     {
 #if MANUAL_SKILL_INDEX
         static int _debugSkillIndex = 0;
@@ -48,7 +50,7 @@ namespace RoR2Randomizer.RandomizerController
                             foreach (SkillFamily.Variant variant in skills.skillFamily.variants)
                             {
                                 Type stateType = variant.skillDef.activationState.stateType;
-                                if (stateType != null 
+                                if (stateType != null
                                     && stateType != typeof(EntityStates.Idle)
                                     && stateType != typeof(EntityStates.AncientWispMonster.Throw) // Fires a projectile that does nothing
                                     && stateType != typeof(EntityStates.ArchWispMonster.ChargeCannons) // Duplicate of GreaterWispMonster.ChargeCannons
@@ -118,7 +120,7 @@ namespace RoR2Randomizer.RandomizerController
 
         public static void RandomizeSkill(GenericSkill self, CharacterBody body)
         {
-            if (!Main.SKILL_RANDOMIZER_ENABLED)
+            if (!ConfigManager.SkillRandomizer.Enabled)
                 return;
 
             SkillFamily.Variant[] variants = self.skillFamily.variants;

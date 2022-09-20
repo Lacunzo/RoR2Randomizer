@@ -1,32 +1,15 @@
 ﻿using RoR2;
+using RoR2Randomizer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.Utility
 {
     public static class Caches
     {
-        public static readonly GenericCache<CharacterMaster> MasterPrefabs = new GenericCache<CharacterMaster>(name => MasterCatalog.FindMasterPrefab(name)?.GetComponent<CharacterMaster>());
-
-        public class GenericCache<T> : InitializeOnAccessDictionary<string, T>
-        {
-            public GenericCache(ValueSelectorTryGet selector) : base(selector)
-            {
-            }
-
-            public GenericCache(Func<string, T> selector) : base(selector)
-            {
-            }
-
-            public GenericCache(Func<T> selector) : base(selector)
-            {
-            }
-
-            protected GenericCache()
-            {
-            }
-        }
+        public static readonly InitializeOnAccessDictionary<string, CharacterMaster> MasterPrefabs = new InitializeOnAccessDictionary<string, CharacterMaster>(name => MasterCatalog.FindMasterPrefab(name)?.GetComponent<CharacterMaster>());
     }
 }

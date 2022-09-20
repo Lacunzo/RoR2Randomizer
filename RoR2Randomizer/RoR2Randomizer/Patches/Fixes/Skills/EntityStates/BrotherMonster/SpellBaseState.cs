@@ -30,8 +30,6 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
                               x => x.MatchCallvirt(AccessTools.PropertyGetter(typeof(Component), nameof(Component.gameObject)))))
             {
                 c.Index += 2; // Move to before get_gameObject call
-
-                c.Remove(); // Remove get_gameObject call
                 Shared.Try_get_gameObject(c);
             }
         }

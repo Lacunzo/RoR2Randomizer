@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.RandomizerController.Boss;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,16 +34,15 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
             {
                 c.Index += 2; // Move to before get_gameObject call
 
-                c.Remove(); // Remove get_gameObject call
                 Shared.Try_get_gameObject(c);
             }
 
             // Prevent Newt from becoming immune to damage if it's replacing Mithrix
+            int localIndex = -1;
             if (c.TryGotoNext(x => x.MatchCallvirt(SymbolExtensions.GetMethodInfo<Component>(_ => _.GetComponent<HurtBoxGroup>())),
-                              x => x.MatchStloc(out _),
-                              x => x.MatchLdloc(out _),
-                              x => x.MatchImplicitConversion(typeof(UnityEngine.Object), typeof(bool)),
-                              x => x.MatchBrfalse(out _)))
+                              x => x.MatchStloc(out localIndex),
+                              x => x.MatchLdloc(out int tmpLocIndex) && tmpLocIndex == localIndex,
+                              x => x.MatchImplicitConversion<UnityEngine.Object, bool>()))
             {
                 c.Index += 4; // Move before BrFalse
 
@@ -55,8 +55,7 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
                         GameObject master = body.masterObject;
                         if (master)
                         {
-                            return !master.GetComponent<CharacterRandomizer.Mithrix.SpawnHook.MithrixReplacement>()
-                                && !master.GetComponent<CharacterRandomizer.Mithrix.SpawnHook.MithrixPhase2EnemiesReplacement>();
+                            return !BossRandomizerController.Mithrix.IsReplacedPartOfMithrixFight(master);
                         }
                     }
 

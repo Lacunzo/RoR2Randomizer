@@ -1,12 +1,12 @@
 ﻿using EntityStates;
 using RoR2;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using static Mono.Security.X509.X520;
 
 namespace RoR2Randomizer.ChildTransformAdditions
 {
@@ -32,8 +32,8 @@ namespace RoR2Randomizer.ChildTransformAdditions
             if (!body || !locator || locator.FindChild(name))
                 return;
 
-            Array.Resize(ref locator.transformPairs, locator.transformPairs.Length + 1);
-            locator.transformPairs[locator.transformPairs.Length - 1] = getCustomChildTransformPair(body, locator, name, flags);
+            MiscUtils.AddItem(ref locator.transformPairs, getCustomChildTransformPair(body, locator, name, flags));
+
 #if DEBUG
             Log.Debug($"Add child {name} to {body.GetDisplayName()}");
 #endif
@@ -56,15 +56,16 @@ namespace RoR2Randomizer.ChildTransformAdditions
             if (names.Length == 0)
                 return;
 
-            int prevLength = locator.transformPairs.Length;
-            Array.Resize(ref locator.transformPairs, prevLength + names.Length);
-            for (int i = prevLength; i < locator.transformPairs.Length; i++)
+            MiscUtils.AddItems(ref locator.transformPairs, names.Select(n =>
             {
-                locator.transformPairs[i] = getCustomChildTransformPair(body, locator, names[i - prevLength], ChildFlags.None);
+                ChildLocator.NameTransformPair pair = getCustomChildTransformPair(body, locator, n, ChildFlags.None);
+
 #if DEBUG
-                Log.Debug($"Add child {names[i - prevLength]} to {body.GetDisplayName()}");
+                Log.Debug($"Add child {n} to {body.GetDisplayName()}");
 #endif
-            }
+
+                return pair;
+            }));
         }
 
         static ChildLocator.NameTransformPair getCustomChildTransformPair(CharacterBody body, ChildLocator locator, string name, ChildFlags flags)

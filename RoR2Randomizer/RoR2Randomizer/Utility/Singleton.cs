@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+
+namespace RoR2Randomizer.Utility
+{
+    public class Singleton<T> : MonoBehaviour where T : Singleton<T>
+    {
+        public static T Instance { get; private set; }
+
+        void Awake()
+        {
+            Instance = (T)this;
+        }
+    }
+}

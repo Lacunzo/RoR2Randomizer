@@ -1,20 +1,23 @@
 ﻿using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using R2API.Networking;
 using RoR2;
 using RoR2.CharacterSpeech;
+using RoR2Randomizer.Configuration;
+using RoR2Randomizer.RandomizerController.Boss;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
+namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
     public static class BrotherSpeechDriver_ReplaceName
     {
         class OverrideMithrixChatMessage : Chat.NpcChatMessage
         {
-            CharacterMaster _master;
+            string _masterName;
 
             public OverrideMithrixChatMessage(Chat.NpcChatMessage original, CharacterMaster master)
             {
@@ -23,7 +26,16 @@ namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
                 sound = original.sound;
                 formatStringToken = original.formatStringToken;
 
-                _master = master;
+                if (master)
+                {
+                    CharacterBody body = master.GetBody();
+                    if (body)
+                    {
+                        _masterName = body.GetDisplayName();
+                    }
+                }
+
+                _masterName ??= "???";
             }
 
             public OverrideMithrixChatMessage()
@@ -32,32 +44,21 @@ namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
 
             public override string ConstructChatString()
             {
-                string chatString = base.ConstructChatString();
-
-                if (_master)
-                {
-                    CharacterBody body = _master.GetBody();
-                    if (body)
-                    {
-                        chatString = chatString.Replace("Mithrix", body.GetDisplayName() ?? "???");
-                    }
-                }
-
-                return chatString;
+                return base.ConstructChatString().Replace("Mithrix", _masterName);
             }
 
             public override void Serialize(NetworkWriter writer)
             {
                 base.Serialize(writer);
 
-                writer.Write(_master.gameObject);
+                writer.Write(_masterName);
             }
 
             public override void Deserialize(NetworkReader reader)
             {
                 base.Deserialize(reader);
 
-                _master = reader.ReadGameObject().GetComponent<CharacterMaster>();
+                _masterName = reader.ReadString();
             }
         }
 
@@ -86,7 +87,7 @@ namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate((Chat.NpcChatMessage originalMessage, CharacterSpeechController instance) =>
                 {
-                    if (Main.MITHRIX_RANDOMIZER_ENABLED && instance.characterMaster.GetComponent<SpawnHook.MithrixReplacement>())
+                    if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeMithrix && BossRandomizerController.Mithrix.IsReplacedMithrix(instance.characterMaster.gameObject))
                     {
                         return new OverrideMithrixChatMessage(originalMessage, instance.characterMaster);
                     }

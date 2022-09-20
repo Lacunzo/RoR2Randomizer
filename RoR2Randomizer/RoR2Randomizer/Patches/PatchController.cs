@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
-using RoR2Randomizer.RandomizerController;
+using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerController.Skill;
+using RoR2Randomizer.RandomizerController.Stage;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -23,13 +25,15 @@ namespace RoR2Randomizer.Patches
             _patchControllersRoot.AddComponent<Debug.SpawnDisabler>();
 #endif
 
+            _patchControllersRoot.AddComponent<BossRandomizerController>();
             _patchControllersRoot.AddComponent<SkillRandomizerController>();
+            _patchControllersRoot.AddComponent<StageRandomizerController>();
 
             _harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 
-            Fixes.EntityStateOwnerSkill.MainPatch.Apply();
+            Fixes.EntityStateOwnerSkill.MainPatcher.Apply();
 
-            CharacterRandomizer.MainPatcher.Apply();
+            BossRandomizer.MainPatcher.Apply();
         }
 
         public static void Cleanup()
@@ -39,9 +43,9 @@ namespace RoR2Randomizer.Patches
 
             _harmonyInstance.UnpatchSelf();
 
-            Fixes.EntityStateOwnerSkill.MainPatch.Cleanup();
+            Fixes.EntityStateOwnerSkill.MainPatcher.Cleanup();
 
-            CharacterRandomizer.MainPatcher.Cleanup();
+            BossRandomizer.MainPatcher.Cleanup();
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill
 {
-    public static class MainPatch
+    public static class MainPatcher
     {
         public static void Apply()
         {

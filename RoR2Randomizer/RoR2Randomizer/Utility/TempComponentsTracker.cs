@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoR2Randomizer.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -70,11 +71,8 @@ namespace RoR2Randomizer.Utility
         {
             GameObject gameObject = owner.gameObject;
 
-            if (!owner.TryGetComponent<TempComponentsTracker>(out TempComponentsTracker tracker))
-                tracker = gameObject.AddComponent<TempComponentsTracker>();
-
             Component component = gameObject.AddComponent(type);
-            tracker.track(component);
+            gameObject.GetOrAddComponent<TempComponentsTracker>().track(component);
             return component;
         }
 
@@ -82,7 +80,7 @@ namespace RoR2Randomizer.Utility
         {
             GameObject gameObject = owner.gameObject;
 
-            TempComponentsTracker tracker = gameObject.AddComponent<TempComponentsTracker>();
+            TempComponentsTracker tracker = gameObject.GetOrAddComponent<TempComponentsTracker>();
 
             foreach (Type componentType in componentTypes)
             {

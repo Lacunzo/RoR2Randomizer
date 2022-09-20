@@ -2,19 +2,16 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
+namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
-    public static class SpawnCardTracker
+    public static class MithrixSpawnCardTracker
     {
-        public static SpawnCard MithrixNormalSpawnCard { get; private set; }
-        public static SpawnCard MithrixHurtSpawnCard { get; private set; }
-        public static SpawnCard[] Phase2SpawnCards { get; private set; }
-
         public static void Apply()
         {
             On.EntityStates.Missions.BrotherEncounter.Phase1.OnEnter += Phase1_OnEnter;
@@ -33,9 +30,9 @@ namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
         {
             orig(self);
 
-            if (!MithrixNormalSpawnCard)
+            if (!SpawnCardTracker.MithrixNormalSpawnCard)
             {
-                MithrixNormalSpawnCard = self.phaseScriptedCombatEncounter.spawns[0].spawnCard;
+                SpawnCardTracker.MithrixNormalSpawnCard = self.phaseScriptedCombatEncounter.spawns[0].spawnCard;
             }
         }
 
@@ -43,7 +40,7 @@ namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
         {
             orig(self);
 
-            Phase2SpawnCards ??= self.phaseScriptedCombatEncounter.spawns.Select(s => s.spawnCard).Distinct().ToArray();
+            SpawnCardTracker.MithrixPhase2SpawnCards ??= self.phaseScriptedCombatEncounter.spawns.Select(s => s.spawnCard).Distinct().ToArray();
         }
 
         static void Phase4_OnEnter(ILContext il)
@@ -54,9 +51,9 @@ namespace RoR2Randomizer.Patches.CharacterRandomizer.Mithrix
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate((Phase4 __instance) =>
                 {
-                    if (!MithrixHurtSpawnCard)
+                    if (!SpawnCardTracker.MithrixHurtSpawnCard)
                     {
-                        MithrixHurtSpawnCard = __instance.phaseScriptedCombatEncounter.spawns[0].spawnCard;
+                        SpawnCardTracker.MithrixHurtSpawnCard = __instance.phaseScriptedCombatEncounter.spawns[0].spawnCard;
                     }
                 });
             }
