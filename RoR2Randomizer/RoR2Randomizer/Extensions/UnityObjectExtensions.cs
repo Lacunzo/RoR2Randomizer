@@ -18,7 +18,7 @@ namespace RoR2Randomizer.Extensions
 
         public static bool TryFindChild(this ChildLocator locator, string name, out Transform child)
         {
-            return child = locator.FindChild(name);
+            return (bool)(child = locator.FindChild(name));
         }
 
         public static bool TryGetModelBounds(this CharacterModel root, out Bounds bounds)
