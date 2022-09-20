@@ -98,17 +98,12 @@ namespace RoR2Randomizer.ChildTransformAdditions
             switch (name)
             {
                 case "MuzzleLeft" when locator.TryFindChild("HandL", out result):
-                    return result;
                 case "MuzzleRight" when locator.TryFindChild("HandR", out result):
+                case "BodyCenter" when (bool)(result = body.coreTransform):
                     return result;
-                case "BodyCenter" when body.coreTransform:
-                    return body.coreTransform;
+                default:
+                    return body.aimOriginTransform ? body.aimOriginTransform : body.transform;
             }
-
-            if (body.aimOriginTransform)
-                return body.aimOriginTransform;
-
-            return body.transform;
         }
     }
 }
