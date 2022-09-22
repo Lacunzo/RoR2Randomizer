@@ -90,8 +90,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="RandomizerController\Boss\Mithrix\" />
-  </ItemGroup>
-
 </Project>
