@@ -1,4 +1,5 @@
 ﻿using RoR2;
+using RoR2Randomizer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,6 +19,11 @@ namespace RoR2Randomizer.Utility
             {
                 return UnityEngine.Random.Range(min, max);
             }
+        }
+
+        public static T Choose<T>(params T[] options)
+        {
+            return options.GetRandomOrDefault();
         }
     }
 }

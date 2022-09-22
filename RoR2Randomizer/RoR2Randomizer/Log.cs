@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using RoR2Randomizer.Utility;
 using System.Diagnostics;
+using UnityEngine;
 
 namespace RoR2Randomizer
 {
@@ -19,7 +20,7 @@ namespace RoR2Randomizer
 #if DEBUG
             _logSource.LogDebug(data);
 
-            MiscUtils.SendChatMessage(data, "DEBUG");
+            MiscUtils.TryNetworkLog(data, LogLevel.Debug);
 #endif
         }
 
@@ -28,7 +29,7 @@ namespace RoR2Randomizer
             _logSource.LogError(data);
 
 #if DEBUG
-            MiscUtils.SendChatMessage(data, "ERROR");
+            MiscUtils.TryNetworkLog(data, LogLevel.Error);
 #endif
         }
 
@@ -37,7 +38,7 @@ namespace RoR2Randomizer
             _logSource.LogFatal(data);
 
 #if DEBUG
-            MiscUtils.SendChatMessage(data, "FATAL");
+            MiscUtils.TryNetworkLog(data, LogLevel.Fatal);
 #endif
         }
 
@@ -46,7 +47,7 @@ namespace RoR2Randomizer
             _logSource.LogInfo(data);
 
 #if DEBUG
-            MiscUtils.SendChatMessage(data, "INFO");
+            MiscUtils.TryNetworkLog(data, LogLevel.Info);
 #endif
         }
 
@@ -55,7 +56,7 @@ namespace RoR2Randomizer
             _logSource.LogMessage(data);
 
 #if DEBUG
-            MiscUtils.SendChatMessage(data, "MESSAGE");
+            MiscUtils.TryNetworkLog(data, LogLevel.Message);
 #endif
         }
 
@@ -64,8 +65,18 @@ namespace RoR2Randomizer
             _logSource.LogWarning(data);
 
 #if DEBUG
-            MiscUtils.SendChatMessage(data, "WARNING");
+            MiscUtils.TryNetworkLog(data, LogLevel.Warning);
 #endif
+        }
+
+        internal static void LogType(string data, LogLevel level)
+        {
+#if DEBUG
+            if (level == LogLevel.Debug)
+                return;
+#endif
+
+            _logSource.Log(level, data);
         }
     }
 }

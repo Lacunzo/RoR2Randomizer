@@ -1,6 +1,12 @@
 ﻿using EntityStates;
 using HarmonyLib;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using On.EntityStates.BrotherMonster;
+using RoR2;
+using RoR2Randomizer.Configuration;
+using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,11 +19,13 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
         public static void Apply()
         {
             IL.EntityStates.BrotherMonster.SpellBaseState.OnEnter += SpellBaseState_OnEnter;
+            IL.EntityStates.BrotherMonster.SpellBaseState.InitItemStealer += SpellBaseState_InitItemStealer;
         }
 
         public static void Cleanup()
         {
             IL.EntityStates.BrotherMonster.SpellBaseState.OnEnter -= SpellBaseState_OnEnter;
+            IL.EntityStates.BrotherMonster.SpellBaseState.InitItemStealer -= SpellBaseState_InitItemStealer;
         }
         
         // Fix nullref if HammerRenderer doesn't exist
@@ -31,6 +39,32 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
             {
                 c.Index += 2; // Move to before get_gameObject call
                 Shared.Try_get_gameObject(c);
+            }
+        }
+
+        static void SpellBaseState_InitItemStealer(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            if (c.TryGotoNext(x => x.MatchCallvirt(SymbolExtensions.GetMethodInfo<GameObject>(_ => _.GetComponent<ReturnStolenItemsOnGettingHit>()))))
+            {
+                c.Index++; // Move after GetComponent call
+
+                c.Emit(OpCodes.Ldarg_0);
+
+                c.EmitDelegate((ReturnStolenItemsOnGettingHit returnItems, global::EntityStates.BrotherMonster.SpellBaseState instance) =>
+                {
+                    if (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && !returnItems && instance != null)
+                    {
+                        GameObject bodyObj = instance.gameObject;
+                        if (bodyObj && BossRandomizerController.Mithrix.IsReplacedPartOfMithrixFight(instance.characterBody.masterObject))
+                        {
+                            returnItems = MainMithrixReplacement.AddReturnStolenItemsOnGettingHit(bodyObj, instance.healthComponent);
+                        }
+                    }
+
+                    return returnItems;
+                });
             }
         }
     }

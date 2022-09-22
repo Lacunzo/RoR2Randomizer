@@ -11,13 +11,12 @@ namespace RoR2Randomizer.RandomizerController.Boss
     {
         public readonly BoolConfigValue RandomizeMithrix;
         public readonly BoolConfigValue RandomizeMithrixPhase2;
+        public bool AnyMithrixRandomizerEnabled => Enabled && (RandomizeMithrix || RandomizeMithrixPhase2);
 
 #if DEBUG
-        public readonly EnumConfigValue<BossRandomizerController.Mithrix.DebugMode> MithrixDebugMode;
-        public readonly StringConfigValue DebugMithrixForcedMasterName;
+        public readonly EnumConfigValue<BossRandomizerController.DebugMode> BossDebugMode;
+        public readonly StringConfigValue DebugBossForcedMasterName;
 #endif
-
-        public bool AnyMithrixRandomizerEnabled => Enabled && (RandomizeMithrix || RandomizeMithrixPhase2);
 
         public BossRandomizerConfig(ConfigFile file) : base("Boss Randomizer", file)
         {
@@ -25,8 +24,8 @@ namespace RoR2Randomizer.RandomizerController.Boss
             RandomizeMithrixPhase2 = new BoolConfigValue(getEntry("Randomize Mithrix Phase 2", "Randomizes the character type of all the characters spawned during Mithrix phase 2", true));
 
 #if DEBUG
-            MithrixDebugMode = new EnumConfigValue<BossRandomizerController.Mithrix.DebugMode>(getEntry("Mithrix Debug Mode", BossRandomizerController.Mithrix.DebugMode.None));
-            DebugMithrixForcedMasterName = new StringConfigValue(getEntry("Mithrix Debug Forced Master Name", "EquipmentDroneMaster"));
+            BossDebugMode = new EnumConfigValue<BossRandomizerController.DebugMode>(getEntry("Boss Debug Mode", BossRandomizerController.DebugMode.None));
+            DebugBossForcedMasterName = new StringConfigValue(getEntry("Boss Debug Forced Master Name", "EquipmentDroneMaster"));
 #endif
         }
     }

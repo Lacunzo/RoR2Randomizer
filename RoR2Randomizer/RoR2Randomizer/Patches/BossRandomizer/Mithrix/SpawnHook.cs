@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
@@ -33,14 +34,8 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
         static void ScriptedCombatEncounter_Spawn(On.RoR2.ScriptedCombatEncounter.orig_Spawn orig, ScriptedCombatEncounter self, ref ScriptedCombatEncounter.SpawnInfo spawnInfo)
         {
-            if (!ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled)
-            {
-                orig(self, ref spawnInfo);
-                return;
-            }
-
             GameObject originalPrefab = null;
-            if (BossRandomizerController.Mithrix.TryGetOverridePrefabFor(spawnInfo.spawnCard, out GameObject overridePrefab))
+            if (NetworkServer.active && ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && BossRandomizerController.Mithrix.TryGetOverridePrefabFor(spawnInfo.spawnCard, out GameObject overridePrefab))
             {
                 originalPrefab = spawnInfo.spawnCard.prefab;
                 spawnInfo.spawnCard.prefab = overridePrefab;
@@ -66,7 +61,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
             {
                 if (spawnResult.success && spawnResult.spawnedInstance && spawnResult.spawnRequest != null && spawnResult.spawnRequest.spawnCard)
                 {
-                    BossRandomizerController.Mithrix.HandleSpawnedMithrixCharacter(spawnResult);
+                    BossRandomizerController.Mithrix.HandleSpawnedMithrixCharacterServer(spawnResult);
                 }
             }
         }

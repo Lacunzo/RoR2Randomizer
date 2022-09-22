@@ -13,7 +13,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
         public StageRandomizerConfig(ConfigFile file) : base("Stage Randomizer", file)
         {
-            FirstStageBlacklistEnabled = new BoolConfigValue(getEntry<bool>("Starting Stage Blacklist", "Ensures the first stage is always normal(ish) (No obliteration, Commencement, or Voidling fight on stage 1)", true));
+            FirstStageBlacklistEnabled = new BoolConfigValue(getEntry<bool>("Starting Stage Blacklist", "Ensures the first stage is always normal(ish) (No Commencement, or Voidling fight on stage 1)", true));
         }
     }
 }

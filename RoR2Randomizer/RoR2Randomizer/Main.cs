@@ -1,9 +1,11 @@
 using BepInEx;
 using R2API;
+using R2API.Networking;
 using R2API.Utils;
 using RoR2;
 using RoR2.Skills;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Networking;
 using RoR2Randomizer.Patches;
 using RoR2Randomizer.Utility;
 using System;
@@ -13,10 +15,14 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.UIElements;
 using UnityModdingUtility;
 
+[assembly: NetworkCompatibility]
+
 namespace RoR2Randomizer
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency(Constants.R2API_GUID)]
     [BepInDependency(Constants.RISK_OF_OPTIONS_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [R2APISubmoduleDependency(nameof(NetworkingAPI))]
     public class Main : BaseUnityPlugin
     {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
@@ -31,6 +37,8 @@ namespace RoR2Randomizer
             Log.Init(Logger);
 
             Instance = this;
+
+            CustomNetworkMessageManager.RegisterMessages();
 
             if (ModCompatibility.RiskOfOptionsCompat.IsEnabled)
                 ModCompatibility.RiskOfOptionsCompat.Setup();

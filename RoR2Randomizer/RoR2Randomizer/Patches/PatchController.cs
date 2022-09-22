@@ -2,6 +2,7 @@
 using RoR2Randomizer.RandomizerController.Boss;
 using RoR2Randomizer.RandomizerController.Skill;
 using RoR2Randomizer.RandomizerController.Stage;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,6 +23,7 @@ namespace RoR2Randomizer.Patches
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
 
 #if DEBUG
+            _patchControllersRoot.AddComponent<DebugButtonsManager>();
             _patchControllersRoot.AddComponent<Debug.SpawnDisabler>();
 #endif
 

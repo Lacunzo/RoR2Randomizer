@@ -1,10 +1,15 @@
-﻿using RoR2;
+﻿using BepInEx.Logging;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
+using RoR2;
+using RoR2Randomizer.Networking.Debug;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Utility
 {
@@ -18,33 +23,37 @@ namespace RoR2Randomizer.Utility
 
         public static void AddItems<T>(ref T[] array, IEnumerable<T> items)
         {
-            AddItems(ref array, items.ToArray());
+            AddItems(ref array, items is T[] itemsArray ? itemsArray : items.ToArray());
         }
 
         public static void AddItems<T>(ref T[] array, params T[] items)
         {
-            if (items.Length == 0)
-                return;
-
-            int oldLength = array.Length;
-            Array.Resize(ref array, oldLength + items.Length);
-            for (int i = 0; i < items.Length; i++)
+            int itemsLength = items.Length;
+            if (itemsLength > 0)
             {
-                array[oldLength + i] = items[i];
+                int oldLength = array.Length;
+                Array.Resize(ref array, oldLength + itemsLength);
+                Array.Copy(items, 0, array, oldLength, itemsLength);
             }
         }
 
-        // Copied from R2API to prevent dependency issues
-        public static void SendChatMessage(string message, string messageFrom)
+#if DEBUG
+        public static void TryNetworkLog(string message, LogLevel type)
         {
-            Chat.SimpleChatMessage simpleChatMessage = new Chat.SimpleChatMessage
-            {
-                baseToken = "{0}: {1}",
-                paramTokens = new string[2] { messageFrom, message }
-            };
+            PlayerCharacterMasterController localPlayer = PlayerCharacterMasterController.instances.SingleOrDefault(p => p.isLocalPlayer);
+            NetworkInstanceId localPlayerNetId = localPlayer ? localPlayer.NetworknetworkUserInstanceId : default;
 
-            Chat.SendBroadcastChat(simpleChatMessage);
+            SyncConsoleLog syncConsoleLog = new SyncConsoleLog(message, type, localPlayerNetId);
+            if (NetworkServer.active)
+            {
+                syncConsoleLog.Send(NetworkDestination.Clients);
+            }
+            else if (NetworkClient.active)
+            {
+                syncConsoleLog.Send(NetworkDestination.Server);
+            }
         }
+#endif
 
         public static bool TryAssign<T>(ref T dest, T value, IEqualityComparer<T> comparer = null)
         {

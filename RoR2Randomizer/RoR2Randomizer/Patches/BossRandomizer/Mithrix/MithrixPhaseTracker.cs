@@ -25,7 +25,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                     if (value)
                     {
 #if DEBUG
-                        MiscUtils.SendChatMessage("Enter mithrix fight", "DEBUG");
+                        Log.Debug("Enter mithrix fight");
 #endif
 
                         OnEnterMithrixFight?.Invoke();
@@ -33,7 +33,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                     else
                     {
 #if DEBUG
-                        MiscUtils.SendChatMessage("Exit mithrix fight", "DEBUG");
+                        Log.Debug("Exit mithrix fight");
 #endif
 
                         OnExitMithrixFight?.Invoke();
@@ -57,7 +57,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                 if (MiscUtils.TryAssign(ref _phase, value))
                 {
 #if DEBUG
-                    MiscUtils.SendChatMessage($"Enter mithrix fight phase {value}", "DEBUG");
+                    Log.Debug($"Enter mithrix fight phase {value}");
 #endif
 
                     OnMithrixFightPhaseChanged?.Invoke();

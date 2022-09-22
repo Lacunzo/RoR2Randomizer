@@ -58,7 +58,6 @@ namespace RoR2Randomizer.RandomizerController.Stage
                 switch (name)
                 {
                     case COMMENCEMENT_SCENE_NAME:
-                    case OBLITERATE_SCENE_NAME:
                     case LUNAR_SCAV_FIGHT_SCENE_NAME:
                     case VOIDLING_FIGHT_SCENE_NAME:
                         flags |= StageFlags.FirstStageBlacklist;
@@ -124,7 +123,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
         public static void InitializeStageReplacements(string firstStageSceneName)
         {
-            if (ConfigManager.StageRandomizer.Enabled)
+            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
             {
 #if DEBUG
                 Log.Debug($"First stage: {firstStageSceneName}");
@@ -156,7 +155,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
         public static bool TryGetReplacementSceneName(string original, out string replacement)
         {
-            if (ConfigManager.StageRandomizer.Enabled && _stageReplacements != null)
+            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled && _stageReplacements != null)
             {
                 return _stageReplacements.TryGetReplacement(original, out replacement);
             }
