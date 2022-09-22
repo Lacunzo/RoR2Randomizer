@@ -44,32 +44,5 @@ namespace RoR2Randomizer
         {
             PatchController.Cleanup();
         }
-
-#if DEBUG
-        void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Keypad5))
-            {
-                foreach (PlayerCharacterMasterController masterController in PlayerCharacterMasterController.instances)
-                {
-                    CharacterMaster playerMaster = masterController.master;
-
-                    playerMaster.inventory.GiveRandomItems(100, false, false);
-                    playerMaster.inventory.SetEquipmentIndex(RoR2Content.Equipment.Gateway.equipmentIndex); // Vase
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Keypad6))
-            {
-                Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
-                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName("moon2"));
-            }
-
-            if (Input.GetKeyDown(KeyCode.Keypad1))
-            {
-                Stage.instance.BeginAdvanceStage(Run.instance.nextStageScene);
-            }
-        }
-#endif
     }
 }
