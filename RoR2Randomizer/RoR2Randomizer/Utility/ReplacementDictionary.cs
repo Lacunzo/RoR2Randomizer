@@ -17,12 +17,13 @@ namespace RoR2Randomizer.Utility
             List<TSrc> keysList = new List<TSrc>(collection);
             List<TSrc> valuesList = new List<TSrc>(keysList);
 
-            int count = keysList.Count;
-            for (int i = 0; i < count; i++)
+            bool hasReplaceFunc = canReplaceFunc != null;
+
+            while (keysList.Count > 0)
             {
                 TSrc key = keysList.GetAndRemoveAt(0);
 
-                IEnumerable<TSrc> availableValues = valuesList.Where(v => canReplaceFunc == null || canReplaceFunc(key, v));
+                IEnumerable<TSrc> availableValues = hasReplaceFunc ? valuesList.Where(v => canReplaceFunc(key, v)) : valuesList;
                 if (availableValues.Any())
                 {
                     TSrc value = availableValues.GetRandomOrDefault();
@@ -32,7 +33,7 @@ namespace RoR2Randomizer.Utility
                 }
                 else
                 {
-                    Log.Warning($"ReplacementDictionary<{typeof(T).Name}>.Create<{typeof(TSrc).Name}>: No valid replacement exists for key '{key}'. It will be excluded from the resulting dictionary");
+                    Log.Warning($"{nameof(ReplacementDictionary<T>)}<{typeof(T).Name}>.Create<{typeof(TSrc).Name}>: No valid replacement exists for key '{key}'. It will be excluded from the resulting dictionary");
                     valuesList.Remove(key);
                 }
             }
@@ -40,66 +41,34 @@ namespace RoR2Randomizer.Utility
             return new ReplacementDictionary<T>(result);
         }
 
-        static Dictionary<T, T> baseDictFromCollection(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc)
+        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc)
         {
-            Dictionary<T, T> result = new Dictionary<T, T>();
-
-            List<T> keysList = new List<T>(collection);
-            List<T> valuesList = new List<T>(keysList);
-
-            int count = keysList.Count;
-            for (int i = 0; i < count; i++)
-            {
-                T key = keysList.GetAndRemoveAt(0);
-
-                IEnumerable<T> availableValues = valuesList.Where(v => canReplaceFunc == null || canReplaceFunc(key, v));
-                if (availableValues.Any())
-                {
-                    T value = availableValues.GetRandomOrDefault();
-                    result.Add(key, value);
-                    valuesList.Remove(value);
-                }
-                else
-                {
-                    Log.Warning($"ReplacementDictionary<{typeof(T).Name}>.baseDictFromCollection: No valid replacement exists for key '{key}'. It will be excluded from the resulting dictionary");
-                    valuesList.Remove(key);
-                }
-            }
-
-            return result;
+            return CreateFrom(collection, t => t, canReplaceFunc);
         }
 
-        ReadOnlyDictionary<T, T> _reverseDictionary;
-        ReadOnlyDictionary<T, T> reverseDictionary
-        {
-            get
-            {
-                if (_reverseDictionary == null)
-                {
-                    Dictionary<T, T> dict = new Dictionary<T, T>();
-
-                    foreach (KeyValuePair<T, T> pair in this)
-                    {
-                        dict[pair.Value] = pair.Key;
-                    }
-
-                    _reverseDictionary = new ReadOnlyDictionary<T, T>(dict);
-                }
-
-                return _reverseDictionary;
-            }
-        }
+        readonly InitializeOnAccess<ReadOnlyDictionary<T, T>> _reverseDictionary;
 
         public ReplacementDictionary(IEnumerable<T> items) : this(items, null)
         {
         }
 
-        public ReplacementDictionary(IEnumerable<T> items, Func<T, T, bool> canReplaceFunc) : this(baseDictFromCollection(items, canReplaceFunc))
+        public ReplacementDictionary(IEnumerable<T> items, Func<T, T, bool> canReplaceFunc) : this(CreateFrom(items, canReplaceFunc))
         {
         }
 
         public ReplacementDictionary(IDictionary<T, T> dict) : base(dict)
         {
+            _reverseDictionary = new InitializeOnAccess<ReadOnlyDictionary<T, T>>(() =>
+            {
+                Dictionary<T, T> dict = new Dictionary<T, T>();
+
+                foreach (KeyValuePair<T, T> pair in this)
+                {
+                    dict[pair.Value] = pair.Key;
+                }
+
+                return new ReadOnlyDictionary<T, T>(dict);
+            });
         }
 
         public bool TryGetReplacement(T original, out T replacement)
@@ -109,7 +78,7 @@ namespace RoR2Randomizer.Utility
 
         public bool TryGetOriginal(T replacement, out T original)
         {
-            return reverseDictionary.TryGetValue(replacement, out original);
+            return _reverseDictionary.Get.TryGetValue(replacement, out original);
         }
     }
 }
