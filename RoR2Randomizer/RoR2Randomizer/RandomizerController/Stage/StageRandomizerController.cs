@@ -88,7 +88,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
         void sceneLoaded(SceneDef scene)
         {
-            if (ConfigManager.StageRandomizer.Enabled)
+            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
             {
                 StartCoroutine(waitThenCheckForStageLooping(scene));
             }
