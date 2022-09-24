@@ -23,8 +23,10 @@ namespace RoR2Randomizer.RandomizerController.Skill
         static List<SkillFamily.Variant> _availableSkills;
         static List<SkillLocator.PassiveSkill> _availablePassiveSkills;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             SkillRandomizerPatcher.Apply();
         }
 

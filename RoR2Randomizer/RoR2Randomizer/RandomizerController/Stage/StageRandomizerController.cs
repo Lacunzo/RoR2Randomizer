@@ -70,8 +70,10 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
         static ReplacementDictionary<string> _stageReplacements;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             SceneCatalog.onMostRecentSceneDefChanged += sceneLoaded;
 
             StageRandomizerPatcher.Apply();
