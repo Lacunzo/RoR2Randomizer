@@ -37,7 +37,7 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
                 Shared.Try_get_gameObject(c);
             }
 
-            // Prevent Newt from becoming immune to damage if it's replacing Mithrix
+            // Prevent Newt from becoming immune to damage if it's replacing a boss
             int localIndex = -1;
             if (c.TryGotoNext(x => x.MatchCallvirt(SymbolExtensions.GetMethodInfo<Component>(_ => _.GetComponent<HurtBoxGroup>())),
                               x => x.MatchStloc(out localIndex),
@@ -55,7 +55,7 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
                         GameObject master = body.masterObject;
                         if (master)
                         {
-                            return !BossRandomizerController.Mithrix.IsReplacedPartOfMithrixFight(master);
+                            return !BossRandomizerController.IsReplacedBossCharacter(master);
                         }
                     }
 

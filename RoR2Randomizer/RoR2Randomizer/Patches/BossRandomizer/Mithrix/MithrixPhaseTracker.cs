@@ -9,103 +9,46 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
-    public static class MithrixPhaseTracker
+    public sealed class MithrixPhaseTracker : BossPhaseTracker<MithrixPhaseTracker>
     {
-        static bool _isInMithrixFight;
-        public static bool IsInMithrixFight
+        public MithrixPhaseTracker() : base("Mithrix")
         {
-            get
-            {
-                return _isInMithrixFight;
-            }
-            private set
-            {
-                if (MiscUtils.TryAssign(ref _isInMithrixFight, value))
-                {
-                    if (value)
-                    {
-#if DEBUG
-                        Log.Debug("Enter mithrix fight");
-#endif
-
-                        OnEnterMithrixFight?.Invoke();
-                    }
-                    else
-                    {
-#if DEBUG
-                        Log.Debug("Exit mithrix fight");
-#endif
-
-                        OnExitMithrixFight?.Invoke();
-                    }
-                }
-            }
         }
 
-        public static event Action OnEnterMithrixFight;
-        public static event Action OnExitMithrixFight;
-
-        static int _phase;
-        public static int Phase
+        public override void ApplyPatches()
         {
-            get
-            {
-                return _phase;
-            }
-            private set
-            {
-                if (MiscUtils.TryAssign(ref _phase, value))
-                {
-#if DEBUG
-                    Log.Debug($"Enter mithrix fight phase {value}");
-#endif
+            base.ApplyPatches();
 
-                    OnMithrixFightPhaseChanged?.Invoke();
-                }
-            }
-        }
-
-        public static event Action OnMithrixFightPhaseChanged;
-
-        public static void Apply()
-        {
             IL.EntityStates.Missions.BrotherEncounter.BrotherEncounterPhaseBaseState.OnEnter += BrotherEncounterPhaseBaseState_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.PreEncounter.OnEnter += PreEncounter_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.EncounterFinished.OnEnter += EncounterFinished_OnEnter;
-
-            SceneCatalog.onMostRecentSceneDefChanged += onSceneLoaded;
         }
 
-        public static void Cleanup()
+        public override void CleanupPatches()
         {
+            base.CleanupPatches();
+
             IL.EntityStates.Missions.BrotherEncounter.BrotherEncounterPhaseBaseState.OnEnter -= BrotherEncounterPhaseBaseState_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.PreEncounter.OnEnter -= PreEncounter_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.EncounterFinished.OnEnter -= EncounterFinished_OnEnter;
-
-            SceneCatalog.onMostRecentSceneDefChanged -= onSceneLoaded;
         }
 
-        static void EncounterFinished_OnEnter(On.EntityStates.Missions.BrotherEncounter.EncounterFinished.orig_OnEnter orig, EntityStates.Missions.BrotherEncounter.EncounterFinished self)
+        void EncounterFinished_OnEnter(On.EntityStates.Missions.BrotherEncounter.EncounterFinished.orig_OnEnter orig, EntityStates.Missions.BrotherEncounter.EncounterFinished self)
         {
             orig(self);
 
-            IsInMithrixFight = false;
+            IsInFight = false;
         }
 
-        static void onSceneLoaded(SceneDef _)
-        {
-            IsInMithrixFight = false;
-        }
-
-        static void PreEncounter_OnEnter(On.EntityStates.Missions.BrotherEncounter.PreEncounter.orig_OnEnter orig, EntityStates.Missions.BrotherEncounter.PreEncounter self)
+        void PreEncounter_OnEnter(On.EntityStates.Missions.BrotherEncounter.PreEncounter.orig_OnEnter orig, EntityStates.Missions.BrotherEncounter.PreEncounter self)
         {
             orig(self);
 
-            IsInMithrixFight = true;
+            IsInFight = true;
             Phase = 0;
         }
 
-        static void BrotherEncounterPhaseBaseState_OnEnter(ILContext il)
+        void BrotherEncounterPhaseBaseState_OnEnter(ILContext il)
         {
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchCallvirt<PhaseCounter>(nameof(PhaseCounter.GoToNextPhase))))

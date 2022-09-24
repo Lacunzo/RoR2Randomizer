@@ -4,6 +4,7 @@ using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Patches.BossRandomizer.Mithrix;
+using RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -86,14 +87,30 @@ namespace RoR2Randomizer.RandomizerController.Boss
 #endif
         }
 
+        public static bool IsReplacedBossCharacter(GameObject masterObject)
+        {
+            return masterObject && masterObject.GetComponent<BaseBossReplacement>();
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            Mithrix.Initialize();
+            Voidling.Initialize();
+        }
+
+        void OnDestroy()
+        {
+            Mithrix.Uninitialize();
+            Voidling.Uninitialize();
+        }
+
 #if DEBUG
         static int _masterIndex = 0;
-#endif
 
         void Update()
         {
-#if DEBUG
-            if (debugMode == DebugMode.Manual && ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled)
+            if (debugMode == DebugMode.Manual && ConfigManager.BossRandomizer.Enabled)
             {
                 bool changedMasterIndex = false;
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
@@ -113,10 +130,10 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
                 if (changedMasterIndex)
                 {
-                    Log.Debug($"Current Mithrix override: {MasterCatalog.masterPrefabMasterComponents[_masterIndex].name} ({_masterIndex})");
+                    Log.Debug($"Current boss override: {MasterCatalog.masterPrefabMasterComponents[_masterIndex].name} ({_masterIndex})");
                 }
             }
-#endif
         }
+#endif
     }
 }

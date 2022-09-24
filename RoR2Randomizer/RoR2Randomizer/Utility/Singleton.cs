@@ -9,7 +9,7 @@ namespace RoR2Randomizer.Utility
     {
         public static T Instance { get; private set; }
 
-        void Awake()
+        protected virtual void Awake()
         {
             Instance = (T)this;
         }

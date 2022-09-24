@@ -71,12 +71,12 @@ namespace RoR2Randomizer
 
         internal static void LogType(string data, LogLevel level)
         {
-#if DEBUG
-            if (level == LogLevel.Debug)
-                return;
+#if !DEBUG
+            if ((level & LogLevel.Debug) == 0)
 #endif
-
-            _logSource.Log(level, data);
+            {
+                _logSource.Log(level, data);
+            }
         }
     }
 }

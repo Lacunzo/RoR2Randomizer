@@ -4,6 +4,7 @@ using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.BossRandomizer;
+using RoR2Randomizer.Patches.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Mithrix;
 using RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerController.Boss
@@ -26,28 +28,82 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 return Caches.MasterPrefabs["BrotherHurtMaster"].bodyPrefab.GetComponent<ReturnStolenItemsOnGettingHit>();
             });
 
-            public static bool TryGetOverridePrefabFor(SpawnCard card, out GameObject overridePrefab)
+            public static void Initialize()
             {
-                if (ConfigManager.BossRandomizer.Enabled && MithrixPhaseTracker.IsInMithrixFight)
-                {
-                    if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
-                     || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
-                    {
-                        overridePrefab = getBossOverrideMasterPrefab();
+                MithrixPhaseTracker.Instance.OnEnterFight += onEnterMithrixFight;
+                MithrixPhaseTracker.Instance.OnExitFight += onExitMithrixFight;
 
-#if DEBUG
-                        Log.Debug($"MithrixRandomizer: Replaced {card.prefab} with {overridePrefab}");
-#endif
-
-                        return (bool)overridePrefab;
-                    }
-                }
-
-                overridePrefab = null;
-                return false;
+                SyncBossReplacementCharacter.OnReceive += SyncBossReplacementCharacter_OnReceive;
             }
 
-            public static void HandleSpawnedMithrixCharacterClient(GameObject masterObject, BossReplacementType type)
+            public static void Uninitialize()
+            {
+                if (MithrixPhaseTracker.Instance != null)
+                {
+                    MithrixPhaseTracker.Instance.OnEnterFight -= onEnterMithrixFight;
+                    MithrixPhaseTracker.Instance.OnExitFight -= onExitMithrixFight;
+                }
+
+                SyncBossReplacementCharacter.OnReceive -= SyncBossReplacementCharacter_OnReceive;
+            }
+
+            static void onEnterMithrixFight()
+            {
+                if (NetworkServer.active)
+                {
+                    GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
+                    {
+                        if (ConfigManager.BossRandomizer.Enabled)
+                        {
+                            if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
+                             || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
+                            {
+                                overridePrefab = getBossOverrideMasterPrefab();
+
+#if DEBUG
+                                Log.Debug($"MithrixRandomizer: Replaced {card.prefab} with {overridePrefab}");
+#endif
+
+                                return (bool)overridePrefab;
+                            }
+                        }
+
+                        overridePrefab = null;
+                        return false;
+                    };
+
+                    GenericScriptedSpawnHook.OnSpawned += handleSpawnedMithrixCharacterServer;
+                }
+            }
+
+            static void onExitMithrixFight()
+            {
+                if (NetworkServer.active)
+                {
+                    GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = null;
+                    GenericScriptedSpawnHook.OnSpawned -= handleSpawnedMithrixCharacterServer;
+                }
+            }
+
+            static void SyncBossReplacementCharacter_OnReceive(GameObject masterObject, BossReplacementType replacementType)
+            {
+                if (MithrixPhaseTracker.Instance == null || !MithrixPhaseTracker.Instance.IsInFight)
+                    return;
+
+                switch (replacementType)
+                {
+                    case BossReplacementType.MithrixNormal:
+                    case BossReplacementType.MithrixHurt:
+                    case BossReplacementType.MithrixPhase2:
+#if DEBUG
+                        Log.Debug($"Running {nameof(handleSpawnedMithrixCharacterClient)}");
+#endif
+                        handleSpawnedMithrixCharacterClient(masterObject, replacementType);
+                        break;
+                }
+            }
+
+            static void handleSpawnedMithrixCharacterClient(GameObject masterObject, BossReplacementType type)
             {
                 BaseMithrixReplacement baseMithrixReplacement;
                 if (type == BossReplacementType.MithrixPhase2)
@@ -80,12 +136,12 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 baseMithrixReplacement.Initialize();
             }
 
-            public static void HandleSpawnedMithrixCharacterServer(SpawnCard.SpawnResult spawnResult)
+            static void handleSpawnedMithrixCharacterServer(SpawnCard.SpawnResult spawnResult)
             {
-                if (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && MithrixPhaseTracker.IsInMithrixFight)
+                if (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && MithrixPhaseTracker.Instance != null && MithrixPhaseTracker.Instance.IsInFight)
                 {
                     BaseMithrixReplacement baseMithrixReplacement = null;
-                    if (MithrixPhaseTracker.Phase == 2)
+                    if (MithrixPhaseTracker.Instance.Phase == 2)
                     {
                         if (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(spawnResult.spawnRequest.spawnCard))
                         {
@@ -117,17 +173,17 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
             public static bool IsReplacedMithrix(GameObject master)
             {
-                return master.GetComponent<MainMithrixReplacement>();
+                return master && master.GetComponent<MainMithrixReplacement>();
             }
 
             public static bool IsReplacedMithrixPhase2Spawn(GameObject master)
             {
-                return master.GetComponent<MithrixPhase2EnemiesReplacement>();
+                return master && master.GetComponent<MithrixPhase2EnemiesReplacement>();
             }
 
             public static bool IsReplacedPartOfMithrixFight(GameObject master)
             {
-                return IsReplacedMithrix(master) || IsReplacedMithrixPhase2Spawn(master);
+                return master && master.GetComponent<BaseMithrixReplacement>();
             }
         }
     }

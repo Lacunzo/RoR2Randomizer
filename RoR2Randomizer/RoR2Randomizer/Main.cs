@@ -34,6 +34,11 @@ namespace RoR2Randomizer
 
         void Awake()
         {
+#if DEBUG
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+#endif
+
             Log.Init(Logger);
 
             Instance = this;
@@ -46,6 +51,11 @@ namespace RoR2Randomizer
             ConfigManager.Initialize(Config);
 
             PatchController.Setup();
+
+#if DEBUG
+            stopwatch.Stop();
+            Log.Debug($"Initialized in {stopwatch.Elapsed.TotalSeconds:F1} seconds");
+#endif
         }
 
         void OnDestroy()

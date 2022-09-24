@@ -8,18 +8,24 @@ namespace RoR2Randomizer.Patches.BossRandomizer
     {
         public static void Apply()
         {
+            GenericScriptedSpawnHook.Apply();
+
+            new Mithrix.MithrixPhaseTracker().ApplyPatches();
             Mithrix.BrotherSpeechDriver_ReplaceName.Apply();
-            Mithrix.MithrixPhaseTracker.Apply();
             Mithrix.MithrixSpawnCardTracker.Apply();
-            Mithrix.SpawnHook.Apply();
+
+            new Voidling.VoidlingPhaseTracker().ApplyPatches();
         }
 
         public static void Cleanup()
         {
+            GenericScriptedSpawnHook.Cleanup();
+
+            Mithrix.MithrixPhaseTracker.Instance?.CleanupPatches();
             Mithrix.BrotherSpeechDriver_ReplaceName.Cleanup();
-            Mithrix.MithrixPhaseTracker.Cleanup();
             Mithrix.MithrixSpawnCardTracker.Cleanup();
-            Mithrix.SpawnHook.Cleanup();
+
+            Voidling.VoidlingPhaseTracker.Instance?.CleanupPatches();
         }
     }
 }

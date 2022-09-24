@@ -2,9 +2,12 @@
 {
     public enum BossReplacementType : uint
     {
-        None,
+        Invalid,
         MithrixNormal,
         MithrixHurt,
-        MithrixPhase2
+        MithrixPhase2,
+        VoidlingPhase1,
+        VoidlingPhase2,
+        VoidlingPhase3
     }
 }

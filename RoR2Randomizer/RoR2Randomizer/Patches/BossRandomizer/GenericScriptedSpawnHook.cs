@@ -1,27 +1,40 @@
-﻿using EntityStates;
-using HarmonyLib;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
-using RoR2;
+﻿using HarmonyLib;
 using RoR2Randomizer.Configuration;
-using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerController.Boss;
-using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
-using UnityEngine;
 using UnityEngine.Networking;
-using UnityModdingUtility;
+using UnityEngine;
+using RoR2;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
-namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
+namespace RoR2Randomizer.Patches.BossRandomizer
 {
-    public static class SpawnHook
+    public static class GenericScriptedSpawnHook
     {
+        public delegate bool OverrideSpawnPrefabDelegate(SpawnCard card, out GameObject overridePrefab);
+
+        static OverrideSpawnPrefabDelegate _overrideSpawnPrefabFunc;
+        public static OverrideSpawnPrefabDelegate OverrideSpawnPrefabFunc
+        {
+            get
+            {
+                return _overrideSpawnPrefabFunc;
+            }
+            set
+            {
+                if (_overrideSpawnPrefabFunc != null && value != null)
+                    Log.Warning($"Assigning {nameof(GenericScriptedSpawnHook)}.{nameof(OverrideSpawnPrefabFunc)} while there is an existing hook, existing will be removed");
+
+                _overrideSpawnPrefabFunc = value;
+            }
+        }
+
+        public static event Action<SpawnCard.SpawnResult> OnSpawned;
+
         public static void Apply()
         {
             On.RoR2.ScriptedCombatEncounter.Spawn += ScriptedCombatEncounter_Spawn;
@@ -35,7 +48,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
         static void ScriptedCombatEncounter_Spawn(On.RoR2.ScriptedCombatEncounter.orig_Spawn orig, ScriptedCombatEncounter self, ref ScriptedCombatEncounter.SpawnInfo spawnInfo)
         {
             GameObject originalPrefab = null;
-            if (NetworkServer.active && ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && BossRandomizerController.Mithrix.TryGetOverridePrefabFor(spawnInfo.spawnCard, out GameObject overridePrefab))
+            if (NetworkServer.active && _overrideSpawnPrefabFunc != null && _overrideSpawnPrefabFunc(spawnInfo.spawnCard, out GameObject overridePrefab))
             {
                 originalPrefab = spawnInfo.spawnCard.prefab;
                 spawnInfo.spawnCard.prefab = overridePrefab;
@@ -57,11 +70,11 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                 return typeof(ScriptedCombatEncounter).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null && m.Name.StartsWith("<Spawn>g__HandleSpawn|"));
             }
 
-            static void Prefix(ref SpawnCard.SpawnResult spawnResult)
+            static void Postfix(ref SpawnCard.SpawnResult spawnResult)
             {
                 if (spawnResult.success && spawnResult.spawnedInstance && spawnResult.spawnRequest != null && spawnResult.spawnRequest.spawnCard)
                 {
-                    BossRandomizerController.Mithrix.HandleSpawnedMithrixCharacterServer(spawnResult);
+                    OnSpawned?.Invoke(spawnResult);
                 }
             }
         }

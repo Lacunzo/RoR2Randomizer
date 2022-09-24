@@ -35,6 +35,8 @@ namespace RoR2Randomizer.Patches
             Fixes.Skills.EntityStates.GreaterWispMonster.ChargeCannons.Apply();
 
             Fixes.Skills.EntityStates.NewtMonster.KickFromShop.Apply();
+
+            Fixes.Skills.EntityStates.VoidRaidCrab.EscapeDeath.Apply();
         }
 
         public static void Cleanup()
@@ -62,6 +64,8 @@ namespace RoR2Randomizer.Patches
             Fixes.Skills.EntityStates.GreaterWispMonster.ChargeCannons.Cleanup();
 
             Fixes.Skills.EntityStates.NewtMonster.KickFromShop.Cleanup();
+
+            Fixes.Skills.EntityStates.VoidRaidCrab.EscapeDeath.Cleanup();
         }
 
         static void GenericSkill_Awake(On.RoR2.GenericSkill.orig_Awake orig, GenericSkill self)

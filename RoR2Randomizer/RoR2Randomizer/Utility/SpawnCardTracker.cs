@@ -11,9 +11,16 @@ namespace RoR2Randomizer.Utility
         public static SpawnCard MithrixHurtSpawnCard;
         public static SpawnCard[] MithrixPhase2SpawnCards;
 
+        public static SpawnCard[] VoidlingPhasesSpawnCards;
+
         public static bool IsPartOfMithrixPhase2(SpawnCard card)
         {
             return MithrixPhase2SpawnCards != null && Array.IndexOf(MithrixPhase2SpawnCards, card) != -1;
+        }
+
+        public static bool IsAnyVoidlingPhase(SpawnCard card)
+        {
+            return VoidlingPhasesSpawnCards != null && Array.IndexOf(VoidlingPhasesSpawnCards, card) != -1;
         }
     }
 }

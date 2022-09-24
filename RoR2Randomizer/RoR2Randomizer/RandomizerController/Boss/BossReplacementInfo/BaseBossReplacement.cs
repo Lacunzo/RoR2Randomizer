@@ -13,7 +13,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
     public abstract class BaseBossReplacement : MonoBehaviour
     {
         protected CharacterMaster _master;
-        CharacterBody _cachedBody;
+        protected CharacterBody _cachedBody;
 
         protected abstract BossReplacementType ReplacementType { get; }
 
@@ -74,10 +74,15 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             Log.Debug($"Sent {nameof(SyncBossReplacementCharacter)} to clients");
 #endif
 
-            CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
-            yield return getBody(bodyOut);
+            CharacterBody body = _cachedBody;
+            if (!body)
+            {
+                CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
+                yield return getBody(bodyOut);
 
-            CharacterBody body = bodyOut.Result;
+                body = bodyOut.Result;
+            }
+
             if (body)
             {
                 if (body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))

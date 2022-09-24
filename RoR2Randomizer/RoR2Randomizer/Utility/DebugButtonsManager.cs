@@ -1,6 +1,7 @@
 ﻿#if DEBUG
 using RoR2;
 using RoR2Randomizer.Patches.Debug;
+using RoR2Randomizer.RandomizerController.Stage;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,7 +34,12 @@ namespace RoR2Randomizer.Utility
             else if (Input.GetKeyDown(KeyCode.Keypad6))
             {
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
-                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName("moon2"));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.COMMENCEMENT_SCENE_NAME));
+            }
+            else if (Input.GetKeyDown(KeyCode.Keypad7))
+            {
+                Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.VOIDLING_FIGHT_SCENE_NAME));
             }
         }
     }

@@ -10,6 +10,9 @@ namespace RoR2Randomizer.Networking.BossRandomizer
 {
     public class SyncBossReplacementCharacter : INetMessage
     {
+        public delegate void OnReceivedDelegate(GameObject masterObject, BossReplacementType replacementType);
+        public static event OnReceivedDelegate OnReceive;
+
         GameObject _masterObject;
         BossReplacementType _replacementType;
 
@@ -38,7 +41,7 @@ namespace RoR2Randomizer.Networking.BossRandomizer
         void INetMessage.OnReceived()
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncBossReplacementCharacter)}.OnReceived(): _masterObject: {_masterObject}, _replacementType: {_replacementType}");
+            Log.Debug($"{nameof(SyncBossReplacementCharacter)}.{nameof(INetMessage.OnReceived)}(): _masterObject: {_masterObject}, _replacementType: {_replacementType}");
 #endif
             if (!NetworkServer.active)
             {
@@ -46,17 +49,7 @@ namespace RoR2Randomizer.Networking.BossRandomizer
                 Log.Debug($"Recieved {nameof(SyncBossReplacementCharacter)} as non-server");
 #endif
 
-                switch (_replacementType)
-                {
-                    case BossReplacementType.MithrixNormal:
-                    case BossReplacementType.MithrixHurt:
-                    case BossReplacementType.MithrixPhase2:
-#if DEBUG
-                        Log.Debug($"Running {nameof(BossRandomizerController.Mithrix.HandleSpawnedMithrixCharacterClient)}");
-#endif
-                        BossRandomizerController.Mithrix.HandleSpawnedMithrixCharacterClient(_masterObject, _replacementType);
-                        break;
-                }
+                OnReceive?.Invoke(_masterObject, _replacementType);
             }
 #if DEBUG
             else

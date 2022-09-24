@@ -44,10 +44,15 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
         {
             yield return base.initializeServer();
 
-            CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
-            yield return getBody(bodyOut);
+            CharacterBody body = _cachedBody;
+            if (!body)
+            {
+                CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
+                yield return getBody(bodyOut);
 
-            CharacterBody body = bodyOut.Result;
+                body = bodyOut.Result;
+            }
+
             if (body && IsHurt)
             {
                 // Prevent low-health replacements from instantly dying
