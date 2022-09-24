@@ -1,4 +1,5 @@
-﻿using RoR2;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using RoR2;
 using RoR2Randomizer.ChildTransformAdditions;
 using RoR2Randomizer.Utility;
 using System;
@@ -39,3 +40,4 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.AcidLarva
         }
     }
 }
+#endif

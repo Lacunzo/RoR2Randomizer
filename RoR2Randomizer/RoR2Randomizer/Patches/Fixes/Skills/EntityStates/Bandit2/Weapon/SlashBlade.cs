@@ -1,4 +1,5 @@
-﻿using EntityStates;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using EntityStates;
 using HarmonyLib;
 using RoR2Randomizer.ChildTransformAdditions;
 using System;
@@ -28,3 +29,4 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Bandit2.Weapon
         }
     }
 }
+#endif

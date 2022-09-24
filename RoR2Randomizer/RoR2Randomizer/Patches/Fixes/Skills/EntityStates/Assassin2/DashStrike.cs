@@ -1,4 +1,5 @@
-﻿using EntityStates;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using EntityStates;
 using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -94,3 +95,4 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Assassin2
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using Mono.Cecil.Cil;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.Utility;
@@ -37,3 +38,4 @@ namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill.NextSkillOwnerSette
         }
     }
 }
+#endif

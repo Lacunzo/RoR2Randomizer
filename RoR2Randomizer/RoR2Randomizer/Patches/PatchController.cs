@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using RoR2Randomizer.RandomizerController.Boss;
+#if !DISABLE_SKILL_RANDOMIZER
 using RoR2Randomizer.RandomizerController.Skill;
+#endif
 using RoR2Randomizer.RandomizerController.Stage;
 using RoR2Randomizer.Utility;
 using System;
@@ -21,9 +23,8 @@ namespace RoR2Randomizer.Patches
         {
             _harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 
-            Fixes.EntityStateOwnerSkill.MainPatcher.Apply();
-
             BossRandomizer.MainPatcher.Apply();
+            SkillPatcher.Apply();
 
             _patchControllersRoot = new GameObject(Main.PluginName + ".PatchControllers");
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
@@ -34,7 +35,9 @@ namespace RoR2Randomizer.Patches
 #endif
 
             _patchControllersRoot.AddComponent<BossRandomizerController>();
+#if !DISABLE_SKILL_RANDOMIZER
             _patchControllersRoot.AddComponent<SkillRandomizerController>();
+#endif
             _patchControllersRoot.AddComponent<StageRandomizerController>();
         }
 
@@ -45,9 +48,8 @@ namespace RoR2Randomizer.Patches
 
             _harmonyInstance.UnpatchSelf();
 
-            Fixes.EntityStateOwnerSkill.MainPatcher.Cleanup();
-
             BossRandomizer.MainPatcher.Cleanup();
+            SkillPatcher.Cleanup();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BepInEx.Configuration;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using BepInEx.Configuration;
 using RoR2Randomizer.Configuration;
 using System;
 using System.Collections.Generic;
@@ -13,3 +14,4 @@ namespace RoR2Randomizer.RandomizerController.Skill
         }
     }
 }
+#endif

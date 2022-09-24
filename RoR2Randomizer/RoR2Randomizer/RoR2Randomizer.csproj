@@ -13,10 +13,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>True</Optimize>
     <Deterministic>True</Deterministic>
+    <DefineConstants>$(DefineConstants)TRACE;DISABLE_SKILL_RANDOMIZER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <Deterministic>True</Deterministic>
+    <DefineConstants>$(DefineConstants)TRACE;DISABLE_SKILL_RANDOMIZER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

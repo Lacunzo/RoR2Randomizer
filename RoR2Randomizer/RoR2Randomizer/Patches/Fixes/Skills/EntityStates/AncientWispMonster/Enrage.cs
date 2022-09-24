@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
@@ -35,3 +36,4 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.AncientWispMonster
         }
     }
 }
+#endif

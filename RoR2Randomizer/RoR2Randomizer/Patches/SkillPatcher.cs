@@ -1,17 +1,20 @@
 ﻿using RoR2;
 using RoR2.Skills;
 using RoR2Randomizer.Extensions;
+#if !DISABLE_SKILL_RANDOMIZER
 using RoR2Randomizer.RandomizerController.Skill;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RoR2Randomizer.Patches
 {
-    public static class SkillRandomizerPatcher
+    public static class SkillPatcher
     {
         public static void Apply()
         {
+#if !DISABLE_SKILL_RANDOMIZER
             On.RoR2.GenericSkill.Awake += GenericSkill_Awake;
 
             Fixes.Skills.EntityStates.AcidLarva.LarvaLeap.Apply();
@@ -27,12 +30,15 @@ namespace RoR2Randomizer.Patches
             Fixes.Skills.EntityStates.Bandit2.Weapon.Reload.Apply();
             Fixes.Skills.EntityStates.Bandit2.Weapon.SlashBlade.Apply();
 
-            Fixes.Skills.EntityStates.BrotherMonster.SpellBaseState.Apply();
-            Fixes.Skills.EntityStates.BrotherMonster.SpellChannelState.Apply();
-
             Fixes.Skills.EntityStates.Drone.DroneWeapon.FireTurret.Apply();
 
             Fixes.Skills.EntityStates.GreaterWispMonster.ChargeCannons.Apply();
+
+            Fixes.EntityStateOwnerSkill.MainPatcher.Apply();
+#endif
+
+            Fixes.Skills.EntityStates.BrotherMonster.SpellBaseState.Apply();
+            Fixes.Skills.EntityStates.BrotherMonster.SpellChannelState.Apply();
 
             Fixes.Skills.EntityStates.NewtMonster.KickFromShop.Apply();
 
@@ -41,6 +47,7 @@ namespace RoR2Randomizer.Patches
 
         public static void Cleanup()
         {
+#if !DISABLE_SKILL_RANDOMIZER
             On.RoR2.GenericSkill.Awake -= GenericSkill_Awake;
 
             Fixes.Skills.EntityStates.AcidLarva.LarvaLeap.Cleanup();
@@ -56,18 +63,22 @@ namespace RoR2Randomizer.Patches
             Fixes.Skills.EntityStates.Bandit2.Weapon.Reload.Cleanup();
             Fixes.Skills.EntityStates.Bandit2.Weapon.SlashBlade.Cleanup();
 
-            Fixes.Skills.EntityStates.BrotherMonster.SpellBaseState.Cleanup();
-            Fixes.Skills.EntityStates.BrotherMonster.SpellChannelState.Cleanup();
-
             Fixes.Skills.EntityStates.Drone.DroneWeapon.FireTurret.Cleanup();
 
             Fixes.Skills.EntityStates.GreaterWispMonster.ChargeCannons.Cleanup();
+
+            Fixes.EntityStateOwnerSkill.MainPatcher.Cleanup();
+#endif
+
+            Fixes.Skills.EntityStates.BrotherMonster.SpellBaseState.Cleanup();
+            Fixes.Skills.EntityStates.BrotherMonster.SpellChannelState.Cleanup();
 
             Fixes.Skills.EntityStates.NewtMonster.KickFromShop.Cleanup();
 
             Fixes.Skills.EntityStates.VoidRaidCrab.EscapeDeath.Cleanup();
         }
 
+#if !DISABLE_SKILL_RANDOMIZER
         static void GenericSkill_Awake(On.RoR2.GenericSkill.orig_Awake orig, GenericSkill self)
         {
             if (self && self.skillFamily)
@@ -81,5 +92,6 @@ namespace RoR2Randomizer.Patches
 
             orig(self);
         }
+#endif
     }
 }

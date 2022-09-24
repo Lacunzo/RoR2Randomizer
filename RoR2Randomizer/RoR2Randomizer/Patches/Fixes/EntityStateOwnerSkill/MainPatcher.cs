@@ -1,4 +1,5 @@
-﻿using EntityStates;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using EntityStates;
 using RoR2;
 using RoR2Randomizer.Utility;
 using System;
@@ -72,3 +73,4 @@ namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill
         }
     }
 }
+#endif

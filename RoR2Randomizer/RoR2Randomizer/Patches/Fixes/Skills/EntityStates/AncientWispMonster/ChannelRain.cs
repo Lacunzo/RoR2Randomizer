@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿#if !DISABLE_SKILL_RANDOMIZER
+using HarmonyLib;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,3 +22,4 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.AncientWispMonster
         }
     }
 }
+#endif

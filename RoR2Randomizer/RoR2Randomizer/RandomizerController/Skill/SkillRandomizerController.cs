@@ -1,4 +1,5 @@
-﻿// #define MANUAL_SKILL_INDEX
+﻿#if !DISABLE_SKILL_RANDOMIZER
+// #define MANUAL_SKILL_INDEX
 
 using RoR2;
 using RoR2.Skills;
@@ -22,18 +23,6 @@ namespace RoR2Randomizer.RandomizerController.Skill
 
         static List<SkillFamily.Variant> _availableSkills;
         static List<SkillLocator.PassiveSkill> _availablePassiveSkills;
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            SkillRandomizerPatcher.Apply();
-        }
-
-        void OnDestroy()
-        {
-            SkillRandomizerPatcher.Cleanup();
-        }
 
         void Update()
         {
@@ -144,3 +133,4 @@ namespace RoR2Randomizer.RandomizerController.Skill
         }
     }
 }
+#endif
