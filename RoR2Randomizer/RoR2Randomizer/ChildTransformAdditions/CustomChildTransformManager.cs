@@ -52,11 +52,7 @@ namespace RoR2Randomizer.ChildTransformAdditions
             if (!body || !locator || names.Length == 0)
                 return;
 
-            IEnumerable<string> missingNames = names.Where(n => !locator.FindChild(n));
-            if (!missingNames.Any())
-                return;
-
-            MiscUtils.AddItems(ref locator.transformPairs, missingNames.Select(n =>
+            MiscUtils.AddItems(ref locator.transformPairs, names.Where(n => !locator.FindChild(n)).Select(n =>
             {
                 ChildLocator.NameTransformPair pair = getCustomChildTransformPair(body, locator, n, ChildFlags.None);
 
