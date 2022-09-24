@@ -36,7 +36,7 @@ namespace RoR2Randomizer.Configuration
         {
             foreach (FieldInfo field in _configFields[GetType()])
             {
-                ((IConfigModCompatibility)field.GetValue(this)).CreateRiskOfOptionsEntry();
+                ((IConfigModCompatibility)field.GetValue(this))?.CreateRiskOfOptionsEntry();
             }
         }
 
