@@ -19,6 +19,12 @@ namespace RoR2Randomizer.Patches
 
         public static void Setup()
         {
+            _harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
+
+            Fixes.EntityStateOwnerSkill.MainPatcher.Apply();
+
+            BossRandomizer.MainPatcher.Apply();
+
             _patchControllersRoot = new GameObject(Main.PluginName + ".PatchControllers");
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
 
@@ -30,12 +36,6 @@ namespace RoR2Randomizer.Patches
             _patchControllersRoot.AddComponent<BossRandomizerController>();
             _patchControllersRoot.AddComponent<SkillRandomizerController>();
             _patchControllersRoot.AddComponent<StageRandomizerController>();
-
-            _harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
-
-            Fixes.EntityStateOwnerSkill.MainPatcher.Apply();
-
-            BossRandomizer.MainPatcher.Apply();
         }
 
         public static void Cleanup()
