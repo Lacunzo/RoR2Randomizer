@@ -1,7 +1,9 @@
-﻿using RoR2;
+﻿using MonoMod.Cil;
+using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerController;
+using RoR2Randomizer.RandomizerController.Stage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +17,13 @@ namespace RoR2Randomizer.Patches.StageRandomizer
         public static void Apply()
         {
             On.RoR2.ArtifactTrialMissionController.Awake += ArtifactTrialMissionController_Awake;
+            IL.RoR2.PortalDialerController.OpenArtifactPortalServer += PortalDialerController_OpenArtifactPortalServer;
         }
 
         public static void Cleanup()
         {
             On.RoR2.ArtifactTrialMissionController.Awake -= ArtifactTrialMissionController_Awake;
+            IL.RoR2.PortalDialerController.OpenArtifactPortalServer -= PortalDialerController_OpenArtifactPortalServer;
         }
 
         static void ArtifactTrialMissionController_Awake(On.RoR2.ArtifactTrialMissionController.orig_Awake orig, RoR2.ArtifactTrialMissionController self)
@@ -40,6 +44,30 @@ namespace RoR2Randomizer.Patches.StageRandomizer
             }
 
             orig(self);
+        }
+
+        static void PortalDialerController_OpenArtifactPortalServer(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(x => x.MatchStfld<ArtifactTrialMissionController>(nameof(ArtifactTrialMissionController.trialArtifact))))
+            {
+                c.EmitDelegate((ArtifactDef artifactDef) =>
+                {
+                    // If the artifact trial stage is replaced by something else, don't set the trial artifact definition
+                    if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
+                    {
+                        if (StageRandomizerController.TryGetReplacementSceneName(StageRandomizerController.ARTIFACT_TRIAL_SCENE_NAME, out string replacement))
+                        {
+                            if (replacement != StageRandomizerController.ARTIFACT_TRIAL_SCENE_NAME)
+                            {
+                                return null;
+                            }
+                        }
+                    }
+
+                    return artifactDef;
+                });
+            }
         }
     }
 }
