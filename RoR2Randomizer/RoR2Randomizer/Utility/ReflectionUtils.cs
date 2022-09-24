@@ -28,7 +28,7 @@ namespace RoR2Randomizer.Utility
             throw new MissingMethodException($"No implicit conversion {from.FullDescription()} -> {to.FullDescription()} could be found");
         }
 
-        public static Type[] GetTypeHierarchyList(Type type)
+        public static LinkedList<Type> GetTypeHierarchyList(Type type)
         {
             LinkedList<Type> result = new LinkedList<Type>();
 
@@ -37,7 +37,7 @@ namespace RoR2Randomizer.Utility
                 result.AddFirst(type);
             } while ((type = type.BaseType) != null);
 
-            return result.ToArray();
+            return result;
         }
     }
 }
