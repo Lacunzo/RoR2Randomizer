@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using RoR2Randomizer.Configuration.ConfigValue;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +13,20 @@ namespace RoR2Randomizer.Configuration
     {
         static readonly InitializeOnAccessDictionary<Type, FieldInfo[]> _configFields = new InitializeOnAccessDictionary<Type, FieldInfo[]>(type =>
         {
-            List<FieldInfo> fields = new List<FieldInfo>();
-
-            do
+            return ReflectionUtils.GetTypeHierarchyList(type).SelectMany(t =>
             {
-                fields.InsertRange(0, type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(f => f.FieldType.GetInterface(nameof(IConfigModCompatibility)) != null));
-            } while ((type = type.BaseType) != null);
+                const BindingFlags FIELD_FLAGS = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
-            return fields.ToArray();
+                return t == type ? t.GetFields(FIELD_FLAGS).Where(f => f.FieldType.GetInterface(nameof(IConfigModCompatibility)) != null)
+                                 : _configFields[t];
+            }).ToArray();
         });
 
         public readonly string CategoryName;
 
         protected readonly ConfigFile _file;
+
+        public virtual ModCompatibilityFlags CompatibilityFlags => ModCompatibilityFlags.None;
 
         public ConfigCategory(string categoryName, ConfigFile file)
         {
@@ -32,7 +34,15 @@ namespace RoR2Randomizer.Configuration
             _file = file;
         }
 
-        public void RiskOfOptionsCompatibility()
+        public void RunModCompatibilities()
+        {
+            ModCompatibilityFlags flags = CompatibilityFlags;
+
+            if ((flags & ModCompatibilityFlags.RiskOfOptions) != 0 && ModCompatibility.RiskOfOptionsCompat.IsEnabled)
+                riskOfOptionsCompatibility();
+        }
+
+        void riskOfOptionsCompatibility()
         {
             foreach (FieldInfo field in _configFields[GetType()])
             {

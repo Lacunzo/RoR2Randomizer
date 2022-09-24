@@ -5,7 +5,6 @@ using MonoMod.Cil;
 using RoR2;
 using RoR2.CharacterAI;
 using RoR2Randomizer.Utility;
-using RoR2Randomizer.Utility.Patching;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace RoR2Randomizer.Utility.Patching
+namespace RoR2Randomizer.Utility
 {
     public static class ReflectionUtils
     {
@@ -26,6 +26,18 @@ namespace RoR2Randomizer.Utility.Patching
             }
 
             throw new MissingMethodException($"No implicit conversion {from.FullDescription()} -> {to.FullDescription()} could be found");
+        }
+
+        public static Type[] GetTypeHierarchyList(Type type)
+        {
+            LinkedList<Type> result = new LinkedList<Type>();
+
+            do
+            {
+                result.AddFirst(type);
+            } while ((type = type.BaseType) != null);
+
+            return result.ToArray();
         }
     }
 }

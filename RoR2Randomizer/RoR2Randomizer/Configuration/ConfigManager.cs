@@ -12,7 +12,7 @@ namespace RoR2Randomizer.Configuration
 {
     public static class ConfigManager
     {
-        static readonly List<ConfigCategory> _riskOfOptionsCategories = new List<ConfigCategory>();
+        static readonly List<ConfigCategory> _allCategories = new List<ConfigCategory>();
 
         public static BossRandomizerConfig BossRandomizer;
         public static SkillRandomizerConfig SkillRandomizer;
@@ -20,16 +20,13 @@ namespace RoR2Randomizer.Configuration
 
         public static void Initialize(ConfigFile file)
         {
-            _riskOfOptionsCategories.Add(StageRandomizer = new StageRandomizerConfig(file));
-            _riskOfOptionsCategories.Add(SkillRandomizer = new SkillRandomizerConfig(file));
-            _riskOfOptionsCategories.Add(BossRandomizer = new BossRandomizerConfig(file));
+            _allCategories.Add(StageRandomizer = new StageRandomizerConfig(file));
+            _allCategories.Add(SkillRandomizer = new SkillRandomizerConfig(file));
+            _allCategories.Add(BossRandomizer = new BossRandomizerConfig(file));
 
-            if (ModCompatibility.RiskOfOptionsCompat.IsEnabled)
+            foreach (ConfigCategory category in _allCategories)
             {
-                foreach (ConfigCategory category in _riskOfOptionsCategories)
-                {
-                    category.RiskOfOptionsCompatibility();
-                }
+                category.RunModCompatibilities();
             }
         }
     }
