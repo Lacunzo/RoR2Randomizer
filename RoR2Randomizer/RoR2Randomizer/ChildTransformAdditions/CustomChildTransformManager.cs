@@ -73,9 +73,7 @@ namespace RoR2Randomizer.ChildTransformAdditions
             Transform child = getCustomChildTransform(body, locator, name, flags);
             if ((flags & ChildFlags.ForceNewObject) != 0)
             {
-                GameObject newObj = new GameObject(name);
-
-                Transform transform = newObj.transform;
+                Transform transform = new GameObject(name).transform;
 
                 transform.parent = child;
                 transform.localPosition = Vector3.zero;
