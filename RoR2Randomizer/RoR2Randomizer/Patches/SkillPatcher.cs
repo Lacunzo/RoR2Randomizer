@@ -42,6 +42,7 @@ namespace RoR2Randomizer.Patches
 
             Fixes.Skills.EntityStates.NewtMonster.KickFromShop.Apply();
 
+            Fixes.Skills.EntityStates.VoidRaidCrab.DeathState.Apply();
             Fixes.Skills.EntityStates.VoidRaidCrab.EscapeDeath.Apply();
         }
 
@@ -75,6 +76,7 @@ namespace RoR2Randomizer.Patches
 
             Fixes.Skills.EntityStates.NewtMonster.KickFromShop.Cleanup();
 
+            Fixes.Skills.EntityStates.VoidRaidCrab.DeathState.Cleanup();
             Fixes.Skills.EntityStates.VoidRaidCrab.EscapeDeath.Cleanup();
         }
 

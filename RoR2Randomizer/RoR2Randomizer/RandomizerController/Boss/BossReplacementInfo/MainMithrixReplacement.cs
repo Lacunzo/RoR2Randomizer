@@ -5,6 +5,7 @@ using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
@@ -15,69 +16,47 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
         protected override BossReplacementType ReplacementType => IsHurt ? BossReplacementType.MithrixHurt : BossReplacementType.MithrixNormal;
 
-        protected override IEnumerator initializeClient()
+        protected override void bodyResolved()
         {
-            yield return base.initializeClient();
-
-            CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
-            yield return getBody(bodyOut);
-
-            CharacterBody body = bodyOut.Result;
+            base.bodyResolved();
 
 #if DEBUG
-            Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(initializeClient)}: IsHurt={IsHurt}, _master={_master}, body={(bool)body}");
+            Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(initializeClient)}: body.subtitleNameToken={_body.subtitleNameToken}");
 #endif
 
-            if (body)
+            if (string.IsNullOrEmpty(_body.subtitleNameToken))
             {
-#if DEBUG
-                Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(initializeClient)}: body.subtitleNameToken={body.subtitleNameToken}");
-#endif
-                if (string.IsNullOrEmpty(body.subtitleNameToken))
-                {
-                    body.subtitleNameToken = "BROTHER_BODY_SUBTITLE";
-                }
-            }
-        }
-
-        protected override IEnumerator initializeServer()
-        {
-            yield return base.initializeServer();
-
-            CharacterBody body = _cachedBody;
-            if (!body)
-            {
-                CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
-                yield return getBody(bodyOut);
-
-                body = bodyOut.Result;
+                setBodySubtitle("BROTHER_BODY_SUBTITLE");
             }
 
-            if (body && IsHurt)
+            if (NetworkServer.active)
             {
-                // Prevent low-health replacements from instantly dying
-                body.AddTimedBuff(RoR2Content.Buffs.HiddenInvincibility, SpellChannelEnterState.duration);
-
-                EntityStateMachine bodyState = EntityStateMachine.FindByCustomName(body.gameObject, "Body");
-                if (bodyState)
+                if (IsHurt)
                 {
-                    if (bodyState.state != null)
+                    // Prevent low-health replacements from instantly dying
+                    _body.AddTimedBuff(RoR2Content.Buffs.HiddenInvincibility, SpellChannelEnterState.duration);
+
+                    EntityStateMachine bodyState = EntityStateMachine.FindByCustomName(_body.gameObject, "Body");
+                    if (bodyState)
                     {
-                        bodyState.SetState(EntityStateCatalog.InstantiateState(BossRandomizerController.Mithrix.MithrixHurtInitialState));
+                        if (bodyState.state != null)
+                        {
+                            bodyState.SetState(EntityStateCatalog.InstantiateState(BossRandomizerController.Mithrix.MithrixHurtInitialState));
+                        }
+                        else
+                        {
+                            bodyState.initialStateType = BossRandomizerController.Mithrix.MithrixHurtInitialState;
+                        }
                     }
                     else
                     {
-                        bodyState.initialStateType = BossRandomizerController.Mithrix.MithrixHurtInitialState;
+                        Log.Warning($"Body entityState for {_body.GetDisplayName()} could not be found!");
                     }
-                }
-                else
-                {
-                    Log.Warning($"Body entityState for {body.GetDisplayName()} could not be found!");
-                }
 
-                if (!body.GetComponent<ReturnStolenItemsOnGettingHit>())
-                {
-                    AddReturnStolenItemsOnGettingHit(body.gameObject, body.healthComponent);
+                    if (!_body.GetComponent<ReturnStolenItemsOnGettingHit>())
+                    {
+                        AddReturnStolenItemsOnGettingHit(_body.gameObject, _body.healthComponent);
+                    }
                 }
             }
         }

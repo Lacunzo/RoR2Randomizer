@@ -26,6 +26,8 @@ namespace RoR2Randomizer.Patches
             BossRandomizer.MainPatcher.Apply();
             SkillPatcher.Apply();
 
+            MultiEntityStatePatches.MainPatcher.Apply();
+
             _patchControllersRoot = new GameObject(Main.PluginName + ".PatchControllers");
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
 
@@ -50,6 +52,8 @@ namespace RoR2Randomizer.Patches
 
             BossRandomizer.MainPatcher.Cleanup();
             SkillPatcher.Cleanup();
+
+            MultiEntityStatePatches.MainPatcher.Cleanup();
         }
     }
 }

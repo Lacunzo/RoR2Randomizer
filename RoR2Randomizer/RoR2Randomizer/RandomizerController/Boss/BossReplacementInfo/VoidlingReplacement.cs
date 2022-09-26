@@ -1,15 +1,21 @@
-﻿using RoR2;
+﻿using EntityStates;
+using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Voidling;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine.Networking;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 {
+    // TODO: Add SphereZone to phase 3 replacements
+    // UrchinTurretMaster (102) does not spawn gauntlet portal
+    // Stopped at VoidInfestorMaster (108)
     public class VoidlingReplacement : BaseBossReplacement
     {
         public int Phase;
@@ -22,47 +28,48 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             _ => BossReplacementType.Invalid
         };
 
-        protected override IEnumerator initializeClient()
+        protected override void bodyResolved()
         {
-            yield return base.initializeClient();
+            base.bodyResolved();
 
-            CharacterBody body = _cachedBody;
-            if (!body)
+            _body.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
+
+            if (string.IsNullOrEmpty(_body.subtitleNameToken))
             {
-                CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
-                yield return getBody(bodyOut);
-
-                body = bodyOut.Result;
+                setBodySubtitle("VOIDRAIDCRAB_BODY_SUBTITLE");
             }
 
-            if (body)
+            CharacterDeathBehavior deathBehavior = _body.gameObject.GetOrAddComponent<CharacterDeathBehavior>();
+            if (!deathBehavior.deathStateMachine)
             {
-                if (string.IsNullOrEmpty(body.subtitleNameToken))
+                EntityStateMachine bodyState = EntityStateMachine.FindByCustomName(_body.gameObject, "Body");
+                if (bodyState)
                 {
-                    body.subtitleNameToken = "VOIDRAIDCRAB_BODY_SUBTITLE";
+                    deathBehavior.deathStateMachine = bodyState;
                 }
-
-                const string BODY_STATE_MACHINE_NAME = "Body";
-
-                CharacterDeathBehavior deathBehavior = body.gameObject.GetOrAddComponent<CharacterDeathBehavior>();
-                if (!deathBehavior.deathStateMachine || deathBehavior.deathStateMachine.customName != BODY_STATE_MACHINE_NAME)
+                else
                 {
-                    EntityStateMachine bodyState = EntityStateMachine.FindByCustomName(body.gameObject, BODY_STATE_MACHINE_NAME);
-                    if (bodyState)
-                    {
-                        deathBehavior.deathStateMachine = bodyState;
-                    }
-                    else
-                    {
-                        Log.Warning($"Body entityState for {body.GetDisplayName()} could not be found!");
-                    }
+                    Log.Warning($"Body entityState for {_body.GetDisplayName()} could not be found!");
                 }
-
-                deathBehavior.deathState = Phase == VoidlingPhaseTracker.TotalNumPhases ? BossRandomizerController.Voidling.FinalDeathState
-                                                                                        : BossRandomizerController.Voidling.EscapeDeathState;
-
-                deathBehavior.idleStateMachine ??= Array.Empty<EntityStateMachine>();
             }
+
+            SerializableEntityStateType voidlingDeathState = Phase == VoidlingPhaseTracker.TotalNumPhases ? BossRandomizerController.Voidling.FinalDeathState
+                                                                                                          : BossRandomizerController.Voidling.EscapeDeathState;
+
+            Type deathStateType = deathBehavior.deathState.stateType;
+            if (deathStateType == null || deathStateType == BossRandomizerController.Voidling.EscapeDeathState.stateType) // Don't combine anything with the escape death state, since that always opens a portal to the next gauntlet, where there is nothing if it happens on phase 3
+            {
+                deathBehavior.deathState = voidlingDeathState;
+            }
+            else if (deathStateType != voidlingDeathState.stateType) // If the death state is already the one we want, nothing needs to be done
+            {
+                MultiEntityStateSubStatesData subStatesData = deathBehavior.gameObject.AddComponent<MultiEntityStateSubStatesData>();
+                subStatesData.StateTypes = new SerializableEntityStateType[] { deathBehavior.deathState, voidlingDeathState };
+
+                deathBehavior.deathState = MultiEntityState.SerializableStateType;
+            }
+
+            deathBehavior.idleStateMachine ??= Array.Empty<EntityStateMachine>();
         }
     }
 }

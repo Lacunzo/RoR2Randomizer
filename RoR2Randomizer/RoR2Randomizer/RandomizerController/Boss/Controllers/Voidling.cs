@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 using UnityEngine;
 using RoR2;
 using EntityStates;
+using RoR2Randomizer.RandomizerController.Stage;
 
 namespace RoR2Randomizer.RandomizerController.Boss
 {
@@ -20,10 +21,15 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
             public static void Initialize()
             {
-                VoidlingPhaseTracker.Instance.OnEnterFight += onEnterVoidlingFight;
-                VoidlingPhaseTracker.Instance.OnExitFight += onExitVoidlingFight;
+                if (VoidlingPhaseTracker.Instance != null)
+                {
+                    VoidlingPhaseTracker.Instance.OnEnterFight += onEnterVoidlingFight;
+                    VoidlingPhaseTracker.Instance.OnExitFight += onExitVoidlingFight;
+                }
 
                 SyncBossReplacementCharacter.OnReceive += SyncBossReplacementCharacter_OnReceive;
+
+                SceneCatalog.onMostRecentSceneDefChanged += SceneCatalog_onMostRecentSceneDefChanged;
             }
 
             public static void Uninitialize()
@@ -35,6 +41,25 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 }
 
                 SyncBossReplacementCharacter.OnReceive -= SyncBossReplacementCharacter_OnReceive;
+
+                SceneCatalog.onMostRecentSceneDefChanged -= SceneCatalog_onMostRecentSceneDefChanged;
+            }
+
+            static void SceneCatalog_onMostRecentSceneDefChanged(SceneDef obj)
+            {
+                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && obj.cachedName == StageRandomizerController.VOIDLING_FIGHT_SCENE_NAME)
+                {
+                    GameObject levelRoot = GameObject.Find("RaidVoid");
+                    if (levelRoot)
+                    {
+                        // Disable some blobs that often obscure the replaced voidling
+                        Transform blob = levelRoot.transform.Find("RaidVoidProps/CrabFoam1Prop (14)");
+                        if (blob)
+                        {
+                            blob.gameObject.SetActive(false);
+                        }
+                    }
+                }
             }
 
             static void onEnterVoidlingFight()

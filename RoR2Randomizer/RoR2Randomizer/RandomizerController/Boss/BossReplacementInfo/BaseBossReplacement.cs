@@ -6,6 +6,7 @@ using RoR2Randomizer.Networking.BossRandomizer;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
@@ -13,7 +14,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
     public abstract class BaseBossReplacement : MonoBehaviour
     {
         protected CharacterMaster _master;
-        protected CharacterBody _cachedBody;
+        protected CharacterBody _body;
 
         protected abstract BossReplacementType ReplacementType { get; }
 
@@ -21,48 +22,80 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
         {
             _master = GetComponent<CharacterMaster>();
 
+            StartCoroutine(waitForBodyInitialized());
+
             if (NetworkServer.active)
             {
-                StartCoroutine(initializeServer());
+                initializeServer();
             }
 
-            StartCoroutine(initializeClient());
+            initializeClient();
         }
 
-        protected IEnumerator getBody(CoroutineOut<CharacterBody> body)
+        IEnumerator waitForBodyInitialized()
         {
-            if (_cachedBody)
+            if (!_body)
             {
-                body.Result = _cachedBody;
-                yield break;
-            }
-
-            body.Result = _master.GetBody();
-            if (!body.Result)
-            {
-                while (_master && !_master.hasBody)
+                _body = _master.GetBody();
+                if (!_body)
                 {
-                    yield return 0;
+                    while (_master && !_master.hasBody)
+                    {
+                        yield return 0;
+                    }
+
+                    if (!_master)
+                        yield break;
+
+                    _body = _master.GetBody();
                 }
-
-                if (!_master)
-                    yield break;
-
-                body.Result = _master.GetBody();
             }
 
-            _cachedBody = body.Result;
+            if (_body)
+            {
+                bodyResolved();
+            }
         }
 
-        protected virtual IEnumerator initializeClient()
+        protected virtual void bodyResolved()
+        {
+            if (_body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))
+            {
+                Inventory inventory = _master.inventory;
+                if (inventory && inventory.GetEquipmentIndex() == EquipmentIndex.None)
+                {
+                    EquipmentIndex equipment = BossRandomizerController.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
+                    inventory.SetEquipmentIndex(equipment);
+
+#if DEBUG
+                    Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(_body.baseNameToken)}");
+#endif
+                }
+            }
+            else if (_body.bodyIndex == BodyCatalog.FindBodyIndex("DroneCommanderBody")) // Col. Droneman
+            {
+                Inventory inventory = _master.inventory;
+                if (inventory)
+                {
+                    const int NUM_DRONE_PARTS = 1;
+
+                    Patches.Reverse.DroneWeaponsBehavior.SetNumDroneParts(inventory, NUM_DRONE_PARTS);
+
+#if DEBUG
+                    Log.Debug($"Gave {NUM_DRONE_PARTS} drone parts to {Language.GetString(_body.baseNameToken)}");
+#endif
+                }
+            }
+        }
+
+        protected virtual void initializeClient()
         {
 #if DEBUG
             Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeClient)}");
 #endif
-            yield break;
         }
 
-        protected virtual IEnumerator initializeServer()
+        protected virtual void initializeServer()
         {
 #if DEBUG
             Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeServer)}");
@@ -73,43 +106,34 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 #if DEBUG
             Log.Debug($"Sent {nameof(SyncBossReplacementCharacter)} to clients");
 #endif
+        }
 
-            CharacterBody body = _cachedBody;
-            if (!body)
+        protected void setBodySubtitle(string subtitleToken)
+        {
+            if (_body && _body.subtitleNameToken != subtitleToken)
             {
-                CoroutineOut<CharacterBody> bodyOut = new CoroutineOut<CharacterBody>();
-                yield return getBody(bodyOut);
+                _body.subtitleNameToken = subtitleToken;
 
-                body = bodyOut.Result;
-            }
-
-            if (body)
-            {
-                if (body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))
+                // Update BossGroup
+                if (_master.isBoss)
                 {
-                    Inventory inventory = _master.inventory;
-                    if (inventory && inventory.GetEquipmentIndex() == EquipmentIndex.None)
-                    {
-                        EquipmentIndex equipment = BossRandomizerController.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
-                        inventory.SetEquipmentIndex(equipment);
-
-#if DEBUG
-                        Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(body.baseNameToken)}");
-#endif
-                    }
+                    resetBossGroupSubtitle();
                 }
-                else if (body.bodyIndex == BodyCatalog.FindBodyIndex("DroneCommanderBody")) // Col. Droneman
+            }
+        }
+
+        void resetBossGroupSubtitle()
+        {
+            BossGroup[] bossGroups = GameObject.FindObjectsOfType<BossGroup>();
+            foreach (BossGroup group in bossGroups)
+            {
+                for (int i = 0; i < group.bossMemoryCount; i++)
                 {
-                    Inventory inventory = _master.inventory;
-                    if (inventory)
+                    if (group.bossMemories[i].cachedMaster == _master)
                     {
-                        const int NUM_DRONE_PARTS = 1;
-
-                        Patches.Reverse.DroneWeaponsBehavior.SetNumDroneParts(inventory, NUM_DRONE_PARTS);
-
-#if DEBUG
-                        Log.Debug($"Gave {NUM_DRONE_PARTS} drone parts to {Language.GetString(body.baseNameToken)}");
-#endif
+                        // Force a refresh of the boss subtitle
+                        group.bestObservedSubtitle = string.Empty;
+                        return;
                     }
                 }
             }
