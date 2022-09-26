@@ -132,6 +132,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
                     if (group.bossMemories[i].cachedMaster == _master)
                     {
                         // Force a refresh of the boss subtitle
+                        group.bestObservedName = string.Empty;
                         group.bestObservedSubtitle = string.Empty;
                         return;
                     }
