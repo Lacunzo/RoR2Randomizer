@@ -40,17 +40,22 @@ namespace RoR2Randomizer.Utility
 #if DEBUG
         public static void TryNetworkLog(string message, LogLevel type)
         {
-            PlayerCharacterMasterController localPlayer = PlayerCharacterMasterController.instances.SingleOrDefault(p => p.isLocalPlayer);
-            NetworkInstanceId localPlayerNetId = localPlayer ? localPlayer.NetworknetworkUserInstanceId : default;
-
-            SyncConsoleLog syncConsoleLog = new SyncConsoleLog(message, type, localPlayerNetId);
-            if (NetworkServer.active)
+            LocalUser localUser = LocalUserManager.GetFirstLocalUser();
+            if (localUser != null)
             {
-                syncConsoleLog.Send(NetworkDestination.Clients);
-            }
-            else if (NetworkClient.active)
-            {
-                syncConsoleLog.Send(NetworkDestination.Server);
+                NetworkUser networkUser = localUser.currentNetworkUser;
+                if (networkUser)
+                {
+                    SyncConsoleLog syncConsoleLog = new SyncConsoleLog(message, type, networkUser.id);
+                    if (NetworkServer.active)
+                    {
+                        syncConsoleLog.Send(NetworkDestination.Clients);
+                    }
+                    else if (NetworkClient.active)
+                    {
+                        syncConsoleLog.Send(NetworkDestination.Server);
+                    }
+                }
             }
         }
 #endif
