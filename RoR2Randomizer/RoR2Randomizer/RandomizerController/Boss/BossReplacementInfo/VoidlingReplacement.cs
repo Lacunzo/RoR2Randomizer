@@ -81,11 +81,8 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
                 MultiEntityState.SubStatesData subStatesData = deathBehavior.gameObject.AddComponent<MultiEntityState.SubStatesData>();
                 subStatesData.StateTypes = new SerializableEntityStateType[] { deathBehavior.deathState, voidlingDeathState };
                 subStatesData.AlwaysExecuteEnter = true;
-                
-                if (isFinalDeathState)
-                {
-                    subStatesData.MinActiveDuration = BossRandomizerController.Voidling.FinalDeathStateAnimationDuration;
-                }
+
+                subStatesData.MinActiveDuration = isFinalDeathState ? BossRandomizerController.Voidling.FinalDeathStateAnimationDuration : 0.75f;
 
                 deathBehavior.deathState = MultiEntityState.SerializableStateType;
             }
