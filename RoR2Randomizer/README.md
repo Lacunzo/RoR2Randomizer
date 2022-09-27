@@ -1,9 +1,13 @@
-# My first mod
+# RoR2 Randomizer
 
-Description.
+A randomizer mod for Risk of Rain 2!
+
+Current features:
+* Stage Randomizer: Swaps every stage for a random playable map.
+* Boss Randomizer: Randomizes the character types of bosses. Currently only Mithrix and Voidling are implemented.
 
 ## Changelog
 
-**1.0.0**
+**0.0.1**
 
-* Release of my first mod.
+* First public release
