@@ -19,8 +19,8 @@ namespace RoR2Randomizer.RandomizerController.Stage
         public const string ARTIFACT_TRIAL_SCENE_NAME = "artifactworld";
         public const string COMMENCEMENT_SCENE_NAME = "moon2";
         public const string GOLD_SHORES_SCENE_NAME = "goldshores";
-        public const string OBLITERATE_SCENE_NAME = "limbo";
-        public const string LUNAR_SCAV_FIGHT_SCENE_NAME = "mysteryspace";
+        public const string OBLITERATE_SCENE_NAME = "mysteryspace";
+        public const string LUNAR_SCAV_FIGHT_SCENE_NAME = "limbo";
         public const string VOIDLING_FIGHT_SCENE_NAME = "voidraid";
         public const string VOID_FIELDS_SCENE_NAME = "arena";
 
