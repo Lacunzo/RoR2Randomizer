@@ -9,6 +9,12 @@ using UnityEngine;
 using RoR2;
 using EntityStates;
 using RoR2Randomizer.RandomizerController.Stage;
+using UnityModdingUtility;
+using RoR2.ContentManagement;
+using System.Linq;
+using System;
+using HG.GeneralSerializer;
+using HarmonyLib;
 
 namespace RoR2Randomizer.RandomizerController.Boss
 {
@@ -18,6 +24,16 @@ namespace RoR2Randomizer.RandomizerController.Boss
         {
             public static readonly SerializableEntityStateType EscapeDeathState = new SerializableEntityStateType(typeof(EntityStates.VoidRaidCrab.EscapeDeath));
             public static readonly SerializableEntityStateType FinalDeathState = new SerializableEntityStateType(typeof(EntityStates.VoidRaidCrab.DeathState));
+
+            public static readonly InitializeOnAccess<float> FinalDeathStateAnimationDuration = new InitializeOnAccess<float>(() =>
+            {
+                Type deathStateType = FinalDeathState.stateType;
+                EntityStateConfiguration finalDeathStateConfig = ContentManager.entityStateConfigurations.Single(c => (Type)c.targetType == deathStateType);
+
+                SerializedField durationField = finalDeathStateConfig.serializedFieldsCollection.serializedFields.Single(f => f.fieldName.Equals(nameof(EntityStates.VoidRaidCrab.DeathState.duration)));
+
+                return (float)durationField.fieldValue.GetValue(AccessTools.DeclaredField(typeof(EntityStates.VoidRaidCrab.DeathState), nameof(EntityStates.VoidRaidCrab.DeathState.duration)));
+            });
 
             public static void Initialize()
             {
@@ -109,12 +125,12 @@ namespace RoR2Randomizer.RandomizerController.Boss
 #if DEBUG
                         Log.Debug($"Running {nameof(handleSpawnedVoidlingCharacterClient)}");
 #endif
-                        handleSpawnedVoidlingCharacterClient(masterObject, (int)(replacementType - BossReplacementType.VoidlingPhase1) + 1);
+                        handleSpawnedVoidlingCharacterClient(masterObject, replacementType - BossReplacementType.VoidlingPhase1 + 1);
                         break;
                 }
             }
 
-            static void handleSpawnedVoidlingCharacterClient(GameObject masterObject, int phase)
+            static void handleSpawnedVoidlingCharacterClient(GameObject masterObject, uint phase)
             {
                 VoidlingReplacement voidlingReplacement = masterObject.AddComponent<VoidlingReplacement>();
                 voidlingReplacement.Phase = phase;

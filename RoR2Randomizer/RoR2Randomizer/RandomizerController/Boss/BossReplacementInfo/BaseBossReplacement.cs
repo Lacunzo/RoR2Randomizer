@@ -4,6 +4,7 @@ using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.BossRandomizer;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -16,7 +17,11 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
         protected CharacterMaster _master;
         protected CharacterBody _body;
 
-        protected abstract BossReplacementType ReplacementType { get; }
+        protected abstract BossReplacementType replacementType { get; }
+
+        protected abstract CharacterMaster originalBossMasterPrefab { get; }
+
+        protected CharacterBody originalBossBodyPrefab => originalBossMasterPrefab.bodyPrefab.GetComponent<CharacterBody>();
 
         public void Initialize()
         {
@@ -59,23 +64,35 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
         protected virtual void bodyResolved()
         {
-            if (_body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))
+            Inventory inventory = _master.inventory;
+            if (inventory)
             {
-                Inventory inventory = _master.inventory;
-                if (inventory && inventory.GetEquipmentIndex() == EquipmentIndex.None)
+                GivePickupsOnStart givePickupsOnStart = _master.GetComponent<GivePickupsOnStart>();
+
+                if (originalBossMasterPrefab)
                 {
-                    EquipmentIndex equipment = BossRandomizerController.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
-                    inventory.SetEquipmentIndex(equipment);
+                    GivePickupsOnStart originalGivePickupsOnStart = originalBossMasterPrefab.GetComponent<GivePickupsOnStart>();
+
+                    ItemIndex adaptiveArmorItemIndex = RoR2Content.Items.AdaptiveArmor.itemIndex;
+                    if (originalGivePickupsOnStart && originalGivePickupsOnStart.HasItems(adaptiveArmorItemIndex, out int originalAdaptiveArmorCount))
+                    {
+                        inventory.GiveItem(adaptiveArmorItemIndex, originalAdaptiveArmorCount);
+                    }
+                }
+
+                if (_body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))
+                {
+                    if ((!givePickupsOnStart || !givePickupsOnStart.HasAnyEquipment()) && inventory.GetEquipmentIndex() == EquipmentIndex.None)
+                    {
+                        EquipmentIndex equipment = BossRandomizerController.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
+                        inventory.SetEquipmentIndex(equipment);
 
 #if DEBUG
-                    Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(_body.baseNameToken)}");
+                        Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(_body.baseNameToken)}");
 #endif
+                    }
                 }
-            }
-            else if (_body.bodyIndex == BodyCatalog.FindBodyIndex("DroneCommanderBody")) // Col. Droneman
-            {
-                Inventory inventory = _master.inventory;
-                if (inventory)
+                else if (_body.bodyIndex == BodyCatalog.FindBodyIndex("DroneCommanderBody")) // Col. Droneman
                 {
                     const int NUM_DRONE_PARTS = 1;
 
@@ -101,7 +118,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeServer)}");
 #endif
 
-            new SyncBossReplacementCharacter(_master.gameObject, ReplacementType).Send(NetworkDestination.Clients);
+            new SyncBossReplacementCharacter(_master.gameObject, replacementType).Send(NetworkDestination.Clients);
 
 #if DEBUG
             Log.Debug($"Sent {nameof(SyncBossReplacementCharacter)} to clients");

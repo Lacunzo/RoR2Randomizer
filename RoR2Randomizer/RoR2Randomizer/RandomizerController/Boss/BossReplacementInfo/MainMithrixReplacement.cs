@@ -14,7 +14,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
     {
         public bool IsHurt;
 
-        protected override BossReplacementType ReplacementType => IsHurt ? BossReplacementType.MithrixHurt : BossReplacementType.MithrixNormal;
+        protected override BossReplacementType replacementType => IsHurt ? BossReplacementType.MithrixHurt : BossReplacementType.MithrixNormal;
 
         protected override void bodyResolved()
         {

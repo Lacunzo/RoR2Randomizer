@@ -3,7 +3,7 @@ using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.CustomContent;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -30,7 +30,12 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
         }
 
         static readonly FieldInfo _tempStackField_FI = AccessTools.DeclaredField(typeof(SetStateOuterPatch), nameof(_tempStackField));
+
+#pragma warning disable IDE0044 // Add readonly modifier
+#pragma warning disable CS0649 // Field is never assigned
         static EntityStateMachine _tempStackField;
+#pragma warning restore CS0649 // Field is never assigned
+#pragma warning restore IDE0044 // Add readonly modifier
 
         static void setOuterHook(ILContext il)
         {

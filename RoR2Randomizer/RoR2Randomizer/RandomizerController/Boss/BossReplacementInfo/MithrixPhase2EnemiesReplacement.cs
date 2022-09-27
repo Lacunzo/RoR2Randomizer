@@ -8,6 +8,6 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 {
     public sealed class MithrixPhase2EnemiesReplacement : BaseMithrixReplacement
     {
-        protected override BossReplacementType ReplacementType => BossReplacementType.MithrixPhase2;
+        protected override BossReplacementType replacementType => BossReplacementType.MithrixPhase2;
     }
 }

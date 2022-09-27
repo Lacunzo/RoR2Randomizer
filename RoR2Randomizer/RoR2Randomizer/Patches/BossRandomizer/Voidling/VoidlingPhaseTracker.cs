@@ -11,11 +11,12 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
 {
     public sealed class VoidlingPhaseTracker : BossPhaseTracker<VoidlingPhaseTracker>
     {
-        public static int TotalNumPhases { get; private set; } = -1;
+        static uint? _totalNumPhases = null;
+        public static uint TotalNumPhases => _totalNumPhases.Value;
 
         class PhaseEncounterData : MonoBehaviour
         {
-            public int Phase;
+            public uint Phase;
             public ScriptedCombatEncounter ScriptedEncounter;
 
             public void Initialize()
@@ -48,15 +49,15 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
             On.RoR2.ScriptedCombatEncounter.BeginEncounter -= ScriptedCombatEncounter_BeginEncounter;
             On.EntityStates.VoidRaidCrab.DeathState.OnEnter -= DeathState_OnEnter;
         }
-            
+        
         static void VoidRaidGauntletController_Start(On.RoR2.VoidRaidGauntletController.orig_Start orig, VoidRaidGauntletController self)
         {
             orig(self);
 
-            if (TotalNumPhases == -1)
-                TotalNumPhases = self.phaseEncounters.Length;
+            if (!_totalNumPhases.HasValue)
+                _totalNumPhases = (uint)self.phaseEncounters.Length;
 
-            for (int i = 0; i < TotalNumPhases; i++)
+            for (uint i = 0; i < TotalNumPhases; i++)
             {
                 ScriptedCombatEncounter scriptedEncounter = self.phaseEncounters[i];
                 PhaseEncounterData encounterData = scriptedEncounter.gameObject.AddComponent<PhaseEncounterData>();

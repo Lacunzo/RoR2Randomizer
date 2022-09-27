@@ -3,14 +3,15 @@ using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.CustomContent;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 {
-    public static class SetSubStatesPatch
+    public static class InitializeMultiStatePatch
     {
         public static void Apply()
         {
@@ -32,16 +33,16 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
                 c.Emit(OpCodes.Dup); // Dup EntityState
 
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate((EntityState state, CharacterDeathBehavior instance) =>
-                {
-                    if (state is MultiEntityState multiState && instance.TryGetComponent<MultiEntityStateSubStatesData>(out MultiEntityStateSubStatesData subStateData))
-                    {
-                        multiState.SetStates(subStateData.StateTypes);
-                    }
-                });
+                c.EmitDelegate(tryInitializeMultiState);
             }
+        }
 
-            Log.Debug(il.ToString());
+        static void tryInitializeMultiState(EntityState state, Component subStateDataHolder)
+        {
+            if (state is MultiEntityState multiState && subStateDataHolder.TryGetComponent<MultiEntityState.SubStatesData>(out MultiEntityState.SubStatesData subStateData))
+            {
+                multiState.Initialize(subStateData);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@
         MithrixPhase2,
         VoidlingPhase1,
         VoidlingPhase2,
-        VoidlingPhase3
+        VoidlingPhase3,
+        Count
     }
 }

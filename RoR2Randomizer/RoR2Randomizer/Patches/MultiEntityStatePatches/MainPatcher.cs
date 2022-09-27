@@ -8,14 +8,16 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
     {
         public static void Apply()
         {
+            EntityStateExitOnDestroy.Apply();
             SetStateOuterPatch.Apply();
-            SetSubStatesPatch.Apply();
+            InitializeMultiStatePatch.Apply();
         }
 
         public static void Cleanup()
         {
+            EntityStateExitOnDestroy.Cleanup();
             SetStateOuterPatch.Cleanup();
-            SetSubStatesPatch.Cleanup();
+            InitializeMultiStatePatch.Cleanup();
         }
     }
 }

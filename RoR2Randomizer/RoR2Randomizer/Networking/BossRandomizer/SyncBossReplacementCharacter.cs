@@ -1,4 +1,5 @@
 ﻿using R2API.Networking.Interfaces;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerController.Boss;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,15 @@ namespace RoR2Randomizer.Networking.BossRandomizer
         {
         }
 
-        public SyncBossReplacementCharacter(GameObject gameObject, BossReplacementType replacementType)
+        public SyncBossReplacementCharacter(GameObject masterObject, BossReplacementType replacementType)
         {
-            _masterObject = gameObject;
+            _masterObject = masterObject;
             _replacementType = replacementType;
+
+            if (!replacementType.IsValid())
+            {
+                Log.Warning($"{nameof(SyncBossReplacementCharacter)} is about to sync a boss replacement with an invalid boss type of {replacementType}! {nameof(masterObject)}: {masterObject}");
+            }
         }
 
         void ISerializableObject.Serialize(NetworkWriter writer)
@@ -43,6 +49,12 @@ namespace RoR2Randomizer.Networking.BossRandomizer
 #if DEBUG
             Log.Debug($"{nameof(SyncBossReplacementCharacter)}.{nameof(INetMessage.OnReceived)}(): _masterObject: {_masterObject}, _replacementType: {_replacementType}");
 #endif
+
+            if (!_replacementType.IsValid())
+            {
+                Log.Warning($"{nameof(SyncBossReplacementCharacter)} received a boss replacement with invalid replacement type {_replacementType}! {nameof(_masterObject)}: {_masterObject}");
+            }
+
             if (!NetworkServer.active)
             {
 #if DEBUG

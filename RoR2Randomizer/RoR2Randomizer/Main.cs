@@ -1,10 +1,12 @@
 using BepInEx;
 using R2API;
+using R2API.ContentManagement;
 using R2API.Networking;
 using R2API.Utils;
 using RoR2;
 using RoR2.Skills;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.CustomContent;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Patches;
 using RoR2Randomizer.Utility;
@@ -22,7 +24,7 @@ namespace RoR2Randomizer
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(Constants.R2API_GUID)]
     [BepInDependency(Constants.RISK_OF_OPTIONS_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [R2APISubmoduleDependency(nameof(NetworkingAPI))]
+    [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(R2APIContentManager))]
     public class Main : BaseUnityPlugin
     {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
@@ -49,6 +51,8 @@ namespace RoR2Randomizer
             ConfigManager.Initialize(Config);
 
             PatchController.Setup();
+
+            new ContentPackProvider().Init();
 
             stopwatch.Stop();
             Log.Info($"Initialized in {stopwatch.Elapsed.TotalSeconds:F1} seconds");

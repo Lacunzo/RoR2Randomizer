@@ -8,12 +8,17 @@ namespace RoR2Randomizer.Extensions
 {
     public static class UnityObjectExtensions
     {
-        public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
+        public static Component GetOrAddComponent(this GameObject obj, Type componentType)
         {
-            if (obj.TryGetComponent<T>(out T comp))
+            if (obj.TryGetComponent(componentType, out Component comp))
                 return comp;
 
-            return obj.AddComponent<T>();
+            return obj.AddComponent(componentType);
+        }
+
+        public static T GetOrAddComponent<T>(this GameObject obj) where T : Component
+        {
+            return (T)GetOrAddComponent(obj, typeof(T));
         }
 
         public static bool TryFindChild(this ChildLocator locator, string name, out Transform child)

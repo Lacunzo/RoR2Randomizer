@@ -2,6 +2,7 @@
 using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Debug;
 using System;
 using System.Collections.Generic;
@@ -67,6 +68,40 @@ namespace RoR2Randomizer.Utility
 
             dest = value;
             return true;
+        }
+
+        public static LinkedList<T> CreateReverseLinkedListFromLinks<T>(T value, TryConvertToNextValue<T> tryConvertToNext)
+        {
+            LinkedList<T> result = new LinkedList<T>();
+
+            do
+            {
+                result.AddFirst(value);
+            } while (tryConvertToNext(ref value));
+
+            return result;
+        }
+
+        public static LinkedList<T> CreateReverseLinkedListFromLinks<T>(T value, TryConvertDelegate<T> tryConvert)
+        {
+            return CreateReverseLinkedListFromLinks(value, tryConvert.ToConvertToNextValue());
+        }
+
+        public static LinkedList<T> CreateReverseLinkedListFromLinks<T>(T value, Func<T, T> tryGetNextValue) where T : class
+        {
+            return CreateReverseLinkedListFromLinks(value, tryGetNextValue.AddNullCheck());
+        }
+
+        public static void AppendDelegate<T>(ref T original, T additional) where T : Delegate
+        {
+            if (original != null)
+            {
+                original = (T)Delegate.Combine(original, additional);
+            }
+            else
+            {
+                original = additional;
+            }
         }
     }
 }

@@ -59,7 +59,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
                 c.EmitDelegate((PhaseCounter instance) =>
                 {
-                    Phase = instance.phase;
+                    Phase = (uint)instance.phase;
                 });
             }
         }

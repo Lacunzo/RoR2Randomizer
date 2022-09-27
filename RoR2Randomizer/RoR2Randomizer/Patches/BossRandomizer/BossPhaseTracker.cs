@@ -48,9 +48,9 @@ namespace RoR2Randomizer.Patches.BossRandomizer
         public event Action OnEnterFight;
         public event Action OnExitFight;
 
-        int _phase;
+        uint _phase;
 
-        public int Phase
+        public uint Phase
         {
             get
             {

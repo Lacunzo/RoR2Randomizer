@@ -30,14 +30,7 @@ namespace RoR2Randomizer.Utility
 
         public static LinkedList<Type> GetTypeHierarchyList(Type type)
         {
-            LinkedList<Type> result = new LinkedList<Type>();
-
-            do
-            {
-                result.AddFirst(type);
-            } while ((type = type.BaseType) != null);
-
-            return result;
+            return MiscUtils.CreateReverseLinkedListFromLinks(type, t => t.BaseType);
         }
     }
 }
