@@ -30,13 +30,16 @@ namespace RoR2Randomizer.Utility
 
         public static void ReadBits(this NetworkReader reader, out bool bit1, out bool bit2)
         {
-            ReadBits(reader, out bit1);
+            readBitsIntoArray(reader, 2);
+            bit1 = _sharedBitsArray[0];
             bit2 = _sharedBitsArray[1];
         }
 
         public static void ReadBits(this NetworkReader reader, out bool bit1, out bool bit2, out bool bit3)
         {
-            ReadBits(reader, out bit1, out bit2);
+            readBitsIntoArray(reader, 3);
+            bit1 = _sharedBitsArray[0];
+            bit2 = _sharedBitsArray[1];
             bit3 = _sharedBitsArray[2];
         }
     }
