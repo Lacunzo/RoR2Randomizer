@@ -1,5 +1,6 @@
 ﻿using EntityStates;
 using EntityStates.BrotherMonster;
+using R2API;
 using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
@@ -28,14 +29,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
         static DebugMode debugMode => ConfigManager.BossRandomizer.BossDebugMode;
 #endif
 
-        // NOTES:
-        // ArchWispMaster: No localized name
-        // BeetleCrystalMaster: No localized name
-        // BeetleGuardMasterCrystal: No localized name, NullRef in CharacterModel.UpdateMaterials on spawn
-        // MajorConstructMaster: No localized name or subtitle
-        // MiniVoidRaidCrabMasterPhase1: Spawns in the ground, only in phase 1 however
-        // EntityStates.VoidRaidCrab.EscapeDeath has NullRef in OnExit (most likely VoidRaidGauntletController.instance)
-
         static readonly InitializeOnAccess<GameObject[]> _availableMasterObjects = new InitializeOnAccess<GameObject[]>(() =>
         {
             return MasterCatalog.masterPrefabs.Where(master =>
@@ -61,6 +54,16 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 return true;
             }).Distinct().ToArray();
         });
+
+        static readonly Dictionary<string, string> _characterNamesLanguageAdditions = new Dictionary<string, string>
+        {
+            { "ARCHWISP_BODY_NAME", "Arch Wisp" },
+
+            { "BEETLE_CRYSTAL_BODY_NAME", "Crystal Beetle" },
+
+            { "MAJORCONSTRUCT_BODY_NAME", "Major Construct" },
+            { "MAJORCONSTRUCT_BODY_SUBTITLE", "Defense System" }
+        };
 
         public static readonly InitializeOnAccess<EquipmentIndex[]> AvailableDroneEquipments = new InitializeOnAccess<EquipmentIndex[]>(() =>
         {
@@ -95,6 +98,9 @@ namespace RoR2Randomizer.RandomizerController.Boss
         protected override void Awake()
         {
             base.Awake();
+
+            LanguageAPI.Add(_characterNamesLanguageAdditions);
+
             Mithrix.Initialize();
             Voidling.Initialize();
         }
