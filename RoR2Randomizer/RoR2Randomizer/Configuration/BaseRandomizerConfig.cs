@@ -11,7 +11,7 @@ namespace RoR2Randomizer.Configuration
 
         protected BaseRandomizerConfig(string randomizerName, ConfigFile file) : base(randomizerName, file)
         {
-            Enabled = new BoolConfigValue(getEntry<bool>($"Enabled", new ConfigDescription("If the randomizer should be enabled"), true));
+            Enabled = new BoolConfigValue(getEntry<bool>($"Enabled", new ConfigDescription($"If the {randomizerName} should be enabled"), true));
         }
     }
 }
