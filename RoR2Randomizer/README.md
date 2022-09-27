@@ -16,7 +16,7 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 * Stage Randomizer:
   * Added a weight system to decrease the likelyhood of getting an ordinary stage 1 map on stage 1, can be configured
   * Fixed "A Moment, Whole" being able to be picked as the starting stage.
-  * Fixed "A Moment, Fractured" not being able to be picked as first stage.
+  * Fixed "A Moment, Fractured" not being able to be picked as starting stage.
   * Added "Void Locus" to the starting stage blacklist.
 
 * Boss Randomizer:
