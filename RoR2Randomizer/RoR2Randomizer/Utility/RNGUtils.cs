@@ -25,5 +25,20 @@ namespace RoR2Randomizer.Utility
         {
             return options.GetRandomOrDefault();
         }
+
+        public static float NormalizedFloat
+        {
+            get
+            {
+                if (Run.instance && Run.instance.runRNG != null)
+                {
+                    return Run.instance.runRNG.nextNormalizedFloat;
+                }
+                else
+                {
+                    return UnityEngine.Random.value;
+                }
+            }
+        }
     }
 }

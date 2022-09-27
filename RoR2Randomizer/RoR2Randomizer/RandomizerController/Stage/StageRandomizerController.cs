@@ -49,25 +49,40 @@ namespace RoR2Randomizer.RandomizerController.Stage
         static readonly InitializeOnAccess<StageRandomizingInfo[]> _stages = new InitializeOnAccess<StageRandomizingInfo[]>(() =>
         {
             return SceneCatalog.allStageSceneDefs
-            .Select(s => s.cachedName)
-            .Except(_excludeScenes)
-            .Concat(_forceIncludeScenes)
-            .Select(name =>
-            {
-                StageFlags flags = StageFlags.None;
+                               .Where(s => !_excludeScenes.Contains(s.cachedName))
+                               .Concat(_forceIncludeScenes.Select(SceneCatalog.FindSceneDef))
+                               .Select(scene =>
+                               {
+                                   StageFlags flags = StageFlags.None;
 
-                switch (name)
-                {
-                    case COMMENCEMENT_SCENE_NAME:
-                    case LUNAR_SCAV_FIGHT_SCENE_NAME:
-                    case VOIDLING_FIGHT_SCENE_NAME:
-                    case VOID_LOCUS_SCENE_NAME:
-                        flags |= StageFlags.FirstStageBlacklist;
-                        break;
-                }
+                                   switch (scene.cachedName)
+                                   {
+                                       case COMMENCEMENT_SCENE_NAME:
+                                       case LUNAR_SCAV_FIGHT_SCENE_NAME:
+                                       case VOIDLING_FIGHT_SCENE_NAME:
+                                       case VOID_LOCUS_SCENE_NAME:
+                                           flags |= StageFlags.FirstStageBlacklist;
+                                           break;
+                                   }
 
-                return new StageRandomizingInfo(name, flags);
-            }).ToArray();
+                                   if (Run.instance)
+                                   {
+                                       SceneCollection startingSceneGroup = Run.instance.startingSceneGroup;
+                                       if (startingSceneGroup)
+                                       {
+                                           foreach (SceneCollection.SceneEntry entry in startingSceneGroup.sceneEntries)
+                                           {
+                                               if (scene == entry.sceneDef)
+                                               {
+                                                   flags |= StageFlags.PossibleStartingStage;
+                                                   break;
+                                               }
+                                           }
+                                       }
+                                   }
+
+                                   return new StageRandomizingInfo(scene.cachedName, flags);
+                               }).ToArray();
         });
 
         static ReplacementDictionary<string> _stageReplacements;
@@ -149,6 +164,17 @@ namespace RoR2Randomizer.RandomizerController.Stage
                     }
 
                     return true;
+                }, (key, value) =>
+                {
+                    float weightMultiplier = 1f;
+
+                    // Decrease likelyhood of an "ordinary" starting stage being picked as the first stage
+                    if ((key.SceneName == firstStageSceneName) && (value.Flags & StageFlags.PossibleStartingStage) != 0)
+                    {
+                        weightMultiplier *= ConfigManager.StageRandomizer.PossibleFirstStageWeightMult;
+                    }
+
+                    return value.BaseSelectionWeight * weightMultiplier;
                 });
             }
             else

@@ -1,4 +1,5 @@
-﻿using RoR2Randomizer.Extensions;
+﻿using HarmonyLib;
+using RoR2Randomizer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,7 @@ namespace RoR2Randomizer.Utility
 {
     public class ReplacementDictionary<T> : ReadOnlyDictionary<T, T>
     {
-        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc)
+        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc, Func<TSrc, TSrc, float> weightSelector)
         {
             Dictionary<T, T> result = new Dictionary<T, T>();
 
@@ -18,6 +19,7 @@ namespace RoR2Randomizer.Utility
             List<TSrc> valuesList = new List<TSrc>(keysList);
 
             bool hasReplaceFunc = canReplaceFunc != null;
+            bool hasWeightSelector = weightSelector != null;
 
             while (keysList.Count > 0)
             {
@@ -26,7 +28,19 @@ namespace RoR2Randomizer.Utility
                 IEnumerable<TSrc> availableValues = hasReplaceFunc ? valuesList.Where(v => canReplaceFunc(key, v)) : valuesList;
                 if (availableValues.Any())
                 {
-                    TSrc value = availableValues.GetRandomOrDefault();
+                    TSrc value;
+                    if (hasWeightSelector)
+                    {
+                        WeightedSelection<TSrc> weightedSelection = new WeightedSelection<TSrc>(availableValues.Count());
+                        availableValues.Do(v => weightedSelection.AddChoice(v, weightSelector(key, v)));
+
+                        value = weightedSelection.Evaluate(RNGUtils.NormalizedFloat);
+                    }
+                    else
+                    {
+                        value = availableValues.GetRandomOrDefault();
+                    }
+
                     valuesList.Remove(value);
 
                     result.Add(converter(key), converter(value));
@@ -41,20 +55,12 @@ namespace RoR2Randomizer.Utility
             return new ReplacementDictionary<T>(result);
         }
 
-        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc)
+        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc, Func<T, T, float> weightSelector)
         {
-            return CreateFrom(collection, t => t, canReplaceFunc);
+            return CreateFrom(collection, t => t, canReplaceFunc, weightSelector);
         }
 
         readonly InitializeOnAccess<ReadOnlyDictionary<T, T>> _reverseDictionary;
-
-        public ReplacementDictionary(IEnumerable<T> items) : this(items, null)
-        {
-        }
-
-        public ReplacementDictionary(IEnumerable<T> items, Func<T, T, bool> canReplaceFunc) : this(CreateFrom(items, canReplaceFunc))
-        {
-        }
 
         public ReplacementDictionary(IDictionary<T, T> dict) : base(dict)
         {

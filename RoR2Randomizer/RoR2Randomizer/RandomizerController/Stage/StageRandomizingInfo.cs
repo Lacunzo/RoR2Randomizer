@@ -6,7 +6,8 @@ namespace RoR2Randomizer.RandomizerController.Stage
     public enum StageFlags : byte
     {
         None = 0,
-        FirstStageBlacklist = 1 << 0
+        FirstStageBlacklist = 1 << 0,
+        PossibleStartingStage = 1 << 1
     }
 
     public readonly struct StageRandomizingInfo
@@ -14,10 +15,13 @@ namespace RoR2Randomizer.RandomizerController.Stage
         public readonly string SceneName;
         public readonly StageFlags Flags;
 
-        public StageRandomizingInfo(string sceneName, StageFlags flags)
+        public readonly float BaseSelectionWeight;
+
+        public StageRandomizingInfo(string sceneName, StageFlags flags, float baseSelectionWeight = 1f)
         {
             SceneName = sceneName;
             Flags = flags;
+            BaseSelectionWeight = baseSelectionWeight;
         }
     }
 }
