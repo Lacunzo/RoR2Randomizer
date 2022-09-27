@@ -23,6 +23,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
         public const string LUNAR_SCAV_FIGHT_SCENE_NAME = "limbo";
         public const string VOIDLING_FIGHT_SCENE_NAME = "voidraid";
         public const string VOID_FIELDS_SCENE_NAME = "arena";
+        public const string VOID_LOCUSTS_SCENE_NAME = "voidstage";
 
         static readonly string[] _excludeScenes = new string[]
         {
@@ -60,6 +61,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
                     case COMMENCEMENT_SCENE_NAME:
                     case LUNAR_SCAV_FIGHT_SCENE_NAME:
                     case VOIDLING_FIGHT_SCENE_NAME:
+                    case VOID_LOCUSTS_SCENE_NAME:
                         flags |= StageFlags.FirstStageBlacklist;
                         break;
                 }
