@@ -14,7 +14,7 @@ namespace RoR2Randomizer.RandomizerController.Stage
         const float FIRST_STAGE_WEIGHT_MULT_DEFAULT = 0.35f;
         public readonly SliderConfigValue<float> PossibleFirstStageWeightMult;
 
-        public StageRandomizerConfig(ConfigFile file) : base("Stage Randomizer", file)
+        public StageRandomizerConfig(ConfigFile file) : base("Stage", file)
         {
             FirstStageBlacklistEnabled = new BoolConfigValue(getEntry("Starting Stage Blacklist", "Ensures the first stage is always normal(ish) (No Commencement, or Voidling fight on stage 1)", true));
 

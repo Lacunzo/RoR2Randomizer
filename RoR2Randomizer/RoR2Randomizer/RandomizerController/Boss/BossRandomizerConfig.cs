@@ -20,7 +20,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
         public readonly StringConfigValue DebugBossForcedMasterName;
 #endif
 
-        public BossRandomizerConfig(ConfigFile file) : base("Boss Randomizer", file)
+        public BossRandomizerConfig(ConfigFile file) : base("Boss", file)
         {
             RandomizeMithrix = new BoolConfigValue(getEntry("Randomize Mithrix", "Randomizes the character type of Mithrix", true));
             RandomizeMithrixPhase2 = new BoolConfigValue(getEntry("Randomize Mithrix Phase 2", "Randomizes the character type of all the characters spawned during Mithrix phase 2", true));
