@@ -11,6 +11,11 @@ namespace RoR2Randomizer.Utility
 {
     public class ReplacementDictionary<T> : ReadOnlyDictionary<T, T>
     {
+        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc)
+        {
+            return CreateFrom(collection, converter, canReplaceFunc, null);
+        }
+
         public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc, Func<TSrc, TSrc, float> weightSelector)
         {
             Dictionary<T, T> result = new Dictionary<T, T>();

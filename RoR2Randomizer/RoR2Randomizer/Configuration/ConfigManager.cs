@@ -1,6 +1,7 @@
 ﻿using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerController.Buff;
 #if !DISABLE_SKILL_RANDOMIZER
 using RoR2Randomizer.RandomizerController.Skill;
 #endif
@@ -16,6 +17,7 @@ namespace RoR2Randomizer.Configuration
     {
         static readonly List<ConfigCategory> _allCategories = new List<ConfigCategory>();
 
+        public static BuffRandomizerConfig BuffRandomizer;
         public static BossRandomizerConfig BossRandomizer;
 #if !DISABLE_SKILL_RANDOMIZER
         public static SkillRandomizerConfig SkillRandomizer;
@@ -24,6 +26,7 @@ namespace RoR2Randomizer.Configuration
 
         public static void Initialize(ConfigFile file)
         {
+            _allCategories.Add(BuffRandomizer = new BuffRandomizerConfig(file));
             _allCategories.Add(StageRandomizer = new StageRandomizerConfig(file));
 #if !DISABLE_SKILL_RANDOMIZER
             _allCategories.Add(SkillRandomizer = new SkillRandomizerConfig(file));
