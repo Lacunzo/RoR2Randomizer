@@ -52,7 +52,7 @@ namespace RoR2Randomizer
 
             PatchController.Setup();
 
-            new ContentPackProvider().Init();
+            new ContentPackManager().Init();
 
             stopwatch.Stop();
             Log.Info($"Initialized in {stopwatch.Elapsed.TotalSeconds:F1} seconds");
