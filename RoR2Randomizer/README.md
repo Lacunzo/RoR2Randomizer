@@ -4,12 +4,23 @@ A randomizer mod for Risk of Rain 2!
 
 Current features:
 * Multiplayer Compatible. Every player needs to have the mod.
+* Compatibile with Risk of Options for easy configuration in-game.
 * Stage Randomizer: Swaps every stage for a random playable map.
-* Boss Randomizer: Randomizes the character types of bosses. Currently only Mithrix (https://youtu.be/EZLbivjyFMk) and Voidling (https://youtu.be/HAH9Rxyl2lU) are implemented.
+* Boss Randomizer: Randomizes the character types of bosses. Currently only [Mithrix](https://youtu.be/EZLbivjyFMk) and [Voidling](https://youtu.be/HAH9Rxyl2lU) are implemented.
+* Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.1.0 Changes:**
+
+* Status Effect Randomizer:
+  * Added Status Effect Randomizer.
+  * Includes option to disable buffs turning into debuffs and vice verse
+
+* Mod Compatibility:
+  * Added an icon in the Risk of Options settings menu
 
 **0.0.2 Changes:**
 
