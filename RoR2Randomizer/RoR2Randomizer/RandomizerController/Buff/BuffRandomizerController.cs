@@ -8,11 +8,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine.Networking;
+using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerController.Buff
 {
     public class BuffRandomizerController : Singleton<BuffRandomizerController>
     {
+        static readonly InitializeOnAccess<BuffIndex[]> _invincibilityBuffs = new InitializeOnAccess<BuffIndex[]>(() =>
+        {
+            return new BuffIndex[]
+            {
+                BuffCatalog.FindBuffIndex("bdHiddenInvincibility"),
+                BuffCatalog.FindBuffIndex("bdImmune"),
+                BuffCatalog.FindBuffIndex("bdBearVoidReady")
+            };
+        });
+
         static ReplacementDictionary<BuffIndex> _buffReplacements;
 
         protected override void Awake()
@@ -33,7 +44,17 @@ namespace RoR2Randomizer.RandomizerController.Buff
         {
             if (ConfigManager.BuffRandomizer.Enabled && NetworkServer.active)
             {
-                _buffReplacements = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None), b => b.buffIndex, (key, value) =>
+                IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None && 
+                   (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.IndexOf(_invincibilityBuffs.Get, b.buffIndex) == -1));
+
+#if DEBUG
+                foreach (BuffDef excludedBuff in BuffCatalog.buffDefs.Except(buffsToRandomize))
+                {
+                    Log.Debug($"Buff randomizer: Excluded buff: {excludedBuff}");
+                }
+#endif
+
+                _buffReplacements = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, b => b.buffIndex, (key, value) =>
                 {
                     if (!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs && key.isDebuff != value.isDebuff)
                     {

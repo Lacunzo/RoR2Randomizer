@@ -18,6 +18,9 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 * Added Survivor Starting Animation Randomizer
 
+* Status Effect Randomizer
+  * Added option to exclude invincibility buffs from the randomizer to prevent potential softlocks
+
 **0.1.0 Changes:**
 
 * Added Status Effect Randomizer.
