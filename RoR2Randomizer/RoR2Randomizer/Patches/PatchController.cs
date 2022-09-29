@@ -5,6 +5,7 @@ using RoR2Randomizer.RandomizerController.Buff;
 using RoR2Randomizer.RandomizerController.Skill;
 #endif
 using RoR2Randomizer.RandomizerController.Stage;
+using RoR2Randomizer.RandomizerController.SurvivorPod;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,8 @@ namespace RoR2Randomizer.Patches
 
             BuffRandomizer.MainPatcher.Apply();
 
+            SurvivorPodRandomizer.OverrideIntroAnimation.Apply();
+
             _patchControllersRoot = new GameObject(Main.PluginName + ".PatchControllers");
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
 
@@ -45,6 +48,7 @@ namespace RoR2Randomizer.Patches
 #endif
             _patchControllersRoot.AddComponent<StageRandomizerController>();
             _patchControllersRoot.AddComponent<BuffRandomizerController>();
+            _patchControllersRoot.AddComponent<SurvivorPodRandomizerController>();
         }
 
         public static void Cleanup()
@@ -60,6 +64,8 @@ namespace RoR2Randomizer.Patches
             MultiEntityStatePatches.MainPatcher.Cleanup();
 
             BuffRandomizer.MainPatcher.Cleanup();
+
+            SurvivorPodRandomizer.OverrideIntroAnimation.Cleanup();
         }
     }
 }

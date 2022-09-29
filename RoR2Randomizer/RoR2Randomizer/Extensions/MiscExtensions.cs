@@ -1,4 +1,5 @@
-﻿using RoR2;
+﻿using EntityStates;
+using RoR2;
 using RoR2.Skills;
 using RoR2Randomizer.Networking.BossRandomizer;
 using System;
@@ -16,6 +17,12 @@ namespace RoR2Randomizer.Extensions
         public static bool IsValid(this BossReplacementType value)
         {
             return value > BossReplacementType.Invalid && value < BossReplacementType.Count;
+        }
+
+        public static bool IsNothing(this SerializableEntityStateType state)
+        {
+            Type stateType = state.stateType;
+            return stateType == null || stateType == typeof(Uninitialized);
         }
     }
 }

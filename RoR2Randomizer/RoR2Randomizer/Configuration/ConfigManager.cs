@@ -23,6 +23,7 @@ namespace RoR2Randomizer.Configuration
         public static SkillRandomizerConfig SkillRandomizer;
 #endif
         public static StageRandomizerConfig StageRandomizer;
+        public static MiscConfig Misc;
 
         public static void Initialize(ConfigFile file)
         {
@@ -32,6 +33,7 @@ namespace RoR2Randomizer.Configuration
             _allCategories.Add(SkillRandomizer = new SkillRandomizerConfig(file));
 #endif
             _allCategories.Add(BossRandomizer = new BossRandomizerConfig(file));
+            _allCategories.Add(Misc = new MiscConfig(file));
 
             foreach (ConfigCategory category in _allCategories)
             {

@@ -41,6 +41,31 @@ namespace RoR2Randomizer.Extensions
             return fallback;
         }
 
+        public static T PickWeighted<T>(this IEnumerable<T> enumerable, Func<T, float> weightSelector)
+        {
+            int capacity;
+            if (enumerable is T[] array)
+            {
+                capacity = array.Length;
+            }
+            else if (enumerable is ICollection<T> collection)
+            {
+                capacity = collection.Count;
+            }
+            else
+            {
+                capacity = WeightedSelection<T>.minCapacity;
+            }
+
+            WeightedSelection<T> weightedSelection = new WeightedSelection<T>(capacity);
+            foreach (T item in enumerable)
+            {
+                weightedSelection.AddChoice(item, weightSelector(item));
+            }
+
+            return weightedSelection.Evaluate(RNGUtils.NormalizedFloat);
+        }
+
         public static TValue GetOrAddNew<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TValue : new()
         {
             if (!dict.TryGetValue(key, out TValue value))
