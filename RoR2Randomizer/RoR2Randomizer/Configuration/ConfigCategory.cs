@@ -15,10 +15,15 @@ namespace RoR2Randomizer.Configuration
         {
             return ReflectionUtils.GetTypeHierarchyList(type).SelectMany(t =>
             {
-                const BindingFlags FIELD_FLAGS = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
-
-                return t == type ? t.GetFields(FIELD_FLAGS).Where(f => f.FieldType.GetInterface(nameof(IConfigModCompatibility)) != null)
-                                 : _configFields[t];
+                if (t == type)
+                {
+                    return t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                            .Where(f => Array.IndexOf(f.FieldType.GetInterfaces(), typeof(IConfigModCompatibility)) != -1);
+                }
+                else
+                {
+                    return _configFields[t];
+                }
             }).ToArray();
         });
 
