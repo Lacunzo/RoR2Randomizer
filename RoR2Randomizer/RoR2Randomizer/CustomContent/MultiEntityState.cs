@@ -14,17 +14,44 @@ namespace RoR2Randomizer.CustomContent
 {
     public sealed class MultiEntityState : EntityState
     {
-        public class SubStatesData : MonoBehaviour
+        public class StateMachineSubStatesData : MonoBehaviour
         {
             public SerializableEntityStateType[] StateTypes = Array.Empty<SerializableEntityStateType>();
             public bool AlwaysExecuteEnter;
             public float MinActiveDuration;
         }
 
+        readonly struct SubState
+        {
+            public readonly EntityState EntityState;
+            public readonly Type CachedStateType;
+
+            public SubState(EntityState state)
+            {
+                EntityState = state;
+                CachedStateType = state.GetType();
+            }
+
+            SubState(EntityStateIndex index)
+            {
+                EntityState = EntityStateCatalog.InstantiateState(CachedStateType = EntityStateCatalog.GetStateType(index));
+            }
+
+            public SubState(NetworkReader reader) : this(reader.ReadEntityStateIndex())
+            {
+                EntityState.OnDeserialize(reader);
+            }
+
+            public void Serialize(NetworkWriter writer)
+            {
+                writer.Write(EntityStateCatalog.GetStateIndex(CachedStateType));
+                EntityState.OnSerialize(writer);
+            }
+        }
+
         public static readonly SerializableEntityStateType SerializableStateType = new SerializableEntityStateType(typeof(MultiEntityState));
 
-        EntityState[] _subStates = Array.Empty<EntityState>();
-        Type[] _subStateTypes = Array.Empty<Type>();
+        SubState[] _subStates = Array.Empty<SubState>();
 
         float _minActiveDuration;
         float _enterExecuteTime = -1f;
@@ -38,10 +65,10 @@ namespace RoR2Randomizer.CustomContent
         {
         }
 
-        public void Initialize(SubStatesData data)
+        public void Initialize(StateMachineSubStatesData data)
         {
-            _subStates = data.StateTypes.Select(EntityStateCatalog.InstantiateState).ToArray();
-            _subStateTypes = data.StateTypes.Select(state => state.stateType).ToArray();
+            _subStates = data.StateTypes.Select(EntityStateCatalog.InstantiateState)
+                                        .Select(state => new SubState(state)).ToArray();
 
             _alwaysExecuteEnter = data.AlwaysExecuteEnter;
 
@@ -50,11 +77,11 @@ namespace RoR2Randomizer.CustomContent
 
         public void OnOuterStateMachineAssigned()
         {
-            foreach (EntityState state in _subStates)
+            foreach (SubState subState in _subStates)
             {
-                state.outer = outer;
+                subState.EntityState.outer = outer;
 
-                if (state is MultiEntityState multiState)
+                if (subState.EntityState is MultiEntityState multiState)
                 {
                     multiState.OnOuterStateMachineAssigned();
                 }
@@ -64,10 +91,9 @@ namespace RoR2Randomizer.CustomContent
         public override void OnSerialize(NetworkWriter writer)
         {
             writer.WritePackedUInt32((uint)_subStates.Length);
-            for (int i = 0; i < _subStates.Length; i++)
+            foreach (SubState subState in _subStates)
             {
-                writer.Write(EntityStateCatalog.GetStateIndex(_subStateTypes[i]));
-                _subStates[i].OnSerialize(writer);
+                subState.Serialize(writer);
             }
 
             writer.Write(_minActiveDuration);
@@ -79,13 +105,10 @@ namespace RoR2Randomizer.CustomContent
         {
             uint length = reader.ReadPackedUInt32();
 
-            _subStates = new EntityState[length];
-            _subStateTypes = new Type[length];
+            _subStates = new SubState[length];
             for (int i = 0; i < length; i++)
             {
-                EntityState state = _subStates[i] = EntityStateCatalog.InstantiateState(reader.ReadEntityStateIndex());
-                _subStateTypes[i] = state.GetType();
-                state.OnDeserialize(reader);
+                _subStates[i] = new SubState(reader);
             }
 
             _minActiveDuration = reader.ReadSingle();
@@ -100,12 +123,11 @@ namespace RoR2Randomizer.CustomContent
 
         void onEnter(HashSet<Type> exclude)
         {
-            for (int i = 0; i < _subStates.Length; i++)
+            foreach (SubState subState in _subStates)
             {
-                EntityState state = _subStates[i];
-                if (exclude == null || !exclude.Contains(_subStateTypes[i]))
+                if (exclude == null || !exclude.Contains(subState.CachedStateType))
                 {
-                    state.OnEnter();
+                    subState.EntityState.OnEnter();
                 }
             }
 
@@ -123,14 +145,13 @@ namespace RoR2Randomizer.CustomContent
                 onEnter(excludeEnterTypes);
             }
 
-            for (int i = 0; i < _subStates.Length; i++)
+            foreach (SubState subState in _subStates)
             {
-                EntityState state = _subStates[i];
-                if (state != null && (excludeExitTypes == null || !excludeExitTypes.Contains(_subStateTypes[i])))
+                if (subState.EntityState != null && (excludeExitTypes == null || !excludeExitTypes.Contains(subState.CachedStateType)))
                 {
                     try
                     {
-                        state.OnExit();
+                        subState.EntityState.OnExit();
                     }
                     catch (Exception e)
                     {
@@ -167,46 +188,46 @@ namespace RoR2Randomizer.CustomContent
 
         public override void OnExit()
         {
-            foreach (EntityState state in _subStates)
+            foreach (SubState subState in _subStates)
             {
-                state.OnExit();
+                subState.EntityState.OnExit();
             }
         }
 
         public override void ModifyNextState(EntityState nextState)
         {
-            foreach (EntityState state in _subStates)
+            foreach (SubState subState in _subStates)
             {
-                state.ModifyNextState(nextState);
+                subState.EntityState.ModifyNextState(nextState);
             }
         }
 
         public override void Update()
         {
-            foreach (EntityState state in _subStates)
+            foreach (SubState subState in _subStates)
             {
-                state.Update();
+                subState.EntityState.Update();
             }
         }
 
         public override void FixedUpdate()
         {
-            foreach (EntityState state in _subStates)
+            foreach (SubState subState in _subStates)
             {
-                state.FixedUpdate();
+                subState.EntityState.FixedUpdate();
             }
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()
         {
-            return (InterruptPriority)_subStates.Select(state => (int)state.GetMinimumInterruptPriority()).Max();
+            return (InterruptPriority)_subStates.Select(subState => (int)subState.EntityState.GetMinimumInterruptPriority()).Max();
         }
 
         public override void PlayAnimation(string layerName, string animationStateName)
         {
-            foreach (EntityState state in _subStates)
+            foreach (SubState subState in _subStates)
             {
-                state.PlayAnimation(layerName, animationStateName);
+                subState.EntityState.PlayAnimation(layerName, animationStateName);
             }
         }
     }

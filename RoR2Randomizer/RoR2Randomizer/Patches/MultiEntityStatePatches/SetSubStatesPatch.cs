@@ -39,7 +39,7 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 
         static void tryInitializeMultiState(EntityState state, Component subStateDataHolder)
         {
-            if (state is MultiEntityState multiState && subStateDataHolder.TryGetComponent<MultiEntityState.SubStatesData>(out MultiEntityState.SubStatesData subStateData))
+            if (state is MultiEntityState multiState && subStateDataHolder.TryGetComponent<MultiEntityState.StateMachineSubStatesData>(out MultiEntityState.StateMachineSubStatesData subStateData))
             {
                 multiState.Initialize(subStateData);
             }

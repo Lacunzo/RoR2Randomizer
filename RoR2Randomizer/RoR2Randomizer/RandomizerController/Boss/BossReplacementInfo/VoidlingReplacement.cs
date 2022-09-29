@@ -78,7 +78,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             }
             else if (deathStateType != voidlingDeathState.stateType) // If the death state is already the one we want, nothing needs to be done
             {
-                MultiEntityState.SubStatesData subStatesData = deathBehavior.gameObject.AddComponent<MultiEntityState.SubStatesData>();
+                MultiEntityState.StateMachineSubStatesData subStatesData = deathBehavior.gameObject.AddComponent<MultiEntityState.StateMachineSubStatesData>();
                 subStatesData.StateTypes = new SerializableEntityStateType[] { deathBehavior.deathState, voidlingDeathState };
                 subStatesData.AlwaysExecuteEnter = true;
 
