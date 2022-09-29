@@ -14,7 +14,7 @@ namespace RoR2Randomizer.Configuration
 
         public MiscConfig(ConfigFile file) : base("Miscellaneous", file)
         {
-            SurvivorPodRandomizerEnabled = new BoolConfigValue(getEntry("Survivor Spawn Pod Randomizer", "", true));
+            SurvivorPodRandomizerEnabled = new BoolConfigValue(getEntry("Survivor Spawn Pod Randomizer", "Randomizes the intro animation of all survivors.", true));
         }
     }
 }
