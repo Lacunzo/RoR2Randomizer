@@ -36,10 +36,7 @@ namespace RoR2Randomizer.Utility
                     TSrc value;
                     if (hasWeightSelector)
                     {
-                        WeightedSelection<TSrc> weightedSelection = new WeightedSelection<TSrc>(availableValues.Count());
-                        availableValues.Do(v => weightedSelection.AddChoice(v, weightSelector(key, v)));
-
-                        value = weightedSelection.Evaluate(RNGUtils.NormalizedFloat);
+                        value = availableValues.PickWeighted(v => weightSelector(key, v));
                     }
                     else
                     {
