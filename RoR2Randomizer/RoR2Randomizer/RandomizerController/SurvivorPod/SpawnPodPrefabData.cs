@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace RoR2Randomizer.RandomizerController.SurvivorPod
 {
-    public struct SpawnPodPrefabData
+    public readonly struct SpawnPodPrefabData
     {
         public readonly bool IsSpawnState;
 
