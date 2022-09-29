@@ -66,11 +66,6 @@ namespace RoR2Randomizer.RandomizerController.Buff
             return false;
         });
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
         void OnDestroy()
         {
             _buffReplacements.Dispose();

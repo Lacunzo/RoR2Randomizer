@@ -63,11 +63,6 @@ namespace RoR2Randomizer.RandomizerController.SurvivorPod
             return false;
         });
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
         void OnDestroy()
         {
             _overrideSpawnPodPrefabs.Dispose();
