@@ -44,44 +44,38 @@ namespace RoR2Randomizer.RandomizerController.SurvivorPod
             return default;
         }
 
-        static Dictionary<BodyIndex, SpawnPodPrefabData> _overrideSpawnPodPrefabs;
-
-        protected override void Awake()
+        static readonly RunSpecific<Dictionary<BodyIndex, SpawnPodPrefabData>> _overrideSpawnPodPrefabs = new RunSpecific<Dictionary<BodyIndex, SpawnPodPrefabData>>((out Dictionary<BodyIndex, SpawnPodPrefabData> result) =>
         {
-            base.Awake();
-
-            Run.onRunStartGlobal += runStarted;
-            Run.onRunDestroyGlobal += runDestroyed;
-        }
-
-        void OnDestroy()
-        {
-            Run.onRunStartGlobal -= runStarted;
-            Run.onRunDestroyGlobal -= runDestroyed;
-        }
-
-        static void runStarted(Run instance)
-        {
-            if (ConfigManager.Misc.SurvivorPodRandomizerEnabled && NetworkServer.active)
+            if (NetworkServer.active && ConfigManager.Misc.SurvivorPodRandomizerEnabled)
             {
-                _overrideSpawnPodPrefabs = new Dictionary<BodyIndex, SpawnPodPrefabData>();
+                result = new Dictionary<BodyIndex, SpawnPodPrefabData>();
 
                 foreach (CharacterBody body in _bodiesWithPods.Get)
                 {
                     SpawnPodPrefabData defaultSpawnData = getDefaultSpawnData(body);
-                    _overrideSpawnPodPrefabs.Add(body.bodyIndex, _distinctPodPrefabs.Get.PickWeighted(s => s == defaultSpawnData ? 0.5f : 1f));
+                    result.Add(body.bodyIndex, _distinctPodPrefabs.Get.PickWeighted(s => s == defaultSpawnData ? 0.5f : 1f));
                 }
+
+                return true;
             }
+
+            result = default;
+            return false;
+        });
+
+        protected override void Awake()
+        {
+            base.Awake();
         }
 
-        static void runDestroyed(Run instance)
+        void OnDestroy()
         {
-            _overrideSpawnPodPrefabs = null;
+            _overrideSpawnPodPrefabs.Dispose();
         }
 
         public static void TryOverrideIntroAnimation(CharacterBody body)
         {
-            if (NetworkServer.active && _overrideSpawnPodPrefabs != null && _overrideSpawnPodPrefabs.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
+            if (NetworkServer.active && _overrideSpawnPodPrefabs.HasValue && _overrideSpawnPodPrefabs.Value.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
             {
                 if (replacementPod.IsSpawnState)
                 {
