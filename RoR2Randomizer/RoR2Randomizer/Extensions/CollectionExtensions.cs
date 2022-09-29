@@ -25,14 +25,7 @@ namespace RoR2Randomizer.Extensions
             }
             else
             {
-                if (enumerable is ICollection<T> collection)
-                {
-                    count = collection.Count;
-                }
-                else
-                {
-                    count = enumerable.Count();
-                }
+                count = enumerable.Count();
 
                 if (count > 0)
                     return enumerable.ElementAt(RNGUtils.RangeInt(0, count));
@@ -48,13 +41,9 @@ namespace RoR2Randomizer.Extensions
             {
                 capacity = array.Length;
             }
-            else if (enumerable is ICollection<T> collection)
-            {
-                capacity = collection.Count;
-            }
             else
             {
-                capacity = WeightedSelection<T>.minCapacity;
+                capacity = enumerable.Count();
             }
 
             WeightedSelection<T> weightedSelection = new WeightedSelection<T>(capacity);
