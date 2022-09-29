@@ -34,13 +34,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             }
         }
 
-        protected override CharacterMaster originalBossMasterPrefab => replacementType switch
-        {
-            BossReplacementType.VoidlingPhase1 => Caches.MasterPrefabs["MiniVoidRaidCrabMasterPhase1"],
-            BossReplacementType.VoidlingPhase2 => Caches.MasterPrefabs["MiniVoidRaidCrabMasterPhase2"],
-            BossReplacementType.VoidlingPhase3 => Caches.MasterPrefabs["MiniVoidRaidCrabMasterPhase3"],
-            _ => null
-        };
+        protected override CharacterMaster originalBossMasterPrefab => Caches.MasterPrefabs[$"MiniVoidRaidCrabMasterPhase{Phase}"];
 
         protected override void bodyResolved()
         {
