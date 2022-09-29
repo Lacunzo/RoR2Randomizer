@@ -33,7 +33,13 @@ namespace RoR2Randomizer.Utility
         void onRunStart(Run instance)
         {
             if (HasValue = _getNewValue(out T value))
+            {
                 Value = value;
+            }
+            else
+            {
+                Value = _defaultValue;
+            }
         }
 
         void onRunEnd(Run instance)
