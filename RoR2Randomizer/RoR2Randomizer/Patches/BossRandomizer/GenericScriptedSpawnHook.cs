@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 
 namespace RoR2Randomizer.Patches.BossRandomizer
 {
+    [PatchClass]
     public static class GenericScriptedSpawnHook
     {
         public delegate bool OverrideSpawnPrefabDelegate(SpawnCard card, out GameObject overridePrefab);
@@ -35,12 +36,12 @@ namespace RoR2Randomizer.Patches.BossRandomizer
 
         public static event Action<SpawnCard.SpawnResult> OnSpawned;
 
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.ScriptedCombatEncounter.Spawn += ScriptedCombatEncounter_Spawn;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.ScriptedCombatEncounter.Spawn -= ScriptedCombatEncounter_Spawn;
         }

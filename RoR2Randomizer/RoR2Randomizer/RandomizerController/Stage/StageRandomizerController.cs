@@ -92,15 +92,11 @@ namespace RoR2Randomizer.RandomizerController.Stage
             base.Awake();
 
             SceneCatalog.onMostRecentSceneDefChanged += sceneLoaded;
-
-            StageRandomizerPatcher.Apply();
         }
 
         void OnDestroy()
         {
             SceneCatalog.onMostRecentSceneDefChanged -= sceneLoaded;
-
-            StageRandomizerPatcher.Cleanup();
         }
 
         void sceneLoaded(SceneDef scene)

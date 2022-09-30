@@ -5,14 +5,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
 {
+    [PatchClass]
     public static class SpellChannelState
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.BrotherMonster.SpellChannelState.OnEnter += SpellChannelState_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.BrotherMonster.SpellChannelState.OnEnter -= SpellChannelState_OnEnter;
         }

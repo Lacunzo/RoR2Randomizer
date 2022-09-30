@@ -6,14 +6,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.GreaterWispMonster
 {
+    [PatchClass]
     public static class ChargeCannons
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.GreaterWispMonster.ChargeCannons.OnEnter += ChargeCannons_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.GreaterWispMonster.ChargeCannons.OnEnter -= ChargeCannons_OnEnter;
         }

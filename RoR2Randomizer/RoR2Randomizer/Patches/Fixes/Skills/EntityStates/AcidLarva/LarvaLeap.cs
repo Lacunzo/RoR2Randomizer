@@ -9,15 +9,16 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.AcidLarva
 {
+    [PatchClass]
     public static class LarvaLeap
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.AcidLarva.LarvaLeap.OnEnter += LarvaLeap_OnEnter;
             On.EntityStates.AcidLarva.LarvaLeap.OnExit += LarvaLeap_OnExit;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.AcidLarva.LarvaLeap.OnEnter -= LarvaLeap_OnEnter;
             On.EntityStates.AcidLarva.LarvaLeap.OnExit -= LarvaLeap_OnExit;

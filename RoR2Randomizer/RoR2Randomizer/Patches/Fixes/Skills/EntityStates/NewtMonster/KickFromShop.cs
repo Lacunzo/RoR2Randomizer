@@ -11,14 +11,15 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
 {
+    [PatchClass]
     public static class KickFromShop
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.EntityStates.NewtMonster.KickFromShop.FixedUpdate += KickFromShop_FixedUpdate;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.EntityStates.NewtMonster.KickFromShop.FixedUpdate -= KickFromShop_FixedUpdate;
         }

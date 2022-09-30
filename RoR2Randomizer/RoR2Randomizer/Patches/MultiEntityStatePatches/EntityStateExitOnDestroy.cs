@@ -11,14 +11,15 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 {
+    [PatchClass]
     public static class EntityStateExitOnDestroy
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.EntityState.Destroy += EntityState_Destroy;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.EntityState.Destroy -= EntityState_Destroy;
         }

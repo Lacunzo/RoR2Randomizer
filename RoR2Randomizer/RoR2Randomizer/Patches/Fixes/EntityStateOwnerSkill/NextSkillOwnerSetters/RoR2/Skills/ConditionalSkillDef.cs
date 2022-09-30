@@ -8,14 +8,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill.NextSkillOwnerSetters.RoR2.Skills
 {
+    [PatchClass]
     public static class ConditionalSkillDef
     {
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.Skills.ConditionalSkillDef.InstantiateNextState += ConditionalSkillDef_InstantiateNextState;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.Skills.ConditionalSkillDef.InstantiateNextState -= ConditionalSkillDef_InstantiateNextState;
         }

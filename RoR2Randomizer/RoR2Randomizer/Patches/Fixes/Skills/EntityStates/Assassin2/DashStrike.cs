@@ -18,6 +18,7 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Assassin2
     // NullRef when used by non-ai character: Fixed
     // Animator states
     // HitBoxGroups
+    [PatchClass]
     public static class DashStrike
     {
         static readonly BullseyeSearch _search = new BullseyeSearch()
@@ -27,7 +28,7 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Assassin2
             maxAngleFilter = 20f
         };
 
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.Assassin2.DashStrike.OnEnter += On_DashStrike_OnEnter;
             On.EntityStates.Assassin2.DashStrike.OnExit += On_DashStrike_OnExit;
@@ -35,7 +36,7 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Assassin2
             IL.EntityStates.Assassin2.DashStrike.OnEnter += IL_DashStrike_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.Assassin2.DashStrike.OnEnter -= On_DashStrike_OnEnter;
             On.EntityStates.Assassin2.DashStrike.OnExit -= On_DashStrike_OnExit;

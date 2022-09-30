@@ -10,14 +10,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill.NextSkillOwnerSetters.RoR2.Skills
 {
+    [PatchClass]
     public static class ReloadSkillDef
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.RoR2.Skills.ReloadSkillDef.OnFixedUpdate += ReloadSkillDef_OnFixedUpdate;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.RoR2.Skills.ReloadSkillDef.OnFixedUpdate -= ReloadSkillDef_OnFixedUpdate;
         }

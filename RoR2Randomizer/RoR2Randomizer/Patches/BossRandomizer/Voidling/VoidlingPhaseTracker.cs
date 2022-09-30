@@ -9,6 +9,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
 {
+    [PatchClass]
     public sealed class VoidlingPhaseTracker : BossPhaseTracker<VoidlingPhaseTracker>
     {
         static uint? _totalNumPhases = null;
@@ -32,18 +33,28 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
         {
         }
 
-        public override void ApplyPatches()
+        static void ApplyPatches()
         {
-            base.ApplyPatches();
+            new VoidlingPhaseTracker().applyPatches();
+        }
+
+        static void CleanupPatches()
+        {
+            Instance?.cleanupPatches();
+        }
+
+        protected override void applyPatches()
+        {
+            base.applyPatches();
 
             On.RoR2.VoidRaidGauntletController.Start += VoidRaidGauntletController_Start;
             On.RoR2.ScriptedCombatEncounter.BeginEncounter += ScriptedCombatEncounter_BeginEncounter;
             On.EntityStates.VoidRaidCrab.DeathState.OnEnter += DeathState_OnEnter;
         }
 
-        public override void CleanupPatches()
+        protected override void cleanupPatches()
         {
-            base.CleanupPatches();
+            base.cleanupPatches();
 
             On.RoR2.VoidRaidGauntletController.Start -= VoidRaidGauntletController_Start;
             On.RoR2.ScriptedCombatEncounter.BeginEncounter -= ScriptedCombatEncounter_BeginEncounter;

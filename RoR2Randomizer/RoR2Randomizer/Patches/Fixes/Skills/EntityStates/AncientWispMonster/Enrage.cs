@@ -10,14 +10,15 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.AncientWispMonster
 {
+    [PatchClass]
     public static class Enrage
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.EntityStates.AncientWispMonster.Enrage.FixedUpdate += FixedUpdate_ActivateWithoutAnimatorValues_ILPatch;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.EntityStates.AncientWispMonster.Enrage.FixedUpdate -= FixedUpdate_ActivateWithoutAnimatorValues_ILPatch;
         }

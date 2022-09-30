@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.StageRandomizer
 {
+    [PatchClass]
     public static class OverrideSceneLoadPatch
     {
         static readonly Hook UnityEngine_Networking_NetworkManager_ServerChangeScene_Hook = new Hook(SymbolExtensions.GetMethodInfo<NetworkManager>(_ => _.ServerChangeScene(default)), (Action<NetworkManager, string> orig, NetworkManager self, string newSceneName) =>
@@ -18,12 +19,12 @@ namespace RoR2Randomizer.Patches.StageRandomizer
             orig(self, newSceneName);
         });
 
-        public static void Apply()
+        static void Apply()
         {
             UnityEngine_Networking_NetworkManager_ServerChangeScene_Hook?.Apply();
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             UnityEngine_Networking_NetworkManager_ServerChangeScene_Hook?.Undo();
         }

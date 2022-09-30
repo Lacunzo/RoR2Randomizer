@@ -9,24 +9,35 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
+    [PatchClass]
     public sealed class MithrixPhaseTracker : BossPhaseTracker<MithrixPhaseTracker>
     {
         public MithrixPhaseTracker() : base("Mithrix")
         {
         }
 
-        public override void ApplyPatches()
+        static void ApplyPatches()
         {
-            base.ApplyPatches();
+            new MithrixPhaseTracker().applyPatches();
+        }
+
+        static void CleanupPatches()
+        {
+            Instance?.cleanupPatches();
+        }
+
+        protected override void applyPatches()
+        {
+            base.applyPatches();
 
             IL.EntityStates.Missions.BrotherEncounter.BrotherEncounterPhaseBaseState.OnEnter += BrotherEncounterPhaseBaseState_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.PreEncounter.OnEnter += PreEncounter_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.EncounterFinished.OnEnter += EncounterFinished_OnEnter;
         }
 
-        public override void CleanupPatches()
+        protected override void cleanupPatches()
         {
-            base.CleanupPatches();
+            base.cleanupPatches();
 
             IL.EntityStates.Missions.BrotherEncounter.BrotherEncounterPhaseBaseState.OnEnter -= BrotherEncounterPhaseBaseState_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.PreEncounter.OnEnter -= PreEncounter_OnEnter;

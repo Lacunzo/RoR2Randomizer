@@ -10,16 +10,17 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
+    [PatchClass]
     public static class MithrixSpawnCardTracker
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.Missions.BrotherEncounter.Phase1.OnEnter += Phase1_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.Phase2.OnEnter += Phase2_OnEnter;
             IL.EntityStates.Missions.BrotherEncounter.Phase4.OnEnter += Phase4_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.Missions.BrotherEncounter.Phase1.OnEnter -= Phase1_OnEnter;
             On.EntityStates.Missions.BrotherEncounter.Phase2.OnEnter -= Phase2_OnEnter;

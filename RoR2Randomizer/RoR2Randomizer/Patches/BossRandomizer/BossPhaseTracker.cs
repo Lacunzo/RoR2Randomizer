@@ -79,12 +79,12 @@ namespace RoR2Randomizer.Patches.BossRandomizer
             Instance = (T)this;
         }
 
-        public virtual void ApplyPatches()
+        protected virtual void applyPatches()
         {
             SceneCatalog.onMostRecentSceneDefChanged += onSceneLoaded;
         }
 
-        public virtual void CleanupPatches()
+        protected virtual void cleanupPatches()
         {
             SceneCatalog.onMostRecentSceneDefChanged -= onSceneLoaded;
         }

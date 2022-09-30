@@ -26,23 +26,13 @@ namespace RoR2Randomizer.Patches
         {
             _harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
 
-            BossRandomizer.MainPatcher.Apply();
-            SkillPatcher.Apply();
-
-            MultiEntityStatePatches.MainPatcher.Apply();
-
-            BuffRandomizer.MainPatcher.Apply();
-
-            SurvivorPodRandomizer.OverrideIntroAnimation.Apply();
-
-            ProjectileRandomizer.MainPatcher.Apply();
+            PatchClassAttribute.ApplyAllPatches();
 
             _patchControllersRoot = new GameObject(Main.PluginName + ".PatchControllers");
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
 
 #if DEBUG
             _patchControllersRoot.AddComponent<DebugButtonsManager>();
-            _patchControllersRoot.AddComponent<Debug.SpawnDisabler>();
 #endif
 
             _patchControllersRoot.AddComponent<BossRandomizerController>();
@@ -62,16 +52,7 @@ namespace RoR2Randomizer.Patches
 
             _harmonyInstance.UnpatchSelf();
 
-            BossRandomizer.MainPatcher.Cleanup();
-            SkillPatcher.Cleanup();
-
-            MultiEntityStatePatches.MainPatcher.Cleanup();
-
-            BuffRandomizer.MainPatcher.Cleanup();
-
-            SurvivorPodRandomizer.OverrideIntroAnimation.Cleanup();
-
-            ProjectileRandomizer.MainPatcher.Cleanup();
+            PatchClassAttribute.CleanupAllPatches();
         }
     }
 }

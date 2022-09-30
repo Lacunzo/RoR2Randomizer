@@ -12,15 +12,16 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.StageRandomizer
 {
+    [PatchClass]
     public static class ArtifactTrialFixPatch
     {
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.ArtifactTrialMissionController.Awake += ArtifactTrialMissionController_Awake;
             IL.RoR2.PortalDialerController.OpenArtifactPortalServer += PortalDialerController_OpenArtifactPortalServer;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.ArtifactTrialMissionController.Awake -= ArtifactTrialMissionController_Awake;
             IL.RoR2.PortalDialerController.OpenArtifactPortalServer -= PortalDialerController_OpenArtifactPortalServer;

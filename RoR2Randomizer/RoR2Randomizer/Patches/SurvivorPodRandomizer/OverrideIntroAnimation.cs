@@ -8,15 +8,16 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.SurvivorPodRandomizer
 {
+    [PatchClass]
     public static class OverrideIntroAnimation
     {
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.Run.HandlePlayerFirstEntryAnimation += Run_HandlePlayerFirstEntryAnimation;
             On.RoR2.InfiniteTowerRun.HandlePlayerFirstEntryAnimation += InfiniteTowerRun_HandlePlayerFirstEntryAnimation;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.Run.HandlePlayerFirstEntryAnimation -= Run_HandlePlayerFirstEntryAnimation;
             On.RoR2.InfiniteTowerRun.HandlePlayerFirstEntryAnimation -= InfiniteTowerRun_HandlePlayerFirstEntryAnimation;

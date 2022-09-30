@@ -7,14 +7,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.ArtifactShell
 {
+    [PatchClass]
     public static class FireSolarFlares
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.ArtifactShell.FireSolarFlares.OnEnter += FireSolarFlares_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.ArtifactShell.FireSolarFlares.OnEnter -= FireSolarFlares_OnEnter;
         }

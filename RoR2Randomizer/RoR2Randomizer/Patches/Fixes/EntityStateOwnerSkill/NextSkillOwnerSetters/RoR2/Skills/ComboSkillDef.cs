@@ -8,14 +8,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill.NextSkillOwnerSetters.RoR2.Skills
 {
+    [PatchClass]
     public static class ComboSkillDef
     {
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.Skills.ComboSkillDef.InstantiateNextState += ComboSkillDef_InstantiateNextState;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.Skills.ComboSkillDef.InstantiateNextState -= ComboSkillDef_InstantiateNextState;
         }

@@ -11,14 +11,15 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 {
+    [PatchClass]
     public static class InitializeMultiStatePatch
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.RoR2.CharacterDeathBehavior.OnDeath += CharacterDeathBehavior_OnDeath;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.RoR2.CharacterDeathBehavior.OnDeath -= CharacterDeathBehavior_OnDeath;
         }

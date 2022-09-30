@@ -15,7 +15,7 @@ namespace RoR2Randomizer.Utility
         {
             if (Input.GetKeyDown(KeyCode.Keypad0))
             {
-                SpawnDisabler.Instance.ToggleSpawnsDisabled();
+                SpawnDisabler.ToggleSpawnsDisabled();
             }
             else if (Input.GetKeyDown(KeyCode.Keypad1))
             {

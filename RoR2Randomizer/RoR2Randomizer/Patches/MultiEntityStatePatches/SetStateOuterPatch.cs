@@ -11,9 +11,10 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 {
+    [PatchClass]
     public static class SetStateOuterPatch
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.RoR2.EntityStateMachine.Awake += setOuterHook;
             IL.RoR2.EntityStateMachine.SetState += setOuterHook;
@@ -21,7 +22,7 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
             IL.RoR2.NetworkStateMachine.OnDeserialize += setOuterHook;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.RoR2.EntityStateMachine.Awake -= setOuterHook;
             IL.RoR2.EntityStateMachine.SetState -= setOuterHook;

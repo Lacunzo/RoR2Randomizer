@@ -8,32 +8,23 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.EntityStateOwnerSkill
 {
+    [PatchClass]
     public static class MainPatcher
     {
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.EntityStateCatalog.InstantiateState_Type += EntityStateCatalog_InstantiateState_Type;
             On.RoR2.EntityStateCatalog.InstantiateState_EntityStateIndex += EntityStateCatalog_InstantiateState_EntityStateIndex;
 
             On.RoR2.EntityStateMachine.SetNextState += EntityStateMachine_SetNextState;
-
-            NextSkillOwnerSetters.RoR2.Skills.ComboSkillDef.Apply();
-            NextSkillOwnerSetters.RoR2.Skills.ConditionalSkillDef.Apply();
-            NextSkillOwnerSetters.RoR2.Skills.ReloadSkillDef.Apply();
-            NextSkillOwnerSetters.RoR2.Skills.SkillDef.Apply();
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.EntityStateCatalog.InstantiateState_Type -= EntityStateCatalog_InstantiateState_Type;
             On.RoR2.EntityStateCatalog.InstantiateState_EntityStateIndex -= EntityStateCatalog_InstantiateState_EntityStateIndex;
 
             On.RoR2.EntityStateMachine.SetNextState -= EntityStateMachine_SetNextState;
-
-            NextSkillOwnerSetters.RoR2.Skills.ComboSkillDef.Cleanup();
-            NextSkillOwnerSetters.RoR2.Skills.ConditionalSkillDef.Cleanup();
-            NextSkillOwnerSetters.RoR2.Skills.ReloadSkillDef.Cleanup();
-            NextSkillOwnerSetters.RoR2.Skills.SkillDef.Cleanup();
         }
 
         static void EntityStateMachine_SetNextState(On.RoR2.EntityStateMachine.orig_SetNextState orig, EntityStateMachine self, EntityState newNextState)

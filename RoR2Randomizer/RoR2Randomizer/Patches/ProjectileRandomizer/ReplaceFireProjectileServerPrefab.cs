@@ -12,16 +12,17 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.ProjectileRandomizer
 {
+    [PatchClass]
     public static class ReplaceFireProjectileServerPrefab
     {
-        public static void Apply()
+        static void Apply()
         {
             On.RoR2.Projectile.ProjectileManager.FireProjectileServer += ProjectileManager_FireProjectileServer;
 
             IL.RoR2.Projectile.ProjectileManager.FireProjectileClient += ProjectileManager_FireProjectileClient;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.RoR2.Projectile.ProjectileManager.FireProjectileServer -= ProjectileManager_FireProjectileServer;
 

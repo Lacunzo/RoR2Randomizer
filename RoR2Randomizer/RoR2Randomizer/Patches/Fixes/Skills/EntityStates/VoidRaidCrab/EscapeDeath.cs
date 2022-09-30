@@ -5,14 +5,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.VoidRaidCrab
 {
+    [PatchClass]
     public static class EscapeDeath
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.VoidRaidCrab.EscapeDeath.OnEnter += EscapeDeath_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.VoidRaidCrab.EscapeDeath.OnEnter -= EscapeDeath_OnEnter;
         }

@@ -9,14 +9,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Bandit2.Weapon
 {
+    [PatchClass]
     public static class SlashBlade
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.Bandit2.Weapon.SlashBlade.OnEnter += SlashBlade_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.Bandit2.Weapon.SlashBlade.OnEnter -= SlashBlade_OnEnter;
         }

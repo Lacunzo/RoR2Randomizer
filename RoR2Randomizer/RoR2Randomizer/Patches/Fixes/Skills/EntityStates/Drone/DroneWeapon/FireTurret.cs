@@ -6,14 +6,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Drone.DroneWeapon
 {
+    [PatchClass]
     public static class FireTurret
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.Drone.DroneWeapon.FireTurret.OnEnter += FireTurret_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.Drone.DroneWeapon.FireTurret.OnEnter -= FireTurret_OnEnter;
         }

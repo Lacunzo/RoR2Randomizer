@@ -6,14 +6,15 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Assassin2
 {
+    [PatchClass]
     public static class ThrowShuriken
     {
-        public static void Apply()
+        static void Apply()
         {
             On.EntityStates.Assassin2.ThrowShuriken.OnEnter += ThrowShuriken_OnEnter;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             On.EntityStates.Assassin2.ThrowShuriken.OnEnter -= ThrowShuriken_OnEnter;
         }

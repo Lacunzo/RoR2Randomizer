@@ -14,15 +14,16 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
 {
+    [PatchClass]
     public static class SpellBaseState
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.EntityStates.BrotherMonster.SpellBaseState.OnEnter += SpellBaseState_OnEnter;
             IL.EntityStates.BrotherMonster.SpellBaseState.InitItemStealer += SpellBaseState_InitItemStealer;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.EntityStates.BrotherMonster.SpellBaseState.OnEnter -= SpellBaseState_OnEnter;
             IL.EntityStates.BrotherMonster.SpellBaseState.InitItemStealer -= SpellBaseState_InitItemStealer;

@@ -13,6 +13,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
+    [PatchClass]
     public static class BrotherSpeechDriver_ReplaceName
     {
         class OverrideMithrixChatMessage : Chat.NpcChatMessage
@@ -62,7 +63,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
             }
         }
 
-        public static void Apply()
+        static void Apply()
         {
             ChatMessageBase.chatMessageTypeToIndex.Add(typeof(OverrideMithrixChatMessage), (byte)ChatMessageBase.chatMessageIndexToType.Count);
             ChatMessageBase.chatMessageIndexToType.Add(typeof(OverrideMithrixChatMessage));
@@ -70,7 +71,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
             IL.RoR2.CharacterSpeech.CharacterSpeechController.SpeakNow += CharacterSpeechController_SpeakNow;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             ChatMessageBase.chatMessageTypeToIndex.Remove(typeof(OverrideMithrixChatMessage));
             ChatMessageBase.chatMessageIndexToType.Remove(typeof(OverrideMithrixChatMessage));

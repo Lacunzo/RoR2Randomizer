@@ -8,14 +8,15 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.StageRandomizer
 {
+    [PatchClass]
     public static class InitializeStageReplacementsPatch
     {
-        public static void Apply()
+        static void Apply()
         {
             IL.RoR2.Run.Start += Run_Start;
         }
 
-        public static void Cleanup()
+        static void Cleanup()
         {
             IL.RoR2.Run.Start -= Run_Start;
         }

@@ -5,23 +5,22 @@ using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Debug
 {
-    public class SpawnDisabler : Singleton<SpawnDisabler>
+    [PatchClass]
+    public static class SpawnDisabler
     {
         static bool _spawnsDisabled;
 
-        protected override void Awake()
+        static void ApplyPatches()
         {
-            base.Awake();
-
             On.RoR2.CombatDirector.Spawn += CombatDirector_Spawn;
         }
 
-        void OnDestroy()
+        static void CleanupPatches()
         {
             On.RoR2.CombatDirector.Spawn -= CombatDirector_Spawn;
         }
 
-        public void ToggleSpawnsDisabled()
+        public static void ToggleSpawnsDisabled()
         {
             _spawnsDisabled = !_spawnsDisabled;
             Chat.AddMessage($"Spawns {(_spawnsDisabled ? "Disabled" : "Enabled")}");
