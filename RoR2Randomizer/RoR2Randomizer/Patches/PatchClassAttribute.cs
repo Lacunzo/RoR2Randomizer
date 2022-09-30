@@ -29,28 +29,34 @@ namespace RoR2Randomizer.Patches
                 _cleanupMethod = type.GetMethod(CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS) ?? type.GetMethod(ALT_CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS);
 
                 if (_applyMethod == null)
-                    throw new MissingMethodException($"Patch class {type.FullName} does not have a {APPLY_METHOD_NAME} or {ALT_APPLY_METHOD_NAME} method");
+                    Log.Error($"Patch class {type.FullName} does not have a {APPLY_METHOD_NAME} or {ALT_APPLY_METHOD_NAME} method");
 
                 if (_cleanupMethod == null)
-                    throw new MissingMethodException($"Patch class {type.FullName} does not have a {CLEANUP_METHOD_NAME} or {ALT_CLEANUP_METHOD_NAME} method");
+                    Log.Error($"Patch class {type.FullName} does not have a {CLEANUP_METHOD_NAME} or {ALT_CLEANUP_METHOD_NAME} method");
             }
 
             public void Apply()
             {
-                _applyMethod.Invoke(null, Array.Empty<object>());
+                if (_applyMethod != null)
+                {
+                    _applyMethod.Invoke(null, Array.Empty<object>());
 
 #if DEBUG
-                Log.Debug($"Applied patch class '{_applyMethod.DeclaringType.FullName}'");
+                    Log.Debug($"Applied patch class '{_applyMethod.DeclaringType.FullName}'");
 #endif
+                }
             }
 
             public void Cleanup()
             {
-                _cleanupMethod.Invoke(null, Array.Empty<object>());
+                if (_cleanupMethod != null)
+                {
+                    _cleanupMethod.Invoke(null, Array.Empty<object>());
 
 #if DEBUG
-                Log.Debug($"Cleaned up patch class '{_cleanupMethod.DeclaringType.FullName}'");
+                    Log.Debug($"Cleaned up patch class '{_cleanupMethod.DeclaringType.FullName}'");
 #endif
+                }
             }
         }
 
