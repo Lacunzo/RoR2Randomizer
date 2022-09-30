@@ -12,8 +12,8 @@ namespace RoR2Randomizer.Patches
     {
         readonly struct PatchClassInfo
         {
-            public readonly MethodInfo ApplyMethod;
-            public readonly MethodInfo CleanupMethod;
+            readonly MethodInfo _applyMethod;
+            readonly MethodInfo _cleanupMethod;
 
             public PatchClassInfo(Type type)
             {
@@ -25,31 +25,31 @@ namespace RoR2Randomizer.Patches
 
                 const BindingFlags PATCH_METHOD_FLAGS = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
-                ApplyMethod = type.GetMethod(APPLY_METHOD_NAME, PATCH_METHOD_FLAGS) ?? type.GetMethod(ALT_APPLY_METHOD_NAME, PATCH_METHOD_FLAGS);
-                CleanupMethod = type.GetMethod(CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS) ?? type.GetMethod(ALT_CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS);
+                _applyMethod = type.GetMethod(APPLY_METHOD_NAME, PATCH_METHOD_FLAGS) ?? type.GetMethod(ALT_APPLY_METHOD_NAME, PATCH_METHOD_FLAGS);
+                _cleanupMethod = type.GetMethod(CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS) ?? type.GetMethod(ALT_CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS);
 
-                if (ApplyMethod == null)
+                if (_applyMethod == null)
                     throw new MissingMethodException($"Patch class {type.FullName} does not have a {APPLY_METHOD_NAME} or {ALT_APPLY_METHOD_NAME} method");
 
-                if (CleanupMethod == null)
+                if (_cleanupMethod == null)
                     throw new MissingMethodException($"Patch class {type.FullName} does not have a {CLEANUP_METHOD_NAME} or {ALT_CLEANUP_METHOD_NAME} method");
             }
 
             public void Apply()
             {
-                ApplyMethod.Invoke(null, Array.Empty<object>());
+                _applyMethod.Invoke(null, Array.Empty<object>());
 
 #if DEBUG
-                Log.Debug($"Applied patch class '{ApplyMethod.DeclaringType.FullName}'");
+                Log.Debug($"Applied patch class '{_applyMethod.DeclaringType.FullName}'");
 #endif
             }
 
             public void Cleanup()
             {
-                CleanupMethod.Invoke(null, Array.Empty<object>());
+                _cleanupMethod.Invoke(null, Array.Empty<object>());
 
 #if DEBUG
-                Log.Debug($"Cleaned up patch class '{CleanupMethod.DeclaringType.FullName}'");
+                Log.Debug($"Cleaned up patch class '{_cleanupMethod.DeclaringType.FullName}'");
 #endif
             }
         }
