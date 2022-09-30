@@ -15,7 +15,7 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
-**0._._ Changes:**
+**0.3.0 Changes:**
 
 * Added Projectile Randomizer.
 
