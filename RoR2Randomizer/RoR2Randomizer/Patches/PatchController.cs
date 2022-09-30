@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RoR2Randomizer.RandomizerController.Boss;
 using RoR2Randomizer.RandomizerController.Buff;
+using RoR2Randomizer.RandomizerController.Projectile;
 #if !DISABLE_SKILL_RANDOMIZER
 using RoR2Randomizer.RandomizerController.Skill;
 #endif
@@ -34,6 +35,8 @@ namespace RoR2Randomizer.Patches
 
             SurvivorPodRandomizer.OverrideIntroAnimation.Apply();
 
+            ProjectileRandomizer.MainPatcher.Apply();
+
             _patchControllersRoot = new GameObject(Main.PluginName + ".PatchControllers");
             GameObject.DontDestroyOnLoad(_patchControllersRoot);
 
@@ -49,6 +52,7 @@ namespace RoR2Randomizer.Patches
             _patchControllersRoot.AddComponent<StageRandomizerController>();
             _patchControllersRoot.AddComponent<BuffRandomizerController>();
             _patchControllersRoot.AddComponent<SurvivorPodRandomizerController>();
+            _patchControllersRoot.AddComponent<ProjectileRandomizerController>();
         }
 
         public static void Cleanup()
@@ -66,6 +70,8 @@ namespace RoR2Randomizer.Patches
             BuffRandomizer.MainPatcher.Cleanup();
 
             SurvivorPodRandomizer.OverrideIntroAnimation.Cleanup();
+
+            ProjectileRandomizer.MainPatcher.Cleanup();
         }
     }
 }

@@ -1,4 +1,4 @@
-# RoR2 Randomizer
+# Risk of Rain 2 Randomizer
 
 A randomizer mod for Risk of Rain 2!
 
@@ -8,11 +8,16 @@ Current features:
 * Stage Randomizer: Swaps every stage for a random playable map.
 * Boss Randomizer: Randomizes the character types of bosses. Currently only [Mithrix](https://youtu.be/EZLbivjyFMk) and [Voidling](https://youtu.be/HAH9Rxyl2lU) are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
-* Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025094545190428693/randomspawnpod.gif)
+* Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
+* Projectile Randomizer: Randomizes all projectiles.
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0._._ Changes:**
+
+* Added Projectile Randomizer.
 
 **0.2.0 Changes:**
 

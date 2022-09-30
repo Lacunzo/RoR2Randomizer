@@ -13,7 +13,24 @@ namespace RoR2Randomizer.Utility
         readonly T _defaultValue;
 
         public bool HasValue { get; private set; }
-        public T Value { get; private set; }
+
+        T _value;
+        public T Value
+        {
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                _value = value;
+                HasValue = !EqualityComparer<T>.Default.Equals(value, _defaultValue);
+            }
+        }
+
+        public RunSpecific(T defaultValue = default) : this(null, defaultValue)
+        {
+        }
 
         public RunSpecific(TryGetNewValueDelegate getNewValue, T defaultValue = default)
         {
@@ -32,13 +49,16 @@ namespace RoR2Randomizer.Utility
 
         void onRunStart(Run instance)
         {
-            if (HasValue = _getNewValue(out T value))
+            if (_getNewValue != null && !HasValue)
             {
-                Value = value;
-            }
-            else
-            {
-                Value = _defaultValue;
+                if (_getNewValue(out T value))
+                {
+                    Value = value;
+                }
+                else
+                {
+                    Value = _defaultValue;
+                }
             }
         }
 
