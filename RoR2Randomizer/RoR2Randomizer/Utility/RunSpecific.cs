@@ -65,7 +65,6 @@ namespace RoR2Randomizer.Utility
         void onRunEnd(Run instance)
         {
             Value = _defaultValue;
-            HasValue = false;
         }
 
         public void Dispose()
