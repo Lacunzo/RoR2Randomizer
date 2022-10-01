@@ -107,30 +107,34 @@ namespace RoR2Randomizer.RandomizerController.Projectile
             _projectileIndicesReplacements.Dispose();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static bool getProjectileReplacement(int original, out int replacement)
-        {
 #if DEBUG
+        static bool getDebugProjectileReplacement(out int replacement)
+        {
             switch ((BossRandomizerController.DebugMode)ConfigManager.ProjectileRandomizer.DebugMode)
             {
                 case BossRandomizerController.DebugMode.Manual:
                     replacement = _projectileIndicesToRandomize.Get[_forcedProjectileIndex];
                     return true;
                 case BossRandomizerController.DebugMode.Forced:
-                    replacement = int.Parse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex);
-                    return true;
+                    return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
+                default:
+                    replacement = -1;
+                    return false;
             }
-#endif
-
-            return _projectileIndicesReplacements.Value.TryGetReplacement(original, out replacement);
         }
+#endif
 
         public static void TryOverrideProjectilePrefab(ref GameObject prefab)
         {
             if (shouldBeActive && _projectileIndicesReplacements.HasValue)
             {
                 int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
-                if (getProjectileReplacement(originalIndex, out int replacementIndex))
+                int replacementIndex;
+                if (
+#if DEBUG
+                    getDebugProjectileReplacement(out replacementIndex) ||
+#endif
+                    _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
                 {
                     GameObject replacementPrefab = ProjectileCatalog.GetProjectilePrefab(replacementIndex);
                     if (replacementPrefab)
