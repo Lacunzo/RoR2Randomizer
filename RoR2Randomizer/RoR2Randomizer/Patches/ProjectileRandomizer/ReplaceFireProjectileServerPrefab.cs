@@ -59,7 +59,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                 {
                     int prefabIndex = RoR2.Util.UintToIntMinusOne(prefabIndexPlusOne);
 
-                    if (ProjectileRandomizerController.TryGetOriginalProjectile(prefabIndex, out int originalIndex))
+                    if (ProjectileRandomizerController.TryGetOriginalProjectileIndex(prefabIndex, out int originalIndex))
                     {
                         prefabIndex = originalIndex;
                     }

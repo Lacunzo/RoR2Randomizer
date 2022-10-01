@@ -28,13 +28,29 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                                             return false;
 
                                         if (projectile.TryGetComponent<ProjectileFireChildren>(out ProjectileFireChildren projectileFireChildren)
-                                            && !projectileFireChildren.childProjectilePrefab)
+                                            && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
                                         {
 #if DEBUG
                                             Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
 #endif
 
                                             return false;
+                                        }
+
+                                        switch (projectile.name)
+                                        {
+                                            case "BanditBomblets": // Does nothing
+                                            case "EngiMineDeployer": // Constant NullRef in FixedUpdate
+                                            case "EngiWallShield": // Unfinished engi shield
+                                            case "GatewayProjectile": // Does nothing
+                                            case "NullifierBombProjectile": // Does nothing
+                                            case "ScoutGrenade": // Does nothing
+                                            case "BanditClusterGrenadeProjectile": // No collision, cannot deal damage
+                                            case "Spine": // No collision, cannot deal damage
+#if DEBUG
+                                                Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
+#endif
+                                                return false;
                                         }
 
                                         return true;
