@@ -18,8 +18,11 @@ namespace RoR2Randomizer.RandomizerController.Buff
         {
             return new BuffIndex[]
             {
+                BuffCatalog.FindBuffIndex("bdBodyArmor"),
+                BuffCatalog.FindBuffIndex("bdGoldEmpowered"),
                 BuffCatalog.FindBuffIndex("bdHiddenInvincibility"),
                 BuffCatalog.FindBuffIndex("bdImmune"),
+                BuffCatalog.FindBuffIndex("bdIntangible"),
                 BuffCatalog.FindBuffIndex("bdBearVoidReady")
             };
         });
