@@ -78,5 +78,12 @@ namespace RoR2Randomizer.RandomizerController.Buff
                 index = replacement;
             }
         }
+
+        public static void TryReplaceBuffIndex(ref int index)
+        {
+            BuffIndex buffIndex = (BuffIndex)index;
+            TryReplaceBuffIndex(ref buffIndex);
+            index = (int)buffIndex;
+        }
     }
 }
