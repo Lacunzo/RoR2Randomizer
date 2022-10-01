@@ -39,14 +39,28 @@ namespace RoR2Randomizer.RandomizerController.Projectile
 
                                         switch (projectile.name)
                                         {
+                                            case "AACannon": // Does nothing
+                                            case "AncientWispCannon": // Does nothing
                                             case "BanditBomblets": // Does nothing
+                                            case "BanditClusterBombSeed": // Clusterbombs fall through ground and do nothing
+                                            case "BanditClusterGrenadeProjectile": // No collision, cannot deal damage
+                                            case "BeetleQueenAcid": // Does nothing
+                                            case "BellBallSmall": // Does nothing
+                                            case "DroneRocket": // Does nothing
                                             case "EngiMineDeployer": // Constant NullRef in FixedUpdate
+                                            case "EngiSeekerGrenadeProjectile": // Does nothing
                                             case "EngiWallShield": // Unfinished engi shield
                                             case "GatewayProjectile": // Does nothing
+                                            case "MinorConstructOnKillProjectile": // Does nothing
                                             case "NullifierBombProjectile": // Does nothing
+                                            case "PaladinBigRocket": // Does nothing
+                                            case "RedAffixMissileProjectile": // Does nothing
                                             case "ScoutGrenade": // Does nothing
-                                            case "BanditClusterGrenadeProjectile": // No collision, cannot deal damage
+                                            case "Rocket": // Does nothing
                                             case "Spine": // No collision, cannot deal damage
+                                            case "ToolbotDroneHeal": // Does nothing
+                                            case "ToolbotDroneStun": // Does nothing
+                                            case "TreebotPounderProjectile": // Does nothing
 #if DEBUG
                                                 Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
 #endif
@@ -100,7 +114,7 @@ namespace RoR2Randomizer.RandomizerController.Projectile
             switch ((BossRandomizerController.DebugMode)ConfigManager.ProjectileRandomizer.DebugMode)
             {
                 case BossRandomizerController.DebugMode.Manual:
-                    replacement = _forcedProjectileIndex;
+                    replacement = _projectileIndicesToRandomize.Get[_forcedProjectileIndex];
                     return true;
                 case BossRandomizerController.DebugMode.Forced:
                     replacement = int.Parse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex);
@@ -164,7 +178,7 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                 bool changedProjectileIndex = false;
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
                 {
-                    if (++_forcedProjectileIndex >= ProjectileCatalog.projectilePrefabCount)
+                    if (++_forcedProjectileIndex >= _projectileIndicesToRandomize.Get.Length)
                         _forcedProjectileIndex = 0;
 
                     changedProjectileIndex = true;
@@ -172,14 +186,14 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                 else if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
                     if (--_forcedProjectileIndex < 0)
-                        _forcedProjectileIndex = ProjectileCatalog.projectilePrefabCount - 1;
+                        _forcedProjectileIndex = _projectileIndicesToRandomize.Get.Length - 1;
 
                     changedProjectileIndex = true;
                 }
 
                 if (changedProjectileIndex)
                 {
-                    Log.Debug($"Current projectile override: {ProjectileCatalog.GetProjectilePrefab(_forcedProjectileIndex).name} ({_forcedProjectileIndex})");
+                    Log.Debug($"Current projectile override: {ProjectileCatalog.GetProjectilePrefab(_projectileIndicesToRandomize.Get[_forcedProjectileIndex]).name} ({_projectileIndicesToRandomize.Get[_forcedProjectileIndex]})");
                 }
             }
         }
