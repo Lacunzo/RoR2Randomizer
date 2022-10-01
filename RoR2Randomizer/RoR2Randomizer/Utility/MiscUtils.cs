@@ -3,7 +3,9 @@ using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Extensions;
+#if DEBUG
 using RoR2Randomizer.Networking.Debug;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
