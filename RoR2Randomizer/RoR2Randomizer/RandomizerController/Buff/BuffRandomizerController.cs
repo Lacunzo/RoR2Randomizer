@@ -6,6 +6,7 @@ using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine.Networking;
 using UnityModdingUtility;
@@ -37,7 +38,7 @@ namespace RoR2Randomizer.RandomizerController.Buff
 #if DEBUG
                 foreach (BuffDef excludedBuff in BuffCatalog.buffDefs.Except(buffsToRandomize))
                 {
-                    Log.Debug($"Buff randomizer: Excluded buff: {excludedBuff}");
+                    Log.Debug($"Buff randomizer: Excluded buff: {toLogString(excludedBuff)}");
                 }
 #endif
 
@@ -46,7 +47,7 @@ namespace RoR2Randomizer.RandomizerController.Buff
                     if (!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs && key.isDebuff != value.isDebuff)
                     {
 #if DEBUG
-                        Log.Debug($"{nameof(BuffRandomizerController)}: Not allowing replacement {key.name}->{value.name}, mixing buffs and debuffs is not enabled.");
+                        Log.Debug($"{nameof(BuffRandomizerController)}: Not allowing replacement {toLogString(key)}->{toLogString(value)}, mixing buffs and debuffs is not enabled.");
 #endif
 
                         return false;
@@ -58,7 +59,7 @@ namespace RoR2Randomizer.RandomizerController.Buff
 #if DEBUG
                 foreach (KeyValuePair<BuffIndex, BuffIndex> pair in result)
                 {
-                    Log.Debug($"Replaced buff: {BuffCatalog.GetBuffDef(pair.Key)}->{BuffCatalog.GetBuffDef(pair.Value)}");
+                    Log.Debug($"Replaced buff: {toLogString(pair.Key)} -> {toLogString(pair.Value)}");
                 }
 #endif
 
@@ -69,6 +70,21 @@ namespace RoR2Randomizer.RandomizerController.Buff
             return false;
         });
 
+#if DEBUG
+        static string toLogString(BuffIndex buff)
+        {
+            return toLogString(BuffCatalog.GetBuffDef(buff));
+        }
+
+        static string toLogString(BuffDef buff)
+        {
+            if (!buff || buff == null)
+                return "null";
+
+            return $"{buff.name} ({(int)buff.buffIndex})";
+        }
+#endif
+
         void OnDestroy()
         {
             _buffReplacements.Dispose();
@@ -78,6 +94,10 @@ namespace RoR2Randomizer.RandomizerController.Buff
         {
             if (NetworkServer.active && ConfigManager.BuffRandomizer.Enabled && _buffReplacements.HasValue && _buffReplacements.Value.TryGetReplacement(index, out BuffIndex replacement))
             {
+#if DEBUG
+                Log.Debug($"Buff Randomizer: Replaced {toLogString(index)} -> {toLogString(replacement)}");
+#endif
+
                 index = replacement;
             }
         }
