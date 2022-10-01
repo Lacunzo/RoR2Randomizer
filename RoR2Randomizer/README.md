@@ -15,6 +15,12 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.3.2 Changes:**
+
+* Status Effect Randomizer:
+  * Fixed stacking effects not working
+  * Added some missing invincibility buffs to the invincibility status effect list
+
 **0.3.1 Changes:**
 
 * Projectile Randomizer:
