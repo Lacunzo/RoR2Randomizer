@@ -1,4 +1,5 @@
-﻿using BepInEx.Logging;
+﻿#if DEBUG
+using BepInEx.Logging;
 using R2API.Networking.Interfaces;
 using RoR2;
 using System;
@@ -44,7 +45,6 @@ namespace RoR2Randomizer.Networking.Debug
 
         void INetMessage.OnReceived()
         {
-#if DEBUG
             if (_fromClient.HasValidValue())
             {
                 NetworkUser fromUser = NetworkUser.readOnlyInstancesList.SingleOrDefault(user => user.id.Equals(_fromClient));
@@ -53,7 +53,7 @@ namespace RoR2Randomizer.Networking.Debug
                     Log.LogType($"[{fromUser.userName}]: {_log}", _logLevel);
                 }
             }
-#endif
         }
     }
 }
+#endif
