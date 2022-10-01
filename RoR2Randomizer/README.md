@@ -15,6 +15,13 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.3.1 Changes:**
+
+* Projectile Randomizer:
+  * Fixed Grovetender chains not working on other characters
+  * Fixed Loader grapple not working with projectile randomizer
+  * Excluded various projectiles that do nothing
+
 **0.3.0 Changes:**
 
 * Added Projectile Randomizer.
