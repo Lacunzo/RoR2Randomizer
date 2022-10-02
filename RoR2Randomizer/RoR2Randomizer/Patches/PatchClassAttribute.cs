@@ -73,6 +73,10 @@ namespace RoR2Randomizer.Patches
             {
                 patchClass.Apply();
             }
+
+#if DEBUG
+            Log.Debug($"Applied {_patchClasses.Get.Length} patch classes");
+#endif
         }
 
         public static void CleanupAllPatches()
@@ -81,6 +85,10 @@ namespace RoR2Randomizer.Patches
             {
                 patchClass.Cleanup();
             }
+
+#if DEBUG
+            Log.Debug($"Cleaned up {_patchClasses.Get.Length} patch classes");
+#endif
         }
     }
 }
