@@ -57,14 +57,14 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
             {
                 c.EmitDelegate((uint prefabIndexPlusOne) =>
                 {
-                    int prefabIndex = RoR2.Util.UintToIntMinusOne(prefabIndexPlusOne);
-
-                    if (ProjectileRandomizerController.TryGetOriginalProjectileIndex(prefabIndex, out int originalIndex))
+                    if (ProjectileRandomizerController.TryGetOriginalProjectileIndex(Util.UintToIntMinusOne(prefabIndexPlusOne), out int originalIndex))
                     {
-                        prefabIndex = originalIndex;
+                        return Util.IntToUintPlusOne(originalIndex);
                     }
-
-                    return RoR2.Util.IntToUintPlusOne(prefabIndex);
+                    else
+                    {
+                        return prefabIndexPlusOne;
+                    }
                 });
             }
         }
