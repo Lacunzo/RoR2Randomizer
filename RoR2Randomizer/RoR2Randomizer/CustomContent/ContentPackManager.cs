@@ -12,7 +12,7 @@ namespace RoR2Randomizer.CustomContent
 {
     public class ContentPackManager : IContentPackProvider
     {
-        internal readonly ContentPack contentPack = new ContentPack();
+        readonly ContentPack _contentPack = new ContentPack();
 
         public string identifier => Main.PluginGUID;
 
@@ -28,9 +28,9 @@ namespace RoR2Randomizer.CustomContent
 
         public IEnumerator LoadStaticContentAsync(LoadStaticContentAsyncArgs args)
         {
-            contentPack.identifier = identifier;
+            _contentPack.identifier = identifier;
 
-            contentPack.entityStateTypes.Add(new Type[] { typeof(MultiEntityState) });
+            _contentPack.entityStateTypes.Add(new Type[] { typeof(MultiEntityState) });
 
             args.ReportProgress(1f);
             yield break;
@@ -38,7 +38,7 @@ namespace RoR2Randomizer.CustomContent
 
         public IEnumerator GenerateContentPackAsync(GetContentPackAsyncArgs args)
         {
-            ContentPack.Copy(contentPack, args.output);
+            ContentPack.Copy(_contentPack, args.output);
             args.ReportProgress(1f);
             yield break;
         }
