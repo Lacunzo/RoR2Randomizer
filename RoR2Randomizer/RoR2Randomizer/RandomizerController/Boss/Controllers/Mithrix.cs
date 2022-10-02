@@ -30,8 +30,10 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
             public static void Initialize()
             {
-                MithrixPhaseTracker.Instance.OnEnterFight += onEnterMithrixFight;
-                MithrixPhaseTracker.Instance.OnExitFight += onExitMithrixFight;
+                if (MithrixPhaseTracker.Instance != null)
+                {
+                    MithrixPhaseTracker.Instance.IsInFight.OnChanged += IsInFight_OnChanged;
+                }
 
                 SyncBossReplacementCharacter.OnReceive += SyncBossReplacementCharacter_OnReceive;
             }
@@ -40,48 +42,46 @@ namespace RoR2Randomizer.RandomizerController.Boss
             {
                 if (MithrixPhaseTracker.Instance != null)
                 {
-                    MithrixPhaseTracker.Instance.OnEnterFight -= onEnterMithrixFight;
-                    MithrixPhaseTracker.Instance.OnExitFight -= onExitMithrixFight;
+                    MithrixPhaseTracker.Instance.IsInFight.OnChanged -= IsInFight_OnChanged;
                 }
 
                 SyncBossReplacementCharacter.OnReceive -= SyncBossReplacementCharacter_OnReceive;
             }
 
-            static void onEnterMithrixFight()
+            static void IsInFight_OnChanged(bool isInFight)
             {
                 if (NetworkServer.active)
                 {
-                    GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
+                    if (isInFight)
                     {
-                        if (ConfigManager.BossRandomizer.Enabled)
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
                         {
-                            if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
-                             || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
+                            if (ConfigManager.BossRandomizer.Enabled)
                             {
-                                overridePrefab = getBossOverrideMasterPrefab();
+                                if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
+                                 || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
+                                {
+                                    overridePrefab = getBossOverrideMasterPrefab();
 
 #if DEBUG
-                                Log.Debug($"MithrixRandomizer: Replaced {card.prefab} with {overridePrefab}");
+                                    Log.Debug($"MithrixRandomizer: Replaced {card.prefab} with {overridePrefab}");
 #endif
 
-                                return (bool)overridePrefab;
+                                    return (bool)overridePrefab;
+                                }
                             }
-                        }
 
-                        overridePrefab = null;
-                        return false;
-                    };
+                            overridePrefab = null;
+                            return false;
+                        };
 
-                    GenericScriptedSpawnHook.OnSpawned += handleSpawnedMithrixCharacterServer;
-                }
-            }
-
-            static void onExitMithrixFight()
-            {
-                if (NetworkServer.active)
-                {
-                    GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = null;
-                    GenericScriptedSpawnHook.OnSpawned -= handleSpawnedMithrixCharacterServer;
+                        GenericScriptedSpawnHook.OnSpawned += handleSpawnedMithrixCharacterServer;
+                    }
+                    else
+                    {
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = null;
+                        GenericScriptedSpawnHook.OnSpawned -= handleSpawnedMithrixCharacterServer;
+                    }
                 }
             }
 

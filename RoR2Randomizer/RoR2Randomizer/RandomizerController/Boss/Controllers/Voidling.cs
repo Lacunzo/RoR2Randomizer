@@ -39,8 +39,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
             {
                 if (VoidlingPhaseTracker.Instance != null)
                 {
-                    VoidlingPhaseTracker.Instance.OnEnterFight += onEnterVoidlingFight;
-                    VoidlingPhaseTracker.Instance.OnExitFight += onExitVoidlingFight;
+                    VoidlingPhaseTracker.Instance.IsInFight.OnChanged += IsInFight_OnChanged;
                 }
 
                 SyncBossReplacementCharacter.OnReceive += SyncBossReplacementCharacter_OnReceive;
@@ -52,13 +51,45 @@ namespace RoR2Randomizer.RandomizerController.Boss
             {
                 if (VoidlingPhaseTracker.Instance != null)
                 {
-                    VoidlingPhaseTracker.Instance.OnEnterFight -= onEnterVoidlingFight;
-                    VoidlingPhaseTracker.Instance.OnExitFight -= onExitVoidlingFight;
+                    VoidlingPhaseTracker.Instance.IsInFight.OnChanged -= IsInFight_OnChanged;
                 }
 
                 SyncBossReplacementCharacter.OnReceive -= SyncBossReplacementCharacter_OnReceive;
 
                 SceneCatalog.onMostRecentSceneDefChanged -= SceneCatalog_onMostRecentSceneDefChanged;
+            }
+
+            static void IsInFight_OnChanged(bool isInFight)
+            {
+                if (NetworkServer.active)
+                {
+                    if (isInFight)
+                    {
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
+                        {
+                            if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && SpawnCardTracker.IsAnyVoidlingPhase(card))
+                            {
+                                overridePrefab = getBossOverrideMasterPrefab();
+
+#if DEBUG
+                                Log.Debug($"VoidlingRandomizer: Replaced {card.prefab} with {overridePrefab}");
+#endif
+
+                                return (bool)overridePrefab;
+                            }
+
+                            overridePrefab = null;
+                            return false;
+                        };
+
+                        GenericScriptedSpawnHook.OnSpawned += handleSpawnedVoidlingCharacterServer;
+                    }
+                    else
+                    {
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = null;
+                        GenericScriptedSpawnHook.OnSpawned -= handleSpawnedVoidlingCharacterServer;
+                    }
+                }
             }
 
             static void SceneCatalog_onMostRecentSceneDefChanged(SceneDef obj)
@@ -75,40 +106,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
                             blob.gameObject.SetActive(false);
                         }
                     }
-                }
-            }
-
-            static void onEnterVoidlingFight()
-            {
-                if (NetworkServer.active)
-                {
-                    GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
-                    {
-                        if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && SpawnCardTracker.IsAnyVoidlingPhase(card))
-                        {
-                            overridePrefab = getBossOverrideMasterPrefab();
-
-#if DEBUG
-                            Log.Debug($"VoidlingRandomizer: Replaced {card.prefab} with {overridePrefab}");
-#endif
-
-                            return (bool)overridePrefab;
-                        }
-
-                        overridePrefab = null;
-                        return false;
-                    };
-
-                    GenericScriptedSpawnHook.OnSpawned += handleSpawnedVoidlingCharacterServer;
-                }
-            }
-
-            static void onExitVoidlingFight()
-            {
-                if (NetworkServer.active)
-                {
-                    GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = null;
-                    GenericScriptedSpawnHook.OnSpawned -= handleSpawnedVoidlingCharacterServer;
                 }
             }
 
