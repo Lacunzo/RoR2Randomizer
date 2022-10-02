@@ -10,51 +10,12 @@ namespace RoR2Randomizer.Patches.BossRandomizer
     {
         public static T Instance { get; private set; }
 
-#if DEBUG
-        protected readonly string _debugName;
-#endif
-
-        protected BossTracker(string debugName)
+        protected BossTracker()
         {
-#if DEBUG
-            _debugName = debugName;
-#endif
             Instance = (T)this;
         }
 
-        bool _isInFight;
-        public bool IsInFight
-        {
-            get
-            {
-                return _isInFight;
-            }
-            protected set
-            {
-                if (MiscUtils.TryAssign(ref _isInFight, value))
-                {
-                    if (value)
-                    {
-#if DEBUG
-                        Log.Debug($"Enter {_debugName} fight");
-#endif
-
-                        OnEnterFight?.Invoke();
-                    }
-                    else
-                    {
-#if DEBUG
-                        Log.Debug($"Exit {_debugName} fight");
-#endif
-
-                        OnExitFight?.Invoke();
-                    }
-                }
-            }
-        }
-
-        public event Action OnEnterFight;
-        public event Action OnExitFight;
+        public TrackedValue<bool> IsInFight = new TrackedValue<bool>();
 
         protected virtual void applyPatches()
         {
@@ -68,7 +29,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer
 
         void onSceneLoaded(SceneDef _)
         {
-            IsInFight = false;
+            IsInFight.Value = false;
         }
     }
 }

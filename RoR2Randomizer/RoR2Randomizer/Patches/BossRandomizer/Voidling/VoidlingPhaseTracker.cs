@@ -29,10 +29,6 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
             }
         }
 
-        public VoidlingPhaseTracker() : base("Voidling")
-        {
-        }
-
         static void ApplyPatches()
         {
             new VoidlingPhaseTracker().applyPatches();
@@ -82,8 +78,8 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
         {
             if (self.TryGetComponent<PhaseEncounterData>(out PhaseEncounterData encounterData))
             {
-                IsInFight = true;
-                Phase = encounterData.Phase;
+                IsInFight.Value = true;
+                Phase.Value = encounterData.Phase;
             }
 
             orig(self);
@@ -92,7 +88,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Voidling
         void DeathState_OnEnter(On.EntityStates.VoidRaidCrab.DeathState.orig_OnEnter orig, EntityStates.VoidRaidCrab.DeathState self)
         {
             orig(self);
-            IsInFight = false;
+            IsInFight.Value = false;
         }
     }
 }

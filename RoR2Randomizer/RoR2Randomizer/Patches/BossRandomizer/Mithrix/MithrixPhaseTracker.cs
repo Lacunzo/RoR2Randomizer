@@ -12,10 +12,6 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
     [PatchClass]
     public sealed class MithrixPhaseTracker : BossPhaseTracker<MithrixPhaseTracker>
     {
-        public MithrixPhaseTracker() : base("Mithrix")
-        {
-        }
-
         static void ApplyPatches()
         {
             new MithrixPhaseTracker().applyPatches();
@@ -48,15 +44,15 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
         {
             orig(self);
 
-            IsInFight = false;
+            IsInFight.Value = false;
         }
 
         void PreEncounter_OnEnter(On.EntityStates.Missions.BrotherEncounter.PreEncounter.orig_OnEnter orig, EntityStates.Missions.BrotherEncounter.PreEncounter self)
         {
             orig(self);
 
-            IsInFight = true;
-            Phase = 0;
+            IsInFight.Value = true;
+            Phase.Value = 0;
         }
 
         void BrotherEncounterPhaseBaseState_OnEnter(ILContext il)
@@ -70,7 +66,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
                 c.EmitDelegate((PhaseCounter instance) =>
                 {
-                    Phase = (uint)instance.phase;
+                    Phase.Value = (uint)instance.phase;
                 });
             }
         }
