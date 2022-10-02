@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityModdingUtility;
 
@@ -84,9 +85,16 @@ namespace RoR2Randomizer.Utility
             });
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryGetReplacement(T original, out T replacement)
         {
             return TryGetValue(original, out replacement);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasReplacement(T original)
+        {
+            return ContainsKey(original);
         }
 
         public bool TryGetOriginal(T replacement, out T original)
