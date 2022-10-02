@@ -61,6 +61,10 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                                             case "ToolbotDroneHeal": // Does nothing
                                             case "ToolbotDroneStun": // Does nothing
                                             case "TreebotPounderProjectile": // Does nothing
+
+                                            // Excluded because I think it's more fun that way
+                                            case "MageIcewallWalkerProjectile":
+                                            case "MageFirewallWalkerProjectile":
 #if DEBUG
                                                 Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
 #endif
@@ -111,20 +115,20 @@ namespace RoR2Randomizer.RandomizerController.Projectile
         static bool getDebugProjectileReplacement(int original, out int replacement)
         {
             if (_projectileIndicesReplacements.Value.HasReplacement(original))
-        {
-            switch ((BossRandomizerController.DebugMode)ConfigManager.ProjectileRandomizer.DebugMode)
             {
-                case BossRandomizerController.DebugMode.Manual:
-                    replacement = _projectileIndicesToRandomize.Get[_forcedProjectileIndex];
-                    return true;
-                case BossRandomizerController.DebugMode.Forced:
-                    return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
+                switch ((BossRandomizerController.DebugMode)ConfigManager.ProjectileRandomizer.DebugMode)
+                {
+                    case BossRandomizerController.DebugMode.Manual:
+                        replacement = _projectileIndicesToRandomize.Get[_forcedProjectileIndex];
+                        return true;
+                    case BossRandomizerController.DebugMode.Forced:
+                        return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
                 }
             }
 
-                    replacement = -1;
-                    return false;
-            }
+            replacement = -1;
+            return false;
+        }
 #endif
 
         public static void TryOverrideProjectilePrefab(ref GameObject prefab)
