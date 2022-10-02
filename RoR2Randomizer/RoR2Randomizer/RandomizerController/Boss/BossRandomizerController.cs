@@ -78,17 +78,13 @@ namespace RoR2Randomizer.RandomizerController.Boss
             switch (debugMode)
             {
                 case DebugMode.Manual:
-                    return MasterCatalog.masterPrefabs[_masterIndex];
+                    return _availableMasterObjects.Get[_masterIndex];
                 case DebugMode.Forced:
                     return MasterCatalog.FindMasterPrefab(ConfigManager.BossRandomizer.DebugBossForcedMasterName);
-                case DebugMode.None:
-                default:
-#endif
-                    return _availableMasterObjects.Get.GetRandomOrDefault();
-#if DEBUG
             }
 #endif
-        }
+                    return _availableMasterObjects.Get.GetRandomOrDefault();
+            }
 
         public static bool IsReplacedBossCharacter(GameObject masterObject)
         {
@@ -121,7 +117,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 bool changedMasterIndex = false;
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
                 {
-                    if (++_masterIndex >= MasterCatalog.masterPrefabs.Length)
+                    if (++_masterIndex >= _availableMasterObjects.Get.Length)
                         _masterIndex = 0;
 
                     changedMasterIndex = true;
@@ -129,14 +125,14 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 else if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
                     if (--_masterIndex < 0)
-                        _masterIndex = MasterCatalog.masterPrefabs.Length - 1;
+                        _masterIndex = _availableMasterObjects.Get.Length - 1;
 
                     changedMasterIndex = true;
                 }
 
                 if (changedMasterIndex)
                 {
-                    Log.Debug($"Current boss override: {MasterCatalog.masterPrefabMasterComponents[_masterIndex].name} ({_masterIndex})");
+                    Log.Debug($"Current boss override: {_availableMasterObjects.Get[_masterIndex].name} ({_masterIndex})");
                 }
             }
         }
