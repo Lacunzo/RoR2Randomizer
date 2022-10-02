@@ -106,7 +106,7 @@ namespace RoR2Randomizer.CustomContent
             uint length = reader.ReadPackedUInt32();
 
             _subStates = new SubState[length];
-            for (int i = 0; i < length; i++)
+            for (uint i = 0; i < length; i++)
             {
                 _subStates[i] = new SubState(reader);
             }

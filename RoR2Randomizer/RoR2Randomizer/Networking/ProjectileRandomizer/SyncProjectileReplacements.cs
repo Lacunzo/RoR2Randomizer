@@ -37,7 +37,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
             Dictionary<int, int> projectileReplacements = new Dictionary<int, int>();
 
             uint count = reader.ReadPackedUInt32();
-            for (int i = 0; i < count; i++)
+            for (uint i = 0; i < count; i++)
             {
                 projectileReplacements.Add(reader.ReadPackedIndex32(), reader.ReadPackedIndex32());
             }
