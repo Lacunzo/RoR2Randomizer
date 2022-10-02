@@ -6,48 +6,8 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.BossRandomizer
 {
-    public class BossPhaseTracker<T> where T : BossPhaseTracker<T>
+    public class BossPhaseTracker<T> : BossTracker<T> where T : BossPhaseTracker<T>
     {
-        public static T Instance { get; private set; }
-
-#if DEBUG
-        readonly string _debugName;
-#endif
-
-        bool _isInFight;
-        public bool IsInFight
-        {
-            get
-            {
-                return _isInFight;
-            }
-            protected set
-            {
-                if (MiscUtils.TryAssign(ref _isInFight, value))
-                {
-                    if (value)
-                    {
-#if DEBUG
-                        Log.Debug($"Enter {_debugName} fight");
-#endif
-
-                        OnEnterFight?.Invoke();
-                    }
-                    else
-                    {
-#if DEBUG
-                        Log.Debug($"Exit {_debugName} fight");
-#endif
-
-                        OnExitFight?.Invoke();
-                    }
-                }
-            }
-        }
-
-        public event Action OnEnterFight;
-        public event Action OnExitFight;
-
         uint _phase;
 
         public uint Phase
@@ -71,27 +31,8 @@ namespace RoR2Randomizer.Patches.BossRandomizer
 
         public event Action OnPhaseChanged;
 
-        protected BossPhaseTracker(string debugName)
+        protected BossPhaseTracker(string debugName) : base(debugName)
         {
-#if DEBUG
-            _debugName = debugName;
-#endif
-            Instance = (T)this;
-        }
-
-        protected virtual void applyPatches()
-        {
-            SceneCatalog.onMostRecentSceneDefChanged += onSceneLoaded;
-        }
-
-        protected virtual void cleanupPatches()
-        {
-            SceneCatalog.onMostRecentSceneDefChanged -= onSceneLoaded;
-        }
-
-        void onSceneLoaded(SceneDef _)
-        {
-            IsInFight = false;
         }
     }
 }
