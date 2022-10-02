@@ -108,7 +108,9 @@ namespace RoR2Randomizer.RandomizerController.Projectile
         }
 
 #if DEBUG
-        static bool getDebugProjectileReplacement(out int replacement)
+        static bool getDebugProjectileReplacement(int original, out int replacement)
+        {
+            if (_projectileIndicesReplacements.Value.HasReplacement(original))
         {
             switch ((BossRandomizerController.DebugMode)ConfigManager.ProjectileRandomizer.DebugMode)
             {
@@ -117,11 +119,12 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                     return true;
                 case BossRandomizerController.DebugMode.Forced:
                     return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
-                default:
+                }
+            }
+
                     replacement = -1;
                     return false;
             }
-        }
 #endif
 
         public static void TryOverrideProjectilePrefab(ref GameObject prefab)
@@ -132,7 +135,7 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                 int replacementIndex;
                 if (
 #if DEBUG
-                    getDebugProjectileReplacement(out replacementIndex) ||
+                    getDebugProjectileReplacement(originalIndex, out replacementIndex) ||
 #endif
                     _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
                 {
