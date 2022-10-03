@@ -83,8 +83,8 @@ namespace RoR2Randomizer.RandomizerController.Boss
                     return MasterCatalog.FindMasterPrefab(ConfigManager.BossRandomizer.DebugBossForcedMasterName);
             }
 #endif
-                    return _availableMasterObjects.Get.GetRandomOrDefault();
-            }
+            return _availableMasterObjects.Get.GetRandomOrDefault();
+        }
 
         public static bool IsReplacedBossCharacter(GameObject masterObject)
         {
@@ -99,12 +99,14 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
             Mithrix.Initialize();
             Voidling.Initialize();
+            Aurelionite.Initialize();
         }
 
         void OnDestroy()
         {
             Mithrix.Uninitialize();
             Voidling.Uninitialize();
+            Aurelionite.Uninitialize();
         }
 
 #if DEBUG
@@ -132,6 +134,11 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
                 if (changedMasterIndex)
                 {
+                    if (ConfigManager.BossRandomizer.RandomizeAurelionite)
+                    {
+                        Aurelionite.OnDebugCharacterChanged();
+                    }
+
                     Log.Debug($"Current boss override: {_availableMasterObjects.Get[_masterIndex].name} ({_masterIndex})");
                 }
             }

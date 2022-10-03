@@ -23,6 +23,8 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
         protected CharacterBody originalBossBodyPrefab => originalBossMasterPrefab.bodyPrefab.GetComponent<CharacterBody>();
 
+        protected virtual bool replaceBossDropEvenIfExisting => false;
+
         public void Initialize()
         {
             _master = GetComponent<CharacterMaster>();
@@ -101,6 +103,15 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 #if DEBUG
                     Log.Debug($"Gave {NUM_DRONE_PARTS} drone parts to {Language.GetString(_body.baseNameToken)}");
 #endif
+                }
+            }
+
+            if (originalBossBodyPrefab.TryGetComponent<DeathRewards>(out DeathRewards prefabDeathRewards))
+            {
+                DeathRewards deathRewards = _body.gameObject.GetOrAddComponent<DeathRewards>();
+                if (!deathRewards.bossDropTable || replaceBossDropEvenIfExisting)
+                {
+                    deathRewards.bossDropTable = prefabDeathRewards.bossDropTable;
                 }
             }
         }

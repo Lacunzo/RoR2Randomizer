@@ -6,7 +6,7 @@ Current features:
 * Multiplayer Compatible. Every player needs to have the mod.
 * Compatibile with Risk of Options for easy configuration in-game.
 * Stage Randomizer: Swaps every stage for a random playable map.
-* Boss Randomizer: Randomizes the character types of bosses. Currently only [Mithrix](https://youtu.be/EZLbivjyFMk) and [Voidling](https://youtu.be/HAH9Rxyl2lU) are implemented.
+* Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU) and Aurelionite are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
 * Projectile Randomizer: Randomizes all projectiles.
@@ -14,6 +14,15 @@ Current features:
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.3.3 Changes:**
+
+* Boss Randomizer:
+  * Added Aurelionite to boss randomizer
+    * Also randomizes character spawned by Halcyon Seed during the teleporter event
+
+* Projectile Randomizer:
+  * Tweaked how Artificers walls are affected by the projectile randomizer.
 
 **0.3.2 Changes:**
 

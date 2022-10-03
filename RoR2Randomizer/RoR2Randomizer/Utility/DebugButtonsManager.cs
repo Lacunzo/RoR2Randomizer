@@ -41,6 +41,18 @@ namespace RoR2Randomizer.Utility
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
                 Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.VOIDLING_FIGHT_SCENE_NAME));
             }
+            else if (Input.GetKeyDown(KeyCode.Keypad8))
+            {
+                Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.GOLD_SHORES_SCENE_NAME));
+            }
+            else if (Input.GetKeyDown(KeyCode.Keypad9))
+            {
+                foreach (PlayerCharacterMasterController masterController in PlayerCharacterMasterController.instances)
+                {
+                    masterController.master.money += 1000;
+                }
+            }
         }
     }
 }

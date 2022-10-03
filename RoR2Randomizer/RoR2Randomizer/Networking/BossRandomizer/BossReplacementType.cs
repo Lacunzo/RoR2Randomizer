@@ -9,6 +9,7 @@
         VoidlingPhase1,
         VoidlingPhase2,
         VoidlingPhase3,
+        Aurelionite,
         Count
     }
 }
