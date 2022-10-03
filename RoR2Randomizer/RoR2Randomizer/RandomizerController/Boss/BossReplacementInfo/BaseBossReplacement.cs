@@ -21,7 +21,19 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
         protected abstract CharacterMaster originalBossMasterPrefab { get; }
 
-        protected CharacterBody originalBossBodyPrefab => originalBossMasterPrefab.bodyPrefab.GetComponent<CharacterBody>();
+        protected CharacterBody originalBossBodyPrefab
+        {
+            get
+            {
+                CharacterMaster originalMasterPrefab = originalBossMasterPrefab;
+                if (originalMasterPrefab && originalMasterPrefab.bodyPrefab && originalMasterPrefab.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
+                {
+                    return body;
+                }
+
+                return null;
+            }
+        }
 
         protected virtual bool replaceBossDropEvenIfExisting => false;
 
