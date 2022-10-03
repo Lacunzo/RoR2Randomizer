@@ -41,13 +41,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
             static void replaceAurelioniteInItemPickupText(ItemDef item, string replacementName)
             {
-                if (_aurelionitePickupOverlay != null)
-                {
-                    _aurelionitePickupOverlay.Remove();
-
-                    Language.currentLanguage.UnloadStrings();
-                    Language.currentLanguage.LoadStrings();
-                }
+                _aurelionitePickupOverlay?.Remove();
 
                 string itemToken = item.pickupToken;
                 string itemPickupDisplay = Language.GetString(itemToken);
