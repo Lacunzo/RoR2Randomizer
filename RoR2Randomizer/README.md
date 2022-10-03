@@ -15,6 +15,11 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.3.4 Changes:**
+
+* Boss Randomizer:
+  * Fixed Mithrix not dropping the Halcyon Seed if he replaces Aurelionite
+
 **0.3.3 Changes:**
 
 * Boss Randomizer:
