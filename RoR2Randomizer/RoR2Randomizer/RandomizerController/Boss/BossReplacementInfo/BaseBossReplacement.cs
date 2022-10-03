@@ -20,7 +20,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
         protected abstract BossReplacementType replacementType { get; }
 
         protected abstract CharacterMaster originalBossMasterPrefab { get; }
-
+        
         protected CharacterBody originalBossBodyPrefab
         {
             get
@@ -118,12 +118,33 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
                 }
             }
 
-            if (originalBossBodyPrefab.TryGetComponent<DeathRewards>(out DeathRewards prefabDeathRewards))
+            CharacterBody originalBodyprefab = originalBossBodyPrefab;
+            if (originalBodyprefab)
             {
-                DeathRewards deathRewards = _body.gameObject.GetOrAddComponent<DeathRewards>();
-                if (!deathRewards.bossDropTable || replaceBossDropEvenIfExisting)
+                if (originalBodyprefab.TryGetComponent<DeathRewards>(out DeathRewards prefabDeathRewards) && prefabDeathRewards.bossDropTable)
                 {
-                    deathRewards.bossDropTable = prefabDeathRewards.bossDropTable;
+                    DeathRewards deathRewards = _body.gameObject.GetOrAddComponent<DeathRewards>();
+                    if (!deathRewards.bossDropTable || deathRewards.bossDropTable == null || replaceBossDropEvenIfExisting)
+                    {
+                        deathRewards.bossDropTable = prefabDeathRewards.bossDropTable;
+                    }
+                }
+
+                HealthComponent healthComponent = _body.healthComponent;
+                if (healthComponent && originalBodyprefab.TryGetComponent<HealthComponent>(out HealthComponent prefabHealthComponent))
+                {
+#if DEBUG
+                    float oldValue = healthComponent.globalDeathEventChanceCoefficient;
+#endif
+
+                    healthComponent.globalDeathEventChanceCoefficient = prefabHealthComponent.globalDeathEventChanceCoefficient;
+
+#if DEBUG
+                    if (oldValue != healthComponent.globalDeathEventChanceCoefficient)
+                    {
+                        Log.Debug($"{nameof(BaseBossReplacement)}: overriding {nameof(HealthComponent.globalDeathEventChanceCoefficient)} for {replacementType} replacement {_master.name} ({oldValue} -> {healthComponent.globalDeathEventChanceCoefficient})");
+                    }
+#endif
                 }
             }
         }
