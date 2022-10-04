@@ -24,11 +24,8 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(initializeClient)}: body.subtitleNameToken={_body.subtitleNameToken}");
 #endif
 
-            if (string.IsNullOrEmpty(_body.subtitleNameToken))
-            {
-                setBodySubtitle("BROTHER_BODY_SUBTITLE");
-            }
-
+            setBodySubtitleIfNull("BROTHER_BODY_SUBTITLE");
+            
             if (NetworkServer.active)
             {
                 if (IsHurt)

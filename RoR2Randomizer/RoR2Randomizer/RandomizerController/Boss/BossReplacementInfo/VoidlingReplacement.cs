@@ -42,11 +42,8 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
             _body.bodyFlags |= CharacterBody.BodyFlags.IgnoreFallDamage;
 
-            if (string.IsNullOrEmpty(_body.subtitleNameToken))
-            {
-                setBodySubtitle("VOIDRAIDCRAB_BODY_SUBTITLE");
-            }
-
+            setBodySubtitleIfNull("VOIDRAIDCRAB_BODY_SUBTITLE");
+            
             CharacterDeathBehavior deathBehavior = _body.gameObject.GetOrAddComponent<CharacterDeathBehavior>();
             if (!deathBehavior.deathStateMachine)
             {

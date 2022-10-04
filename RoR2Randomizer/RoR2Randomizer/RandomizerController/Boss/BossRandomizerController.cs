@@ -31,6 +31,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
             Voidling.Initialize();
             Aurelionite.Initialize();
             LunarScav.Initialize();
+            AlloyWorshipUnit.Initialize();
         }
 
         void OnDestroy()
@@ -39,6 +40,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
             Voidling.Uninitialize();
             Aurelionite.Uninitialize();
             LunarScav.Uninitialize();
+            AlloyWorshipUnit.Uninitialize();
         }
     }
 }

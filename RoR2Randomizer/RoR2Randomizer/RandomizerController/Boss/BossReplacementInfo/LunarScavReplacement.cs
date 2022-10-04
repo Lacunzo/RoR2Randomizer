@@ -19,10 +19,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
         {
             base.bodyResolved();
 
-            if (string.IsNullOrEmpty(_body.subtitleNameToken))
-            {
-                setBodySubtitle("SCAVLUNAR_BODY_SUBTITLE");
-            }
+            setBodySubtitleIfNull("SCAVLUNAR_BODY_SUBTITLE");
         }
     }
 }

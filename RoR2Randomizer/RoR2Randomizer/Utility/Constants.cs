@@ -19,6 +19,7 @@ namespace RoR2Randomizer.Utility
             public const string VOIDLING_FIGHT_SCENE_NAME = "voidraid";
             public const string VOID_FIELDS_SCENE_NAME = "arena";
             public const string VOID_LOCUS_SCENE_NAME = "voidstage";
+            public const string SIRENS_CALL_SCENE_NAME = "shipgraveyard";
         }
     }
 }

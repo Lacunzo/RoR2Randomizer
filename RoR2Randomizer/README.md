@@ -6,7 +6,7 @@ Current features:
 * Multiplayer Compatible. Every player needs to have the mod.
 * Compatibile with Risk of Options for easy configuration in-game.
 * Stage Randomizer: Swaps every stage for a random playable map.
-* Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite and Twisted Scavengers are implemented.
+* Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers and Alloy Worship Unit are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
 * Projectile Randomizer: Randomizes all projectiles.
@@ -19,6 +19,7 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 * Boss Randomizer:
   * Twisted Scavengers can now be randomized.
+  * Alloy Worship Unit on Siren's Call can now be randomized.
   * Fixed Aurelionite not spawning during Mithrix fight if Mithrix randomizer is enabled
 
 * Projectile Randomizer:

@@ -172,6 +172,14 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 #endif
         }
 
+        protected void setBodySubtitleIfNull(string subtitleToken)
+        {
+            if (string.IsNullOrEmpty(_body.subtitleNameToken))
+            {
+                setBodySubtitle(subtitleToken);
+            }
+        }
+
         protected void setBodySubtitle(string subtitleToken)
         {
             if (_body && _body.subtitleNameToken != subtitleToken)

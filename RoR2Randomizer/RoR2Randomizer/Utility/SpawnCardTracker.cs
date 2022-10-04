@@ -17,6 +17,8 @@ namespace RoR2Randomizer.Utility
 
         public static MultiCharacterSpawnCard LunarScavSpawnCard;
 
+        public static SpawnCard AlloyWorshipUnitSpawnCard;
+
         static bool isPartOf(SpawnCard[] array, SpawnCard card, out int index)
         {
             if (array != null)

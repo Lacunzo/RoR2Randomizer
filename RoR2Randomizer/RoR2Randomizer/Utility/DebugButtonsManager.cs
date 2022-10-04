@@ -26,6 +26,11 @@ namespace RoR2Randomizer.Utility
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
                 Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME));
             }
+            else if (Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.SIRENS_CALL_SCENE_NAME));
+            }
             else if (Input.GetKeyDown(KeyCode.Keypad5))
             {
                 foreach (PlayerCharacterMasterController masterController in PlayerCharacterMasterController.instances)

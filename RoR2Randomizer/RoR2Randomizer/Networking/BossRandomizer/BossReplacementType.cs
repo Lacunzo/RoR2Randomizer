@@ -14,6 +14,7 @@
         LunarScav2,
         LunarScav3,
         LunarScav4,
+        AlloyWorshipUnit,
         Count
     }
 }
