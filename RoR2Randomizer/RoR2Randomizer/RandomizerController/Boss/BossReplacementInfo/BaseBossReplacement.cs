@@ -98,7 +98,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
                 {
                     if ((!givePickupsOnStart || !givePickupsOnStart.HasAnyEquipment()) && inventory.GetEquipmentIndex() == EquipmentIndex.None)
                     {
-                        EquipmentIndex equipment = BossRandomizerController.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
+                        EquipmentIndex equipment = CharacterReplacements.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
                         inventory.SetEquipmentIndex(equipment);
 
 #if DEBUG

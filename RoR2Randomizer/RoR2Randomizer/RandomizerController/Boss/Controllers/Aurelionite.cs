@@ -19,11 +19,13 @@ namespace RoR2Randomizer.RandomizerController.Boss
     {
         public static class Aurelionite
         {
+            const string MASTER_NAME = "TitanGoldMaster";
+
             static readonly RunSpecific<GameObject> _aurelioniteMasterReplacementPrefab = new RunSpecific<GameObject>((out GameObject overridePrefab) =>
             {
                 if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAurelionite)
                 {
-                    overridePrefab = getBossOverrideMasterPrefab();
+                    overridePrefab = CharacterReplacements.GetReplacementMasterPrefab(MASTER_NAME);
                     if (overridePrefab &&
                         overridePrefab.TryGetComponent<CharacterMaster>(out CharacterMaster master) &&
                         master.bodyPrefab && master.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
@@ -55,9 +57,9 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAurelionite)
                 {
 #if DEBUG
-                    if (debugMode != DebugMode.None)
+                    if (CharacterReplacements.DebugMode != DebugMode.None)
                     {
-                        replacementPrefab = getBossOverrideMasterPrefab();
+                        replacementPrefab = CharacterReplacements.GetReplacementMasterPrefab(MASTER_NAME);
                     }
                     else
 #endif
@@ -98,11 +100,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 SyncBossReplacementCharacter.OnReceive += SyncBossReplacementCharacter_OnReceive;
 
                 Run.onRunDestroyGlobal += runEnd;
-
-#if DEBUG
-                ConfigManager.BossRandomizer.BossDebugMode.OnChange += OnDebugCharacterChanged;
-                ConfigManager.BossRandomizer.DebugBossForcedMasterName.OnChange += OnDebugCharacterChanged;
-#endif
             }
 
             public static void Uninitialize()
@@ -116,11 +113,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
                 Run.onRunDestroyGlobal -= runEnd;
 
-#if DEBUG
-                ConfigManager.BossRandomizer.BossDebugMode.OnChange -= OnDebugCharacterChanged;
-                ConfigManager.BossRandomizer.DebugBossForcedMasterName.OnChange -= OnDebugCharacterChanged;
-#endif
-
                 _aurelioniteMasterReplacementPrefab.Dispose();
             }
 
@@ -129,16 +121,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 _aurelionitePickupOverlay?.Remove();
                 _aurelionitePickupOverlay = null;
             }
-
-#if DEBUG
-            public static void OnDebugCharacterChanged()
-            {
-                if (_aurelioniteMasterReplacementPrefab.HasValue)
-                {
-                    replaceAurelioniteInItemPickupText(RoR2Content.Items.TitanGoldDuringTP, _aurelioniteMasterReplacementPrefab.Value.GetComponent<CharacterMaster>().bodyPrefab.GetComponent<CharacterBody>().GetDisplayName());
-                }
-            }
-#endif
 
             static void IsInFight_OnChanged(bool isInFight)
             {

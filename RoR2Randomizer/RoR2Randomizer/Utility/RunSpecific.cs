@@ -9,6 +9,8 @@ namespace RoR2Randomizer.Utility
     {
         public delegate bool TryGetNewValueDelegate(out T value);
 
+        readonly ulong _callbackHandle;
+
         readonly TryGetNewValueDelegate _getNewValue;
         readonly T _defaultValue;
 
@@ -28,18 +30,21 @@ namespace RoR2Randomizer.Utility
             }
         }
 
-        public RunSpecific(T defaultValue = default) : this(null, defaultValue)
+        public RunSpecific(int priority = 0, T defaultValue = default) : this(getNewValue: null, priority, defaultValue)
         {
         }
 
-        public RunSpecific(TryGetNewValueDelegate getNewValue, T defaultValue = default)
+        public RunSpecific(Func<T> getValueFunc, int priority = 0, T defaultValue = default) : this((out T value) => { value = getValueFunc(); return true; }, priority, defaultValue)
+        {
+        }
+
+        public RunSpecific(TryGetNewValueDelegate getNewValue, int priority = 0, T defaultValue = default)
         {
             _getNewValue = getNewValue;
             Value = (_defaultValue = defaultValue);
             HasValue = false;
 
-            Run.onRunStartGlobal += onRunStart;
-            Run.onRunDestroyGlobal += onRunEnd;
+            _callbackHandle = RunSpecificCallbacksManager.AddEntry(onRunStart, onRunEnd, priority);
         }
 
         ~RunSpecific()
@@ -69,8 +74,7 @@ namespace RoR2Randomizer.Utility
 
         public void Dispose()
         {
-            Run.onRunStartGlobal -= onRunStart;
-            Run.onRunDestroyGlobal -= onRunEnd;
+            RunSpecificCallbacksManager.RemoveEntry(_callbackHandle);
         }
 
         public static implicit operator T(RunSpecific<T> runSpecific)

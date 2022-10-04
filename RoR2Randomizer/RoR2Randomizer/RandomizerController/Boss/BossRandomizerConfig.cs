@@ -17,11 +17,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
         public readonly BoolConfigValue RandomizeAurelionite;
 
-#if DEBUG
-        public readonly EnumConfigValue<BossRandomizerController.DebugMode> BossDebugMode;
-        public readonly StringConfigValue DebugBossForcedMasterName;
-#endif
-
         public BossRandomizerConfig(ConfigFile file) : base("Boss", file)
         {
             RandomizeMithrix = new BoolConfigValue(getEntry("Randomize Mithrix", "Randomizes the character type of Mithrix", true));
@@ -30,11 +25,6 @@ namespace RoR2Randomizer.RandomizerController.Boss
             RandomizeVoidling = new BoolConfigValue(getEntry("Randomize Voidling", "Randomizes the character type of Voidling", true));
 
             RandomizeAurelionite = new BoolConfigValue(getEntry("Randomize Aurelionite", "Randomizes the character type of Aurelionite", true));
-
-#if DEBUG
-            BossDebugMode = new EnumConfigValue<BossRandomizerController.DebugMode>(getEntry("Boss Debug Mode", BossRandomizerController.DebugMode.None));
-            DebugBossForcedMasterName = new StringConfigValue(getEntry("Boss Debug Forced Master Name", "EquipmentDroneMaster"));
-#endif
         }
     }
 }

@@ -61,7 +61,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
                                 if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
                                  || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
                                 {
-                                    overridePrefab = getBossOverrideMasterPrefab();
+                                    overridePrefab = CharacterReplacements.GetReplacementMasterPrefab(card.prefab.name);
 
 #if DEBUG
                                     Log.Debug($"MithrixRandomizer: Replaced {card.prefab} with {overridePrefab}");

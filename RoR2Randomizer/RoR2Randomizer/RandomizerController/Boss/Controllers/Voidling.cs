@@ -69,7 +69,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
                         {
                             if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && SpawnCardTracker.IsAnyVoidlingPhase(card))
                             {
-                                overridePrefab = getBossOverrideMasterPrefab();
+                                overridePrefab = CharacterReplacements.GetReplacementMasterPrefab(card.prefab.name);
 
 #if DEBUG
                                 Log.Debug($"VoidlingRandomizer: Replaced {card.prefab} with {overridePrefab}");
