@@ -27,10 +27,6 @@ namespace RoR2Randomizer.Configuration
         public static ProjectileRandomizerConfig ProjectileRandomizer;
         public static MiscConfig Misc;
 
-#if DEBUG
-        public static DebugConfig Debug;
-#endif
-
         public static void Initialize(ConfigFile file)
         {
             _allCategories.Add(BuffRandomizer = new BuffRandomizerConfig(file));
@@ -41,9 +37,6 @@ namespace RoR2Randomizer.Configuration
             _allCategories.Add(BossRandomizer = new BossRandomizerConfig(file));
             _allCategories.Add(ProjectileRandomizer = new ProjectileRandomizerConfig(file));
             _allCategories.Add(Misc = new MiscConfig(file));
-#if DEBUG
-            _allCategories.Add(Debug = new DebugConfig(file));
-#endif
 
             foreach (ConfigCategory category in _allCategories)
             {

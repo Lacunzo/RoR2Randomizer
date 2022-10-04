@@ -15,11 +15,6 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
-**0.3.5 Changes:**
-
-* Boss Randomizer:
-  * Fixed Aurelionite not spawning during Mithrix fight if Mithrix randomizer is enabled
-
 **0.3.4 Changes:**
 
 * Boss Randomizer:
