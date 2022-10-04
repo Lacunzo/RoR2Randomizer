@@ -65,6 +65,9 @@ namespace RoR2Randomizer.RandomizerController.Projectile
                                             // Excluded because I think it's more fun that way
                                             case "MageIcewallWalkerProjectile":
                                             case "MageFirewallWalkerProjectile":
+
+                                            // Excluded because it seems like a huge pain getting it to work, might look into it in the future.
+                                            case "LunarSunProjectile":
 #if DEBUG
                                                 Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
 #endif

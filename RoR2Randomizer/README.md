@@ -21,6 +21,10 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
   * Twisted Scavengers can now be randomized.
   * Fixed Aurelionite not spawning during Mithrix fight if Mithrix randomizer is enabled
 
+* Projectile Randomizer:
+  * Disabled randomization of the Egocentrism projectile.
+    * This will be re-enabled again at some point in the future, but I just can't deal with this edge case right now.
+
 **0.3.4 Changes:**
 
 * Boss Randomizer:
