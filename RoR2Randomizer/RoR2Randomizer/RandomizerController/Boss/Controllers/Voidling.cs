@@ -65,21 +65,20 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 {
                     if (isInFight)
                     {
-                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (ref SpawnCard card, out GenericScriptedSpawnHook.ResetCardDelegate resetCardFunc) =>
                         {
                             if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && SpawnCardTracker.IsAnyVoidlingPhase(card))
                             {
-                                overridePrefab = CharacterReplacements.GetReplacementMasterPrefab(card.prefab.name);
+                                GameObject originalPrefab = card.prefab;
 
-#if DEBUG
-                                Log.Debug($"VoidlingRandomizer: Replaced {card.prefab} with {overridePrefab}");
-#endif
+                                resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
 
-                                return (bool)overridePrefab;
+                                CharacterReplacements.ReplaceMasterPrefab(ref card.prefab);
                             }
-
-                            overridePrefab = null;
-                            return false;
+                            else
+                            {
+                                resetCardFunc = null;
+                            }
                         };
 
                         GenericScriptedSpawnHook.OnSpawned += handleSpawnedVoidlingCharacterServer;

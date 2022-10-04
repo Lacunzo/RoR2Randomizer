@@ -10,6 +10,10 @@
         VoidlingPhase2,
         VoidlingPhase3,
         Aurelionite,
+        LunarScav1,
+        LunarScav2,
+        LunarScav3,
+        LunarScav4,
         Count
     }
 }

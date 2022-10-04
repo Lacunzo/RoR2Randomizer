@@ -15,14 +15,28 @@ namespace RoR2Randomizer.Utility
 
         public static SpawnCard AurelioniteSpawnCard;
 
+        public static MultiCharacterSpawnCard LunarScavSpawnCard;
+
+        static bool isPartOf(SpawnCard[] array, SpawnCard card, out int index)
+        {
+            if (array != null)
+            {
+                index = Array.IndexOf(array, card);
+                return index != -1;
+            }
+
+            index = -1;
+            return false;
+        }
+
         public static bool IsPartOfMithrixPhase2(SpawnCard card)
         {
-            return MithrixPhase2SpawnCards != null && Array.IndexOf(MithrixPhase2SpawnCards, card) != -1;
+            return isPartOf(MithrixPhase2SpawnCards, card, out _);
         }
 
         public static bool IsAnyVoidlingPhase(SpawnCard card)
         {
-            return VoidlingPhasesSpawnCards != null && Array.IndexOf(VoidlingPhasesSpawnCards, card) != -1;
+            return isPartOf(VoidlingPhasesSpawnCards, card, out _);
         }
     }
 }

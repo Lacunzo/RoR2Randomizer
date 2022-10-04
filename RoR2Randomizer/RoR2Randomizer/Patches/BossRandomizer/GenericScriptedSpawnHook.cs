@@ -16,7 +16,9 @@ namespace RoR2Randomizer.Patches.BossRandomizer
     [PatchClass]
     public static class GenericScriptedSpawnHook
     {
-        public delegate bool OverrideSpawnPrefabDelegate(SpawnCard card, out GameObject overridePrefab);
+        public delegate void ResetCardDelegate(ref SpawnCard card);
+
+        public delegate void OverrideSpawnPrefabDelegate(ref SpawnCard card, out ResetCardDelegate resetCardFunc);
 
         static OverrideSpawnPrefabDelegate _overrideSpawnPrefabFunc;
         public static OverrideSpawnPrefabDelegate OverrideSpawnPrefabFunc
@@ -48,18 +50,17 @@ namespace RoR2Randomizer.Patches.BossRandomizer
 
         static void ScriptedCombatEncounter_Spawn(On.RoR2.ScriptedCombatEncounter.orig_Spawn orig, ScriptedCombatEncounter self, ref ScriptedCombatEncounter.SpawnInfo spawnInfo)
         {
-            GameObject originalPrefab = null;
-            if (NetworkServer.active && _overrideSpawnPrefabFunc != null && _overrideSpawnPrefabFunc(spawnInfo.spawnCard, out GameObject overridePrefab))
+            ResetCardDelegate resetCardFunc = null;
+            if (NetworkServer.active)
             {
-                originalPrefab = spawnInfo.spawnCard.prefab;
-                spawnInfo.spawnCard.prefab = overridePrefab;
+                _overrideSpawnPrefabFunc?.Invoke(ref spawnInfo.spawnCard, out resetCardFunc);
             }
 
             orig(self, ref spawnInfo);
 
-            if (originalPrefab)
+            if (NetworkServer.active)
             {
-                spawnInfo.spawnCard.prefab = originalPrefab;
+                resetCardFunc?.Invoke(ref spawnInfo.spawnCard);
             }
         }
 

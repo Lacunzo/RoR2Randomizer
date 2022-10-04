@@ -17,6 +17,8 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
         public readonly BoolConfigValue RandomizeAurelionite;
 
+        public readonly BoolConfigValue RandomizeLunarScav;
+
         public BossRandomizerConfig(ConfigFile file) : base("Boss", file)
         {
             RandomizeMithrix = new BoolConfigValue(getEntry("Randomize Mithrix", "Randomizes the character type of Mithrix", true));
@@ -25,6 +27,8 @@ namespace RoR2Randomizer.RandomizerController.Boss
             RandomizeVoidling = new BoolConfigValue(getEntry("Randomize Voidling", "Randomizes the character type of Voidling", true));
 
             RandomizeAurelionite = new BoolConfigValue(getEntry("Randomize Aurelionite", "Randomizes the character type of Aurelionite", true));
+
+            RandomizeLunarScav = new BoolConfigValue(getEntry("Randomize Twisted Scavengers", "Randomizes the character type of Twisted Scavengers", true));
         }
     }
 }

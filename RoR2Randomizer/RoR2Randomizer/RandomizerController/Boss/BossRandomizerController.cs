@@ -30,6 +30,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
             Mithrix.Initialize();
             Voidling.Initialize();
             Aurelionite.Initialize();
+            LunarScav.Initialize();
         }
 
         void OnDestroy()
@@ -37,6 +38,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
             Mithrix.Uninitialize();
             Voidling.Uninitialize();
             Aurelionite.Uninitialize();
+            LunarScav.Uninitialize();
         }
     }
 }

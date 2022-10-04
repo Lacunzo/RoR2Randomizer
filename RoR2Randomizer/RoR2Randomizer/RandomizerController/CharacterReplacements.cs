@@ -84,7 +84,7 @@ namespace RoR2Randomizer.RandomizerController
             LanguageAPI.Add(_characterNamesLanguageAdditions);
 
 #if DEBUG
-            RoR2Application.onUpdate += Update;
+            RoR2Application.onFixedUpdate += Update;
 #endif
         }
 
@@ -93,7 +93,7 @@ namespace RoR2Randomizer.RandomizerController
             _masterIndexReplacements.Dispose();
 
 #if DEBUG
-            RoR2Application.onUpdate -= Update;
+            RoR2Application.onFixedUpdate -= Update;
 #endif
         }
 
@@ -108,11 +108,15 @@ namespace RoR2Randomizer.RandomizerController
                 {
                     if (++_forcedMasterIndex >= _masterIndicesToRandomize.Get.Length)
                         _forcedMasterIndex = 0;
+
+                    changed = true;
                 }
                 else if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
                     if (--_forcedMasterIndex < 0)
                         _forcedMasterIndex = _masterIndicesToRandomize.Get.Length - 1;
+
+                    changed = true;
                 }
 
                 if (changed)
@@ -125,14 +129,29 @@ namespace RoR2Randomizer.RandomizerController
 
         public static GameObject GetReplacementMasterPrefab(string originalMasterName)
         {
-            MasterCatalog.MasterIndex replacementIndex = GetReplacementForMasterIndex(Caches.MasterPrefabIndices[originalMasterName]);
+            MasterCatalog.MasterIndex replacementIndex = GetReplacementForMasterIndex(MasterCatalog.FindMasterIndex(originalMasterName));
             if (replacementIndex.isValid)
             {
-                return MasterCatalog.GetMasterPrefab(replacementIndex);
+                GameObject replacement = MasterCatalog.GetMasterPrefab(replacementIndex);
+
+#if DEBUG
+                Log.Debug($"{nameof(CharacterReplacements)}: Replaced {originalMasterName} with {replacement}");
+#endif
+
+                return replacement;
             }
             else
             {
                 return null;
+            }
+        }
+
+        public static void ReplaceMasterPrefab(ref GameObject prefab)
+        {
+            GameObject replacement = GetReplacementMasterPrefab(prefab.name);
+            if (replacement)
+            {
+                prefab = replacement;
             }
         }
 

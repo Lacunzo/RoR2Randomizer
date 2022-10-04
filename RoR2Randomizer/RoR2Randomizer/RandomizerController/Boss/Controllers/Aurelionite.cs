@@ -128,22 +128,19 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 {
                     if (isInFight)
                     {
-                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (ref SpawnCard card, out GenericScriptedSpawnHook.ResetCardDelegate resetCardFunc) =>
                         {
-                            if (card == SpawnCardTracker.AurelioniteSpawnCard)
+                            if (card == SpawnCardTracker.AurelioniteSpawnCard && TryGetAurelioniteMasterReplacementPrefab(out GameObject overridePrefab))
                             {
-                                bool result = TryGetAurelioniteMasterReplacementPrefab(out overridePrefab);
-#if DEBUG
-                                if (result)
-                                {
-                                    Log.Debug($"AurelioniteRandomizer: Replaced {card.prefab} with {overridePrefab}");
-                                }
-#endif
-                                return result;
-                            }
+                                GameObject originalPrefab = card.prefab;
+                                resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
 
-                            overridePrefab = null;
-                            return false;
+                                card.prefab = overridePrefab;
+                            }
+                            else
+                            {
+                                resetCardFunc = null;
+                            }
                         };
 
                         GenericScriptedSpawnHook.OnSpawned += handleSpawnedAurelioniteCharacterServer;

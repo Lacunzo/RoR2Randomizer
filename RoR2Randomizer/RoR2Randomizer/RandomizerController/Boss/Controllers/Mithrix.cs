@@ -54,25 +54,22 @@ namespace RoR2Randomizer.RandomizerController.Boss
                 {
                     if (isInFight)
                     {
-                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (SpawnCard card, out GameObject overridePrefab) =>
+                        GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (ref SpawnCard card, out GenericScriptedSpawnHook.ResetCardDelegate resetCardFunc) =>
                         {
+                            resetCardFunc = null;
+
                             if (ConfigManager.BossRandomizer.Enabled)
                             {
                                 if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
                                  || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
                                 {
-                                    overridePrefab = CharacterReplacements.GetReplacementMasterPrefab(card.prefab.name);
+                                    GameObject originalPrefab = card.prefab;
 
-#if DEBUG
-                                    Log.Debug($"MithrixRandomizer: Replaced {card.prefab} with {overridePrefab}");
-#endif
+                                    resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
 
-                                    return (bool)overridePrefab;
+                                    CharacterReplacements.ReplaceMasterPrefab(ref card.prefab);
                                 }
                             }
-
-                            overridePrefab = null;
-                            return false;
                         };
 
                         GenericScriptedSpawnHook.OnSpawned += handleSpawnedMithrixCharacterServer;

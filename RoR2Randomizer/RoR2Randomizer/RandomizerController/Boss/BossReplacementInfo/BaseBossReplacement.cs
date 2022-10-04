@@ -37,10 +37,13 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
         protected virtual bool replaceBossDropEvenIfExisting => false;
 
-        public void Initialize()
+        void Awake()
         {
             _master = GetComponent<CharacterMaster>();
+        }
 
+        public void Initialize()
+        {
             StartCoroutine(waitForBodyInitialized());
 
             if (NetworkServer.active)
