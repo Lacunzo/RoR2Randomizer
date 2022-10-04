@@ -4,6 +4,7 @@ using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerController;
 using RoR2Randomizer.RandomizerController.Stage;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,9 +58,9 @@ namespace RoR2Randomizer.Patches.StageRandomizer
                     // If the artifact trial stage is replaced by something else, don't set the trial artifact definition
                     if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
                     {
-                        if (StageRandomizerController.TryGetReplacementSceneName(StageRandomizerController.ARTIFACT_TRIAL_SCENE_NAME, out string replacement))
+                        if (StageRandomizerController.TryGetReplacementSceneName(Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME, out string replacement))
                         {
-                            if (replacement != StageRandomizerController.ARTIFACT_TRIAL_SCENE_NAME)
+                            if (replacement != Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME)
                             {
                                 return null;
                             }

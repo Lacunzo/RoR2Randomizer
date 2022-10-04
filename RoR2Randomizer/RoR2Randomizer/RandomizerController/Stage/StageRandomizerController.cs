@@ -16,15 +16,6 @@ namespace RoR2Randomizer.RandomizerController.Stage
 {
     public class StageRandomizerController : Singleton<StageRandomizerController>
     {
-        public const string ARTIFACT_TRIAL_SCENE_NAME = "artifactworld";
-        public const string COMMENCEMENT_SCENE_NAME = "moon2";
-        public const string GOLD_SHORES_SCENE_NAME = "goldshores";
-        public const string OBLITERATE_SCENE_NAME = "mysteryspace";
-        public const string LUNAR_SCAV_FIGHT_SCENE_NAME = "limbo";
-        public const string VOIDLING_FIGHT_SCENE_NAME = "voidraid";
-        public const string VOID_FIELDS_SCENE_NAME = "arena";
-        public const string VOID_LOCUS_SCENE_NAME = "voidstage";
-
         static readonly string[] _excludeScenes = new string[]
         {
             // Simulacrum maps
@@ -39,11 +30,11 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
         static readonly string[] _forceIncludeScenes = new string[]
         {
-            ARTIFACT_TRIAL_SCENE_NAME,
+            Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME,
             "bazaar",
-            GOLD_SHORES_SCENE_NAME,
-            OBLITERATE_SCENE_NAME,
-            LUNAR_SCAV_FIGHT_SCENE_NAME
+            Constants.SceneNames.GOLD_SHORES_SCENE_NAME,
+            Constants.SceneNames.OBLITERATE_SCENE_NAME,
+            Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME
         };
 
         static readonly InitializeOnAccess<StageRandomizingInfo[]> _stages = new InitializeOnAccess<StageRandomizingInfo[]>(() =>
@@ -57,10 +48,10 @@ namespace RoR2Randomizer.RandomizerController.Stage
 
                                    switch (scene.cachedName)
                                    {
-                                       case COMMENCEMENT_SCENE_NAME:
-                                       case LUNAR_SCAV_FIGHT_SCENE_NAME:
-                                       case VOIDLING_FIGHT_SCENE_NAME:
-                                       case VOID_LOCUS_SCENE_NAME:
+                                       case Constants.SceneNames.COMMENCEMENT_SCENE_NAME:
+                                       case Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME:
+                                       case Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME:
+                                       case Constants.SceneNames.VOID_LOCUS_SCENE_NAME:
                                            flags |= StageFlags.FirstStageBlacklist;
                                            break;
                                    }

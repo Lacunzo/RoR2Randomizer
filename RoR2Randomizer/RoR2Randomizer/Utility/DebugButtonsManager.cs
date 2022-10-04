@@ -24,7 +24,7 @@ namespace RoR2Randomizer.Utility
             else if (Input.GetKeyDown(KeyCode.Keypad2))
             {
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
-                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.LUNAR_SCAV_FIGHT_SCENE_NAME));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME));
             }
             else if (Input.GetKeyDown(KeyCode.Keypad5))
             {
@@ -39,17 +39,17 @@ namespace RoR2Randomizer.Utility
             else if (Input.GetKeyDown(KeyCode.Keypad6))
             {
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
-                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.COMMENCEMENT_SCENE_NAME));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.COMMENCEMENT_SCENE_NAME));
             }
             else if (Input.GetKeyDown(KeyCode.Keypad7))
             {
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
-                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.VOIDLING_FIGHT_SCENE_NAME));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME));
             }
             else if (Input.GetKeyDown(KeyCode.Keypad8))
             {
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
-                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(StageRandomizerController.GOLD_SHORES_SCENE_NAME));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.GOLD_SHORES_SCENE_NAME));
             }
             else if (Input.GetKeyDown(KeyCode.Keypad9))
             {

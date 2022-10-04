@@ -93,7 +93,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
 
             static void SceneCatalog_onMostRecentSceneDefChanged(SceneDef obj)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && obj.cachedName == StageRandomizerController.VOIDLING_FIGHT_SCENE_NAME)
+                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && obj.cachedName == Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME)
                 {
                     GameObject levelRoot = GameObject.Find("RaidVoid");
                     if (levelRoot)
