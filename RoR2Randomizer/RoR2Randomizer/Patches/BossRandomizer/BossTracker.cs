@@ -27,12 +27,6 @@ namespace RoR2Randomizer.Patches.BossRandomizer
             SceneCatalog.onMostRecentSceneDefChanged -= onSceneLoaded;
         }
 
-        // Virtual methods don't work property in events, so this wrapper method is needed to make it work
-        void onSceneLoaded_Wrap(SceneDef scene)
-        {
-            onSceneLoaded(scene);
-        }
-
         protected virtual void onSceneLoaded(SceneDef scene)
         {
             IsInFight.Value = false;
