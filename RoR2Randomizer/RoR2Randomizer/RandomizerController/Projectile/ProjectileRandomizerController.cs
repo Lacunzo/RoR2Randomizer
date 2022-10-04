@@ -116,12 +116,12 @@ namespace RoR2Randomizer.RandomizerController.Projectile
         {
             if (_projectileIndicesReplacements.Value.HasReplacement(original))
             {
-                switch ((BossRandomizerController.DebugMode)ConfigManager.ProjectileRandomizer.DebugMode)
+                switch (ConfigManager.ProjectileRandomizer.DebugMode.Entry.Value)
                 {
-                    case BossRandomizerController.DebugMode.Manual:
+                    case DebugMode.Manual:
                         replacement = _projectileIndicesToRandomize.Get[_forcedProjectileIndex];
                         return true;
-                    case BossRandomizerController.DebugMode.Forced:
+                    case DebugMode.Forced:
                         return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
                 }
             }
@@ -184,7 +184,7 @@ namespace RoR2Randomizer.RandomizerController.Projectile
 
         void Update()
         {
-            if (ConfigManager.ProjectileRandomizer.Enabled && ConfigManager.ProjectileRandomizer.DebugMode == BossRandomizerController.DebugMode.Manual)
+            if (ConfigManager.ProjectileRandomizer.Enabled && ConfigManager.ProjectileRandomizer.DebugMode == DebugMode.Manual)
             {
                 bool changedProjectileIndex = false;
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
