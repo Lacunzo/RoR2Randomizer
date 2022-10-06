@@ -47,11 +47,6 @@ namespace RoR2Randomizer.Utility
             _callbackHandle = RunSpecificCallbacksManager.AddEntry(onRunStart, onRunEnd, priority);
         }
 
-        ~RunSpecific()
-        {
-            Dispose();
-        }
-
         void onRunStart(Run instance)
         {
             if (_getNewValue != null && !HasValue)

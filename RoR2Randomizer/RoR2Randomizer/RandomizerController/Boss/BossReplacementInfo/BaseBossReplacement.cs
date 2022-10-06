@@ -12,116 +12,17 @@ using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 {
-    public abstract class BaseBossReplacement : MonoBehaviour
+    public abstract class BaseBossReplacement : CharacterReplacementInfo
     {
-        protected CharacterMaster _master;
-        protected CharacterBody _body;
-
         protected abstract BossReplacementType replacementType { get; }
-
-        protected abstract CharacterMaster originalBossMasterPrefab { get; }
-        
-        protected CharacterBody originalBossBodyPrefab
-        {
-            get
-            {
-                CharacterMaster originalMasterPrefab = originalBossMasterPrefab;
-                if (originalMasterPrefab && originalMasterPrefab.bodyPrefab && originalMasterPrefab.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
-                {
-                    return body;
-                }
-
-                return null;
-            }
-        }
 
         protected virtual bool replaceBossDropEvenIfExisting => false;
 
-        void Awake()
+        protected override void bodyResolved()
         {
-            _master = GetComponent<CharacterMaster>();
-        }
+            base.bodyResolved();
 
-        public void Initialize()
-        {
-            StartCoroutine(waitForBodyInitialized());
-
-            if (NetworkServer.active)
-            {
-                initializeServer();
-            }
-
-            initializeClient();
-        }
-
-        IEnumerator waitForBodyInitialized()
-        {
-            if (!_body)
-            {
-                _body = _master.GetBody();
-                if (!_body)
-                {
-                    while (_master && !_master.hasBody)
-                    {
-                        yield return 0;
-                    }
-
-                    if (!_master)
-                        yield break;
-
-                    _body = _master.GetBody();
-                }
-            }
-
-            if (_body)
-            {
-                bodyResolved();
-            }
-        }
-
-        protected virtual void bodyResolved()
-        {
-            Inventory inventory = _master.inventory;
-            if (inventory)
-            {
-                GivePickupsOnStart givePickupsOnStart = _master.GetComponent<GivePickupsOnStart>();
-
-                if (originalBossMasterPrefab)
-                {
-                    GivePickupsOnStart originalGivePickupsOnStart = originalBossMasterPrefab.GetComponent<GivePickupsOnStart>();
-
-                    ItemIndex adaptiveArmorItemIndex = RoR2Content.Items.AdaptiveArmor.itemIndex;
-                    if (originalGivePickupsOnStart && originalGivePickupsOnStart.HasItems(adaptiveArmorItemIndex, out int originalAdaptiveArmorCount))
-                    {
-                        inventory.GiveItem(adaptiveArmorItemIndex, originalAdaptiveArmorCount);
-                    }
-                }
-
-                if (_body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))
-                {
-                    if ((!givePickupsOnStart || !givePickupsOnStart.HasAnyEquipment()) && inventory.GetEquipmentIndex() == EquipmentIndex.None)
-                    {
-                        EquipmentIndex equipment = CharacterReplacements.AvailableDroneEquipments.Get.GetRandomOrDefault(EquipmentIndex.None);
-                        inventory.SetEquipmentIndex(equipment);
-
-#if DEBUG
-                        Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(_body.baseNameToken)}");
-#endif
-                    }
-                }
-                else if (_body.bodyIndex == BodyCatalog.FindBodyIndex("DroneCommanderBody")) // Col. Droneman
-                {
-                    const int NUM_DRONE_PARTS = 1;
-
-                    Patches.Reverse.DroneWeaponsBehavior.SetNumDroneParts(inventory, NUM_DRONE_PARTS);
-
-#if DEBUG
-                    Log.Debug($"Gave {NUM_DRONE_PARTS} drone parts to {Language.GetString(_body.baseNameToken)}");
-#endif
-                }
-            }
-
-            CharacterBody originalBodyprefab = originalBossBodyPrefab;
+            CharacterBody originalBodyprefab = originalBodyPrefab;
             if (originalBodyprefab)
             {
                 if (originalBodyprefab.TryGetComponent<DeathRewards>(out DeathRewards prefabDeathRewards) && prefabDeathRewards.bossDropTable)
@@ -152,14 +53,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             }
         }
 
-        protected virtual void initializeClient()
-        {
-#if DEBUG
-            Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeClient)}");
-#endif
-        }
-
-        protected virtual void initializeServer()
+        protected override void initializeServer()
         {
 #if DEBUG
             Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeServer)}");

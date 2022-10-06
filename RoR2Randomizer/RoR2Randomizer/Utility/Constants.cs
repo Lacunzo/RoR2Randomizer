@@ -20,6 +20,7 @@ namespace RoR2Randomizer.Utility
             public const string VOID_FIELDS_SCENE_NAME = "arena";
             public const string VOID_LOCUS_SCENE_NAME = "voidstage";
             public const string SIRENS_CALL_SCENE_NAME = "shipgraveyard";
+            public const string ABANDONED_AQUEDUCT_SCENE_NAME = "goolake";
         }
     }
 }

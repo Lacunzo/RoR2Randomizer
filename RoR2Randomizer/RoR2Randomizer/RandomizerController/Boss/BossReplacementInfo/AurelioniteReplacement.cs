@@ -11,7 +11,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
     {
         protected override BossReplacementType replacementType => BossReplacementType.Aurelionite;
 
-        protected override CharacterMaster originalBossMasterPrefab => Caches.MasterPrefabs["TitanGoldMaster"];
+        protected override CharacterMaster originalMasterPrefab => Caches.MasterPrefabs["TitanGoldMaster"];
 
         protected override bool replaceBossDropEvenIfExisting => true;
 

@@ -76,7 +76,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
                                     for (int i = 0; i < multiCard.masterPrefabs.Length; i++)
                                     {
                                         originalMasterPrefabs[i] = multiCard.masterPrefabs[i];
-                                        CharacterReplacements.ReplaceMasterPrefab(ref multiCard.masterPrefabs[i]);
+                                        CharacterReplacements.TryReplaceMasterPrefab(ref multiCard.masterPrefabs[i]);
                                     }
                                 }
                                 else

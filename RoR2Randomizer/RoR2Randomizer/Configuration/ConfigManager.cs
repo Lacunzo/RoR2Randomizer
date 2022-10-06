@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using RoR2Randomizer.RandomizerController.Boss;
 using RoR2Randomizer.RandomizerController.Buff;
+using RoR2Randomizer.RandomizerController.ExplicitSpawn;
 using RoR2Randomizer.RandomizerController.Projectile;
 #if !DISABLE_SKILL_RANDOMIZER
 using RoR2Randomizer.RandomizerController.Skill;
@@ -25,6 +26,7 @@ namespace RoR2Randomizer.Configuration
 #endif
         public static StageRandomizerConfig StageRandomizer;
         public static ProjectileRandomizerConfig ProjectileRandomizer;
+        public static ExplicitSpawnRandomizerConfig ExplicitSpawnRandomizer;
         public static MiscConfig Misc;
 
 #if DEBUG
@@ -40,6 +42,10 @@ namespace RoR2Randomizer.Configuration
 #endif
             _allCategories.Add(BossRandomizer = new BossRandomizerConfig(file));
             _allCategories.Add(ProjectileRandomizer = new ProjectileRandomizerConfig(file));
+            _allCategories.Add(ExplicitSpawnRandomizer = new ExplicitSpawnRandomizerConfig(file));
+
+            _allCategories.Sort((a, b) => a.CategoryName.CompareTo(b.CategoryName));
+
             _allCategories.Add(Misc = new MiscConfig(file));
 #if DEBUG
             _allCategories.Add(Debug = new DebugConfig(file));

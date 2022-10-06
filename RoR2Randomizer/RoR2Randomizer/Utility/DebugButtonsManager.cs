@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UIElements;
 
 namespace RoR2Randomizer.Utility
 {
@@ -31,14 +33,48 @@ namespace RoR2Randomizer.Utility
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
                 Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.SIRENS_CALL_SCENE_NAME));
             }
+            else if (Input.GetKeyDown(KeyCode.Keypad4))
+            {
+                Vector3 pos;
+                Quaternion rot;
+                if (PlayerCharacterMasterController.instances.Count > 0)
+                {
+                    Transform modelTransform = PlayerCharacterMasterController.instances[0].master.GetBody().modelLocator.modelTransform;
+                    pos = modelTransform.position;
+                    rot = modelTransform.rotation;
+                }
+                else
+                {
+                    pos = Vector3.zero;
+                    rot = Quaternion.identity;
+                }
+
+                GameObject beetleObj = Instantiate(LegacyResourcesAPI.Load<GameObject>("Prefabs/CharacterMasters/BeetleQueenMaster"), pos, rot);
+                CharacterMaster beetleMaster = beetleObj.GetComponent<CharacterMaster>();
+                if (beetleMaster)
+                {
+                    beetleMaster.teamIndex = TeamIndex.Monster;
+                    NetworkServer.Spawn(beetleObj);
+                    beetleMaster.SpawnBodyHere();
+
+                    //beetleMaster.inventory.SetEquipmentIndex(RoR2Content.Elites.Poison.eliteEquipmentDef.equipmentIndex);
+                    //beetleMaster.inventory.SetEquipmentIndex(DLC1Content.Elites.Earth.eliteEquipmentDef.equipmentIndex);
+                    //beetleMaster.inventory.SetEquipmentIndex(DLC1Content.Elites.Void.eliteEquipmentDef.equipmentIndex);
+                }
+            }
             else if (Input.GetKeyDown(KeyCode.Keypad5))
             {
-                foreach (PlayerCharacterMasterController masterController in PlayerCharacterMasterController.instances)
+                foreach (PlayerCharacterMasterController playerMasterController in PlayerCharacterMasterController.instances)
                 {
-                    CharacterMaster playerMaster = masterController.master;
+                    Inventory inventory = playerMasterController.master.inventory;
 
-                    playerMaster.inventory.GiveRandomItems(100, false, false);
-                    playerMaster.inventory.SetEquipmentIndex(RoR2Content.Equipment.Gateway.equipmentIndex); // Vase
+                    //inventory.GiveRandomItems(100, false, false);
+                    //inventory.SetEquipmentIndex(RoR2Content.Equipment.Scanner.equipmentIndex);
+
+                    // inventory.GiveItem(RoR2Content.Items.RoboBallBuddy);
+                    inventory.GiveItem(DLC1Content.Items.DroneWeapons);
+
+                    inventory.SetEquipmentIndex(RoR2Content.Equipment.DroneBackup.equipmentIndex);
                 }
             }
             else if (Input.GetKeyDown(KeyCode.Keypad6))
@@ -62,6 +98,11 @@ namespace RoR2Randomizer.Utility
                 {
                     masterController.master.money += 1000;
                 }
+            }
+            else if (Input.GetKeyDown(KeyCode.RightBracket))
+            {
+                Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.ABANDONED_AQUEDUCT_SCENE_NAME));
             }
         }
     }

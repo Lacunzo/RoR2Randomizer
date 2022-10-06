@@ -96,14 +96,7 @@ namespace RoR2Randomizer.Utility
 
         public static void AppendDelegate<T>(ref T original, T additional) where T : Delegate
         {
-            if (original != null)
-            {
-                original = (T)Delegate.Combine(original, additional);
-            }
-            else
-            {
-                original = additional;
-            }
+            original = (T)Delegate.Combine(original, additional);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.RandomizerController.Boss;
 using System;
 using System.Collections;
@@ -10,21 +11,19 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.BossRandomizer
 {
-    public class SyncBossReplacementCharacter : INetMessage
+    public class SyncBossReplacementCharacter : SyncGameObjectReference
     {
         public delegate void OnReceivedDelegate(GameObject masterObject, BossReplacementType replacementType);
         public static event OnReceivedDelegate OnReceive;
 
-        NetworkInstanceId _masterObjectId;
         BossReplacementType _replacementType;
 
         public SyncBossReplacementCharacter()
         {
         }
 
-        public SyncBossReplacementCharacter(GameObject masterObject, BossReplacementType replacementType)
+        public SyncBossReplacementCharacter(GameObject masterObject, BossReplacementType replacementType) : base(masterObject)
         {
-            _masterObjectId = masterObject.GetComponent<NetworkIdentity>().netId;
             _replacementType = replacementType;
 
             if (!replacementType.IsValid())
@@ -33,67 +32,27 @@ namespace RoR2Randomizer.Networking.BossRandomizer
             }
         }
 
-        void ISerializableObject.Serialize(NetworkWriter writer)
+        public override void Serialize(NetworkWriter writer)
         {
-            writer.Write(_masterObjectId);
+            base.Serialize(writer);
             writer.WritePackedUInt32((uint)_replacementType);
         }
 
-        void ISerializableObject.Deserialize(NetworkReader reader)
+        public override void Deserialize(NetworkReader reader)
         {
-            _masterObjectId = reader.ReadNetworkId();
+            base.Deserialize(reader);
             _replacementType = (BossReplacementType)reader.ReadPackedUInt32();
         }
 
-        void INetMessage.OnReceived()
+        protected override bool shouldHandleEvent => !NetworkServer.active && NetworkClient.active;
+
+        protected override void onReceivedObjectResolved(GameObject obj)
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncBossReplacementCharacter)}.{nameof(INetMessage.OnReceived)}(): _masterObjectId: {_masterObjectId}, _replacementType: {_replacementType}");
+            Log.Debug($"{nameof(SyncBossReplacementCharacter)} object resolved: obj: {obj}, _replacementType: {_replacementType}");
 #endif
 
-            if (!_replacementType.IsValid())
-            {
-                Log.Warning($"{nameof(SyncBossReplacementCharacter)} received a boss replacement with invalid replacement type {_replacementType}! {nameof(_masterObjectId)}: {_masterObjectId}");
-            }
-
-            if (_masterObjectId.IsEmpty())
-            {
-                Log.Warning("Recieved empty master object id from server, aborting");
-                return;
-            }
-
-            if (!NetworkServer.active)
-            {
-#if DEBUG
-                Log.Debug($"Recieved {nameof(SyncBossReplacementCharacter)} as non-server");
-#endif
-                IEnumerator waitThenSendEvent()
-                {
-#if DEBUG
-                    float timeStarted = Time.unscaledTime;
-#endif
-
-                    GameObject obj;
-                    while (!(obj = ClientScene.FindLocalObject(_masterObjectId)))
-                    {
-                        yield return 0;
-                    }
-
-#if DEBUG
-                    Log.Debug($"Waited {Time.unscaledTime - timeStarted:F2} seconds for client object");
-#endif
-
-                    OnReceive?.Invoke(obj, _replacementType);
-                }
-
-                Main.Instance.StartCoroutine(waitThenSendEvent());
-            }
-#if DEBUG
-            else
-            {
-                Log.Debug($"Recieved {nameof(SyncBossReplacementCharacter)} as server, skipping");
-            }
-#endif
+            OnReceive?.Invoke(obj, _replacementType);
         }
     }
 }

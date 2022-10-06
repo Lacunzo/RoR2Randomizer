@@ -3,16 +3,21 @@ using Mono.Cecil;
 using MonoMod.Cil;
 using MonoMod.Utils;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Networking.CharacterReplacements;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityModdingUtility;
+using static UnityEngine.UI.Image;
 
 namespace RoR2Randomizer.RandomizerController
 {
@@ -64,10 +69,33 @@ namespace RoR2Randomizer.RandomizerController
             }).Distinct().Select(go => (int)MasterCatalog.FindMasterIndex(go)).ToArray();
         });
 
-        static readonly RunSpecific<ReplacementDictionary<int>> _masterIndexReplacements = new RunSpecific<ReplacementDictionary<int>>(() =>
+        static readonly RunSpecific<bool> _hasReceivedMasterIndexReplacementsFromServer = new RunSpecific<bool>(1);
+        static readonly RunSpecific<ReplacementDictionary<int>> _masterIndexReplacements = new RunSpecific<ReplacementDictionary<int>>((out ReplacementDictionary<int> result) =>
         {
-            return ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize.Get);
+            if (NetworkServer.active)
+            {
+                result = ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize.Get);
+
+                new SyncCharacterMasterReplacements(result).Send(NetworkDestination.Clients);
+
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
         }, 1);
+
+        static void onMasterReplacementsReceivedFromServer(ReplacementDictionary<int> masterIndexReplacements)
+        {
+#if DEBUG
+            Log.Debug("Received master index replacements from server");
+#endif
+
+            _masterIndexReplacements.Value = masterIndexReplacements;
+            _hasReceivedMasterIndexReplacementsFromServer.Value = true;
+        }
 
         static readonly Dictionary<string, string> _characterNamesLanguageAdditions = new Dictionary<string, string>
         {
@@ -83,6 +111,8 @@ namespace RoR2Randomizer.RandomizerController
         {
             LanguageAPI.Add(_characterNamesLanguageAdditions);
 
+            SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
+
 #if DEBUG
             RoR2Application.onFixedUpdate += Update;
 #endif
@@ -91,6 +121,9 @@ namespace RoR2Randomizer.RandomizerController
         public static void Uninitialize()
         {
             _masterIndexReplacements.Dispose();
+            _hasReceivedMasterIndexReplacementsFromServer.Dispose();
+
+            SyncCharacterMasterReplacements.OnReceive -= onMasterReplacementsReceivedFromServer;
 
 #if DEBUG
             RoR2Application.onFixedUpdate -= Update;
@@ -146,39 +179,60 @@ namespace RoR2Randomizer.RandomizerController
             }
         }
 
-        public static void ReplaceMasterPrefab(ref GameObject prefab)
+        public static bool TryReplaceMasterPrefab(ref GameObject prefab)
         {
             GameObject replacement = GetReplacementMasterPrefab(prefab.name);
             if (replacement)
             {
                 prefab = replacement;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
         public static MasterCatalog.MasterIndex GetReplacementForMasterIndex(MasterCatalog.MasterIndex original)
         {
-            if (original == MasterCatalog.MasterIndex.none)
-                return MasterCatalog.MasterIndex.none;
-
-#if DEBUG
-            if (DebugMode == DebugMode.Manual)
+            if (original.isValid && (NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer)))
             {
-                int masterIndex = ArrayUtils.GetSafe(_masterIndicesToRandomize.Get, _forcedMasterIndex, -1);
-                if (masterIndex != -1)
+#if DEBUG
+                if (NetworkServer.active)
                 {
-                    return (MasterCatalog.MasterIndex)masterIndex;
+                    if (DebugMode == DebugMode.Manual)
+                    {
+                        int masterIndex = ArrayUtils.GetSafe(_masterIndicesToRandomize.Get, _forcedMasterIndex, -1);
+                        if (masterIndex != -1)
+                        {
+                            return (MasterCatalog.MasterIndex)masterIndex;
+                        }
+                    }
+
+                    if (DebugMode == DebugMode.Forced)
+                    {
+                        return MasterCatalog.FindMasterIndex(ConfigManager.Debug.ForcedMasterName);
+                    }
+                }
+#endif
+
+                if (_masterIndexReplacements.HasValue && _masterIndexReplacements.Value.TryGetReplacement((int)original, out int replacementIndex))
+                {
+                    return (MasterCatalog.MasterIndex)replacementIndex;
                 }
             }
 
-            if (DebugMode == DebugMode.Forced)
-            {
-                return MasterCatalog.FindMasterIndex(ConfigManager.Debug.ForcedMasterName);
-            }
-#endif
+            return MasterCatalog.MasterIndex.none;
+        }
 
-            if (_masterIndexReplacements.HasValue && _masterIndexReplacements.Value.TryGetReplacement((int)original, out int replacementIndex))
+        public static MasterCatalog.MasterIndex GetOriginalMasterIndex(MasterCatalog.MasterIndex replacement)
+        {
+            if (replacement.isValid && (NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer)))
             {
-                return (MasterCatalog.MasterIndex)replacementIndex;
+                if (_masterIndexReplacements.HasValue && _masterIndexReplacements.Value.TryGetOriginal((int)replacement, out int originalIndex))
+                {
+                    return (MasterCatalog.MasterIndex)originalIndex;
+                }
             }
 
             return MasterCatalog.MasterIndex.none;

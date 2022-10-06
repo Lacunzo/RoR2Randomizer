@@ -51,7 +51,7 @@ namespace RoR2Randomizer.RandomizerController.Boss
                                 GameObject originalPrefab = card.prefab;
                                 resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
 
-                                CharacterReplacements.ReplaceMasterPrefab(ref card.prefab);
+                                CharacterReplacements.TryReplaceMasterPrefab(ref card.prefab);
                             }
                             else
                             {

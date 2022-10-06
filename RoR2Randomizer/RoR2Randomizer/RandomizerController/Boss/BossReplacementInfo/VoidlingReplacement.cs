@@ -34,7 +34,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
             }
         }
 
-        protected override CharacterMaster originalBossMasterPrefab => Caches.MasterPrefabs[$"MiniVoidRaidCrabMasterPhase{Phase}"];
+        protected override CharacterMaster originalMasterPrefab => Caches.MasterPrefabs[$"MiniVoidRaidCrabMasterPhase{Phase}"];
 
         protected override void bodyResolved()
         {
@@ -80,7 +80,7 @@ namespace RoR2Randomizer.RandomizerController.Boss.BossReplacementInfo
 
             deathBehavior.idleStateMachine ??= Array.Empty<EntityStateMachine>();
 
-            if (originalBossBodyPrefab.TryGetComponent<FogDamageController>(out FogDamageController originalFogDamage) && originalBossBodyPrefab.TryGetComponent<BaseZoneBehavior>(out BaseZoneBehavior originalBaseZone))
+            if (originalBodyPrefab.TryGetComponent<FogDamageController>(out FogDamageController originalFogDamage) && originalBodyPrefab.TryGetComponent<BaseZoneBehavior>(out BaseZoneBehavior originalBaseZone))
             {
                 FogDamageController fogDamage = _body.gameObject.GetOrAddComponent<FogDamageController>();
 
