@@ -10,10 +10,27 @@ Current features:
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
 * Projectile Randomizer: Randomizes all projectiles.
+* Summon Randomizer: Randomizes summoned characters.
+  * Buying drones
+  * Squid Polyp
+  * Engineer Turrets
+  * Soul Wisp
+  * Malachite Urchin
+  * Healing Core
+  * Void Infestors
+  * Beetle Guard, both from Queens Gland and spawned by the Beetle Queen itself.
+  * Quiet Probe and Delighted Probe spawned from the Solus Probes item
+  * Strike Drone spawned from The back-up equipment
+  * Col. Droneman spawned from Spare Drone Parts
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.4.0 Changes:**
+
+* Summon Randomizer:
+  * Added Summon Randomizer
 
 **0.3.5 Changes:**
 
