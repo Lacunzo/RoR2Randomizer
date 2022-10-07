@@ -2,7 +2,7 @@
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RoR2;
-using RoR2Randomizer.RandomizerController.ExplicitSpawn;
+using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,11 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
         static void Apply()
         {
             IL.RoR2.DeployableMinionSpawner.SpawnMinion += DeployableMinionSpawner_SpawnMinion;
+        }
+
+        static void Cleanup()
+        {
+            IL.RoR2.DeployableMinionSpawner.SpawnMinion -= DeployableMinionSpawner_SpawnMinion;
         }
 
         static void DeployableMinionSpawner_SpawnMinion(ILContext il)

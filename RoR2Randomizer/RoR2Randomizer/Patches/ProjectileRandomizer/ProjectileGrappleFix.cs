@@ -1,6 +1,6 @@
 ﻿using RoR2;
 using RoR2.Projectile;
-using RoR2Randomizer.RandomizerController.Projectile;
+using RoR2Randomizer.RandomizerControllers.Projectile;
 using System;
 using System.Collections.Generic;
 using System.Text;

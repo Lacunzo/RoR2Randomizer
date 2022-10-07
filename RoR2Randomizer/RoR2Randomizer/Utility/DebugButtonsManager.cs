@@ -1,16 +1,13 @@
 ﻿#if DEBUG
 using RoR2;
 using RoR2Randomizer.Patches.Debug;
-using RoR2Randomizer.RandomizerController.Stage;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using RoR2Randomizer.RandomizerControllers;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UIElements;
 
 namespace RoR2Randomizer.Utility
 {
+    [RandomizerController]
     public class DebugButtonsManager : MonoBehaviour
     {
         void Update()
@@ -72,9 +69,11 @@ namespace RoR2Randomizer.Utility
                     //inventory.SetEquipmentIndex(RoR2Content.Equipment.Scanner.equipmentIndex);
 
                     // inventory.GiveItem(RoR2Content.Items.RoboBallBuddy);
-                    inventory.GiveItem(DLC1Content.Items.DroneWeapons);
+                    //inventory.GiveItem(DLC1Content.Items.DroneWeapons);
 
-                    inventory.SetEquipmentIndex(RoR2Content.Equipment.DroneBackup.equipmentIndex);
+                    //inventory.SetEquipmentIndex(RoR2Content.Equipment.DroneBackup.equipmentIndex);
+
+                    inventory.GiveItem(RoR2Content.Items.BleedOnHit, 10);
                 }
             }
             else if (Input.GetKeyDown(KeyCode.Keypad6))

@@ -2,7 +2,7 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
-using RoR2Randomizer.RandomizerController.ExplicitSpawn;
+using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using System;
 using System.Collections.Generic;
 using System.Text;

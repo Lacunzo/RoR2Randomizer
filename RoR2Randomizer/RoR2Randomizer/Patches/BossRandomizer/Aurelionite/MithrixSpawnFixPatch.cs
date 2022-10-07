@@ -1,7 +1,7 @@
 ﻿using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.Configuration;
-using RoR2Randomizer.RandomizerController;
+using RoR2Randomizer.RandomizerControllers;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Aurelionite
 {

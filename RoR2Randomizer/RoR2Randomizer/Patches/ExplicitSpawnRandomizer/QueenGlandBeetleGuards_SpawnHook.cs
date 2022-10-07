@@ -5,7 +5,7 @@ using MonoMod.RuntimeDetour;
 using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
-using RoR2Randomizer.RandomizerController.ExplicitSpawn;
+using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;

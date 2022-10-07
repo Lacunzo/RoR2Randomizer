@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using MonoMod.RuntimeDetour;
-using RoR2Randomizer.RandomizerController.Stage;
+using RoR2Randomizer.RandomizerControllers.Stage;
 using System;
 using System.Collections.Generic;
 using System.Text;

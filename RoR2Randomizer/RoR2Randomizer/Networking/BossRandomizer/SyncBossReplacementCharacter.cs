@@ -1,7 +1,7 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerControllers.Boss;
 using System;
 using System.Collections;
 using System.Collections.Generic;

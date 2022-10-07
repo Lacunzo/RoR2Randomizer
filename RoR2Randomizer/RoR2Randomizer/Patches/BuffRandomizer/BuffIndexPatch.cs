@@ -1,6 +1,6 @@
 ﻿using MonoMod.Cil;
 using RoR2;
-using RoR2Randomizer.RandomizerController.Buff;
+using RoR2Randomizer.RandomizerControllers.Buff;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,8 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
     [PatchClass]
     public static class BuffIndexPatch
     {
+        public static uint SkipApplyDotCount = 0;
+
         static void Apply()
         {
             On.RoR2.CharacterBody.SetBuffCount += CharacterBody_SetBuffCount;
@@ -46,7 +48,17 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
         static void CharacterBody_SetBuffCount(On.RoR2.CharacterBody.orig_SetBuffCount orig, CharacterBody self, BuffIndex buffType, int newCount)
         {
-            BuffRandomizerController.TryReplaceBuffIndex(ref buffType);
+            if (BuffRandomizerController.IsActive &&
+                SkipApplyDotCount == 0 &&
+                BuffRandomizerController.TryReplaceBuffIndex(ref buffType) &&
+                BuffRandomizerController.TryGetDotIndex(buffType, out DotController.DotIndex dot))
+            {
+                DotRandomizerPatch.SkipApplyBuffCount++;
+                DotController.InflictDot(self.gameObject, null, dot);
+                DotRandomizerPatch.SkipApplyBuffCount--;
+
+                return;
+            }
 
             orig(self, buffType, newCount);
         }
@@ -61,7 +73,11 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 ILCursor last = cursors[cursors.Length - 1];
                 last.EmitDelegate((int buffIndex) =>
                 {
-                    BuffRandomizerController.TryReplaceBuffIndex(ref buffIndex);
+                    if (BuffRandomizerController.IsActive && SkipApplyDotCount == 0)
+                    {
+                        BuffRandomizerController.TryReplaceBuffIndex(ref buffIndex);
+                    }
+
                     return buffIndex;
                 });
 

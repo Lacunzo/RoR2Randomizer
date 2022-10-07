@@ -1,5 +1,5 @@
 ﻿using RoR2;
-using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerControllers.Boss;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using RoR2Randomizer.Configuration;
-using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerControllers.Boss;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

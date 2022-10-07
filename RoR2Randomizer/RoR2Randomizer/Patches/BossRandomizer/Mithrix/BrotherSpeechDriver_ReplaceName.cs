@@ -5,7 +5,7 @@ using R2API.Networking;
 using RoR2;
 using RoR2.CharacterSpeech;
 using RoR2Randomizer.Configuration;
-using RoR2Randomizer.RandomizerController.Boss;
+using RoR2Randomizer.RandomizerControllers.Boss;
 using System;
 using System.Collections.Generic;
 using System.Text;

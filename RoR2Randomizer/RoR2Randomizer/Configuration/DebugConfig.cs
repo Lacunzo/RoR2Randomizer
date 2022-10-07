@@ -1,7 +1,7 @@
 ﻿#if DEBUG
 using BepInEx.Configuration;
 using RoR2Randomizer.Configuration.ConfigValue;
-using RoR2Randomizer.RandomizerController;
+using RoR2Randomizer.RandomizerControllers;
 using System;
 using System.Collections.Generic;
 using System.Text;

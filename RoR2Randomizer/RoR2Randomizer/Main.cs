@@ -8,8 +8,7 @@ using RoR2.Skills;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.CustomContent;
 using RoR2Randomizer.Networking;
-using RoR2Randomizer.Patches;
-using RoR2Randomizer.RandomizerController;
+using RoR2Randomizer.RandomizerControllers;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -53,7 +52,7 @@ namespace RoR2Randomizer
 
             CharacterReplacements.Initialize();
 
-            PatchController.Setup();
+            InitializationManager.Init();
 
             new ContentPackManager().Init();
 
@@ -63,7 +62,7 @@ namespace RoR2Randomizer
 
         void OnDestroy()
         {
-            PatchController.Cleanup();
+            InitializationManager.Cleanup();
 
             CharacterReplacements.Uninitialize();
         }

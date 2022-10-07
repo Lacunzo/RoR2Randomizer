@@ -1,5 +1,5 @@
 ﻿using RoR2;
-using RoR2Randomizer.RandomizerController.Stage;
+using RoR2Randomizer.RandomizerControllers.Stage;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2;
-using RoR2Randomizer.RandomizerController.Projectile;
+using RoR2Randomizer.RandomizerControllers.Projectile;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
