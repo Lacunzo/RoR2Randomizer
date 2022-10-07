@@ -1,6 +1,7 @@
 ﻿using R2API.Networking;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Networking.CharacterReplacements;
+using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using System;
@@ -18,6 +19,7 @@ namespace RoR2Randomizer.Networking
 
             NetworkingAPI.RegisterMessageType<SyncProjectileReplacements>();
             NetworkingAPI.RegisterMessageType<SyncCharacterMasterReplacements>();
+            NetworkingAPI.RegisterMessageType<SyncEffectReplacements>();
 
 #if DEBUG
             NetworkingAPI.RegisterMessageType<Debug.SyncConsoleLog>();

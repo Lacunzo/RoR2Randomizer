@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RoR2Randomizer.RandomizerController.Boss;
 using RoR2Randomizer.RandomizerController.Buff;
+using RoR2Randomizer.RandomizerController.Effect;
 using RoR2Randomizer.RandomizerController.ExplicitSpawn;
 using RoR2Randomizer.RandomizerController.Projectile;
 #if !DISABLE_SKILL_RANDOMIZER
@@ -45,6 +46,7 @@ namespace RoR2Randomizer.Patches
             _patchControllersRoot.AddComponent<SurvivorPodRandomizerController>();
             _patchControllersRoot.AddComponent<ProjectileRandomizerController>();
             _patchControllersRoot.AddComponent<ExplicitSpawnRandomizerController>();
+            _patchControllersRoot.AddComponent<EffectRandomizerController>();
         }
 
         public static void Cleanup()

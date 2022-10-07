@@ -12,9 +12,13 @@ namespace RoR2Randomizer.Configuration
 
         public readonly BoolConfigValue SurvivorPodRandomizerEnabled;
 
+        public readonly BoolConfigValue EffectRandomizerEnabled;
+
         public MiscConfig(ConfigFile file) : base("Miscellaneous", file)
         {
             SurvivorPodRandomizerEnabled = new BoolConfigValue(getEntry("Survivor Spawn Pod Randomizer", "Randomizes the intro animation of all survivors.", true));
+
+            EffectRandomizerEnabled = new BoolConfigValue(getEntry("Effect Randomizer", "Randomizes various visual effects. (Epilepsy Warning)", false));
         }
     }
 }
