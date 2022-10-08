@@ -1,11 +1,7 @@
 ﻿using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.Buff;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine.Networking;
+using UnityEngine;
 
 namespace RoR2Randomizer.Patches.BuffRandomizer
 {
@@ -58,8 +54,20 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                     Log.Debug($"Buff randomizer: Applying dot {dot}");
 #endif
 
+                    GameObject attacker = null;
+
+                    HealthComponent healthComponent = self.healthComponent;
+                    if (healthComponent)
+                    {
+                        GameObject lastAttacker = healthComponent.lastHitAttacker;
+                        if (lastAttacker)
+                        {
+                            attacker = lastAttacker;
+                        }
+                    }
+
                     DotRandomizerPatch.SkipApplyBuffCount++;
-                    DotController.InflictDot(self.gameObject, self.healthComponent.lastHitAttacker ?? self.gameObject, dot);
+                    DotController.InflictDot(self.gameObject, attacker ?? self.gameObject, dot);
                     DotRandomizerPatch.SkipApplyBuffCount--;
 
                     return;
