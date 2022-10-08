@@ -11,6 +11,10 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
 {
     public sealed class SyncProjectileReplacements : INetMessage
     {
+        public delegate void OnReceiveDelegate(ReplacementDictionary<int> projectileReplacements);
+
+        public static event OnReceiveDelegate OnReceive;
+
         ReplacementDictionary<int> _projectileReplacements;
 
         public SyncProjectileReplacements()
@@ -60,7 +64,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
             Log.Debug($"Received {nameof(SyncProjectileReplacements)} as client, applying replacements");
 #endif
 
-            ProjectileRandomizerController.OnProjectileReplacementsReceivedFromServer(_projectileReplacements);
+            OnReceive?.Invoke(_projectileReplacements);
         }
     }
 }

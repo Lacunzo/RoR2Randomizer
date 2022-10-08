@@ -97,17 +97,25 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return false;
         });
 
-        static bool shouldBeActive => (NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled) || _hasReceivedProjectileReplacementsFromServer;
+        static bool shouldBeActive => ((NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled) || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
 
-        public static void OnProjectileReplacementsReceivedFromServer(ReplacementDictionary<int> replacements)
+        static void onProjectileReplacementsReceivedFromServer(ReplacementDictionary<int> replacements)
         {
             _projectileIndicesReplacements.Value = replacements;
             _hasReceivedProjectileReplacementsFromServer.Value = true;
         }
 
+        void Awake()
+        {
+            SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
+        }
+
         void OnDestroy()
         {
+            SyncProjectileReplacements.OnReceive -= onProjectileReplacementsReceivedFromServer;
+
             _projectileIndicesReplacements.Dispose();
+            _hasReceivedProjectileReplacementsFromServer.Dispose();
         }
 
 #if DEBUG
@@ -132,7 +140,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static void TryOverrideProjectilePrefab(ref GameObject prefab)
         {
-            if (shouldBeActive && _projectileIndicesReplacements.HasValue)
+            if (shouldBeActive)
             {
                 int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
                 int replacementIndex;
@@ -157,7 +165,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryGetOriginalProjectileIndex(int replacementIndex, out int originalIndex)
         {
-            if (shouldBeActive && _projectileIndicesReplacements.HasValue && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
+            if (shouldBeActive && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
             {
                 return true;
             }
