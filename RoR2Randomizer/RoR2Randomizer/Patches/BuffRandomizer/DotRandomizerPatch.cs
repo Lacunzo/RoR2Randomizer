@@ -59,7 +59,9 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 }
             }
 
+            BuffIndexPatch.SkipApplyDotCount++;
             orig(ref inflictDotInfo);
+            BuffIndexPatch.SkipApplyDotCount--;
         }
     }
 }

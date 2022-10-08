@@ -50,14 +50,20 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
         {
             if (BuffRandomizerController.IsActive &&
                 SkipApplyDotCount == 0 &&
-                BuffRandomizerController.TryReplaceBuffIndex(ref buffType) &&
-                BuffRandomizerController.TryGetDotIndex(buffType, out DotController.DotIndex dot))
+                BuffRandomizerController.TryReplaceBuffIndex(ref buffType))
             {
-                DotRandomizerPatch.SkipApplyBuffCount++;
-                DotController.InflictDot(self.gameObject, null, dot);
-                DotRandomizerPatch.SkipApplyBuffCount--;
+                if (BuffRandomizerController.TryGetDotIndex(buffType, out DotController.DotIndex dot))
+                {
+#if DEBUG
+                    Log.Debug($"Buff randomizer: Applying dot {dot}");
+#endif
 
-                return;
+                    DotRandomizerPatch.SkipApplyBuffCount++;
+                    DotController.InflictDot(self.gameObject, self.healthComponent.lastHitAttacker ?? self.gameObject, dot);
+                    DotRandomizerPatch.SkipApplyBuffCount--;
+
+                    return;
+                }
             }
 
             orig(self, buffType, newCount);

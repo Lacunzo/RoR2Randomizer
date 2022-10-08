@@ -27,7 +27,11 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                     BuffDef buffDef = dotDef.associatedBuff;
                     if (buffDef)
                     {
-                        dict[buffDef.buffIndex] = (DotController.DotIndex)i;
+                        BuffIndex buffIndex = buffDef.buffIndex;
+                        if (!dict.ContainsKey(buffIndex))
+                        {
+                            dict[buffIndex] = (DotController.DotIndex)i;
+                        }
                     }
                 }
             }
@@ -172,8 +176,6 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 #endif
                     _buffReplacements.Value.TryGetReplacement(index, out replacement))
                 {
-                    // replacement = (BuffIndex)42; // bdOnFire
-
 #if DEBUG
                     Log.Debug($"Buff Randomizer: Replaced {toLogString(index)} -> {toLogString(replacement)}");
 #endif
