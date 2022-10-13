@@ -49,7 +49,15 @@ namespace RoR2Randomizer.Utility
 
         ~RunSpecific()
         {
-            Dispose();
+            if (_callbackHandle.HasValue)
+            {
+
+#if DEBUG
+                Log.Warning($"{HarmonyLib.GeneralExtensions.FullDescription(GetType())} was not properly disposed");
+#endif
+
+                Dispose();
+            }
         }
 
         void onRunStart(Run instance)
