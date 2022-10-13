@@ -13,11 +13,24 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
     [RandomizerController]
     public class BuffRandomizerController : MonoBehaviour
     {
-        public static bool IsActive => NetworkServer.active && ConfigManager.BuffRandomizer.Enabled && _buffReplacements.HasValue;
+        static BuffIndex[] _invincibilityBuffs;
 
-        static readonly InitializeOnAccess<Dictionary<BuffIndex, DotController.DotIndex>> _buffToDotIndex = new InitializeOnAccess<Dictionary<BuffIndex, DotController.DotIndex>>(() =>
+        static Dictionary<BuffIndex, DotController.DotIndex> _buffToDotIndex;
+
+        [SystemInitializer(typeof(BuffCatalog), typeof(DotController))]
+        static void Init()
         {
-            Dictionary<BuffIndex, DotController.DotIndex> dict = new Dictionary<BuffIndex, DotController.DotIndex>();
+            _invincibilityBuffs = new BuffIndex[]
+            {
+                BuffCatalog.FindBuffIndex("bdBodyArmor"),
+                BuffCatalog.FindBuffIndex("bdGoldEmpowered"),
+                BuffCatalog.FindBuffIndex("bdHiddenInvincibility"),
+                BuffCatalog.FindBuffIndex("bdImmune"),
+                BuffCatalog.FindBuffIndex("bdIntangible"),
+                BuffCatalog.FindBuffIndex("bdBearVoidReady")
+            };
+
+            _buffToDotIndex = new Dictionary<BuffIndex, DotController.DotIndex>();
 
             for (int i = 0; i < DotController.dotDefs.Length; i++)
             {
@@ -28,36 +41,23 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                     if (buffDef)
                     {
                         BuffIndex buffIndex = buffDef.buffIndex;
-                        if (!dict.ContainsKey(buffIndex))
+                        if (!_buffToDotIndex.ContainsKey(buffIndex))
                         {
-                            dict[buffIndex] = (DotController.DotIndex)i;
+                            _buffToDotIndex[buffIndex] = (DotController.DotIndex)i;
                         }
                     }
                 }
             }
+        }
 
-            return dict;
-        });
-
-        static readonly InitializeOnAccess<BuffIndex[]> _invincibilityBuffs = new InitializeOnAccess<BuffIndex[]>(() =>
-        {
-            return new BuffIndex[]
-            {
-                BuffCatalog.FindBuffIndex("bdBodyArmor"),
-                BuffCatalog.FindBuffIndex("bdGoldEmpowered"),
-                BuffCatalog.FindBuffIndex("bdHiddenInvincibility"),
-                BuffCatalog.FindBuffIndex("bdImmune"),
-                BuffCatalog.FindBuffIndex("bdIntangible"),
-                BuffCatalog.FindBuffIndex("bdBearVoidReady")
-            };
-        });
+        public static bool IsActive => NetworkServer.active && ConfigManager.BuffRandomizer.Enabled && _buffReplacements.HasValue;
 
         static readonly RunSpecific<ReplacementDictionary<BuffIndex>> _buffReplacements = new RunSpecific<ReplacementDictionary<BuffIndex>>((out ReplacementDictionary<BuffIndex> result) =>
         {
             if (ConfigManager.BuffRandomizer.Enabled && NetworkServer.active)
             {
                 IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None &&
-                   (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.IndexOf(_invincibilityBuffs.Get, b.buffIndex) == -1));
+                   (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.IndexOf(_invincibilityBuffs, b.buffIndex) == -1));
 
 #if DEBUG
                 foreach (BuffDef excludedBuff in BuffCatalog.buffDefs.Except(buffsToRandomize))
@@ -199,7 +199,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 
         public static bool TryGetDotIndex(BuffIndex buff, out DotController.DotIndex dot)
         {
-            return _buffToDotIndex.Get.TryGetValue(buff, out dot);
+            return _buffToDotIndex.TryGetValue(buff, out dot);
         }
 
         public static bool TryGetBuffIndex(DotController.DotIndex dot, out BuffIndex buff)

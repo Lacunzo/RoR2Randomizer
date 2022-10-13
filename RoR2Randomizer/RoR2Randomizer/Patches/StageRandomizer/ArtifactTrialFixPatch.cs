@@ -58,9 +58,10 @@ namespace RoR2Randomizer.Patches.StageRandomizer
                     // If the artifact trial stage is replaced by something else, don't set the trial artifact definition
                     if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
                     {
-                        if (StageRandomizerController.TryGetReplacementSceneName(Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME, out string replacement))
+                        SceneIndex artifactTrialSceneIndex = StageRandomizerController.ArtifactTrialSceneIndex;
+                        if (artifactTrialSceneIndex != SceneIndex.Invalid && StageRandomizerController.TryGetReplacementSceneIndex(artifactTrialSceneIndex, out SceneIndex replacement))
                         {
-                            if (replacement != Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME)
+                            if (replacement != artifactTrialSceneIndex)
                             {
                                 return null;
                             }

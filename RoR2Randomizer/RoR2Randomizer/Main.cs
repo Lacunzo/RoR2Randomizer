@@ -17,6 +17,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.UIElements;
 using UnityModdingUtility;
 
+[assembly: HG.Reflection.SearchableAttribute.OptIn]
 [assembly: NetworkCompatibility]
 
 namespace RoR2Randomizer

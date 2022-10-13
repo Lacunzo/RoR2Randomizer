@@ -6,6 +6,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Stage
@@ -13,67 +14,80 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
     [RandomizerController]
     public class StageRandomizerController : MonoBehaviour
     {
-        static readonly string[] _excludeScenes = new string[]
+        static bool _isInitialized;
+        static StageRandomizingInfo[] _stages;
+
+        public static SceneIndex ArtifactTrialSceneIndex { get; private set; }
+
+        [SystemInitializer(typeof(SceneCatalog), typeof(GameModeCatalog))]
+        static void Init()
         {
-            // Simulacrum maps
-            "itancientloft",
-            "itdampcave",
-            "itfrozenwall",
-            "itgolemplains",
-            "itgoolake",
-            "itmoon",
-            "itskymeadow"
-        };
+            ArtifactTrialSceneIndex = SceneCatalog.FindSceneIndex(Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME);
 
-        static readonly string[] _forceIncludeScenes = new string[]
-        {
-            Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME,
-            "bazaar",
-            Constants.SceneNames.GOLD_SHORES_SCENE_NAME,
-            Constants.SceneNames.OBLITERATE_SCENE_NAME,
-            Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME
-        };
+            SceneIndex[] excludeScenes = new SceneIndex[]
+            {
+                // Simulacrum maps
+                SceneCatalog.FindSceneIndex("itancientloft"),
+                SceneCatalog.FindSceneIndex("itdampcave"),
+                SceneCatalog.FindSceneIndex("itfrozenwall"),
+                SceneCatalog.FindSceneIndex("itgolemplains"),
+                SceneCatalog.FindSceneIndex("itgoolake"),
+                SceneCatalog.FindSceneIndex("itmoon"),
+                SceneCatalog.FindSceneIndex("itskymeadow")
+            };
 
-        static readonly InitializeOnAccess<StageRandomizingInfo[]> _stages = new InitializeOnAccess<StageRandomizingInfo[]>(() =>
-        {
-            return SceneCatalog.allStageSceneDefs
-                               .Where(s => !_excludeScenes.Contains(s.cachedName))
-                               .Concat(_forceIncludeScenes.Select(SceneCatalog.FindSceneDef))
-                               .Select(scene =>
-                               {
-                                   StageFlags flags = StageFlags.None;
+            SceneIndex[] possibleStartingStages = null;
+            Run runPrefab = PreGameController.GameModeConVar.instance.runPrefabComponent;
+            if (runPrefab)
+            {
+                SceneCollection startingSceneGroup = runPrefab.startingSceneGroup;
+                if (startingSceneGroup)
+                {
+                    HG.ReadOnlyArray<SceneCollection.SceneEntry> sceneEntries = startingSceneGroup.sceneEntries;
+                    possibleStartingStages = new SceneIndex[sceneEntries.Length];
+                    for (int i = 0; i < sceneEntries.Length; i++)
+                    {
+                        possibleStartingStages[i] = sceneEntries[i].sceneDef.sceneDefIndex;
+                    }
+                }
+            }
 
-                                   switch (scene.cachedName)
-                                   {
-                                       case Constants.SceneNames.COMMENCEMENT_SCENE_NAME:
-                                       case Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME:
-                                       case Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME:
-                                       case Constants.SceneNames.VOID_LOCUS_SCENE_NAME:
-                                           flags |= StageFlags.FirstStageBlacklist;
-                                           break;
-                                   }
+            _stages = SceneCatalog.allStageSceneDefs
+                                  .Where(s => Array.IndexOf(excludeScenes, s.sceneDefIndex) == -1)
+                                  .Concat(new string[]
+                                  {
+                                      Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME,
+                                      "bazaar",
+                                      Constants.SceneNames.GOLD_SHORES_SCENE_NAME,
+                                      Constants.SceneNames.OBLITERATE_SCENE_NAME,
+                                      Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME
+                                  }.Select(SceneCatalog.FindSceneDef))
+                                  .Select(scene =>
+                                  {
+                                      StageFlags flags = StageFlags.None;
+                                  
+                                      switch (scene.cachedName)
+                                      {
+                                          case Constants.SceneNames.COMMENCEMENT_SCENE_NAME:
+                                          case Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME:
+                                          case Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME:
+                                          case Constants.SceneNames.VOID_LOCUS_SCENE_NAME:
+                                              flags |= StageFlags.FirstStageBlacklist;
+                                              break;
+                                      }
 
-                                   if (Run.instance)
-                                   {
-                                       SceneCollection startingSceneGroup = Run.instance.startingSceneGroup;
-                                       if (startingSceneGroup)
-                                       {
-                                           foreach (SceneCollection.SceneEntry entry in startingSceneGroup.sceneEntries)
-                                           {
-                                               if (scene == entry.sceneDef)
-                                               {
-                                                   flags |= StageFlags.PossibleStartingStage;
-                                                   break;
-                                               }
-                                           }
-                                       }
-                                   }
+                                      if (possibleStartingStages != null && Array.IndexOf(possibleStartingStages, scene.sceneDefIndex) != -1)
+                                      {
+                                          flags |= StageFlags.PossibleStartingStage;
+                                      }
+                                  
+                                      return new StageRandomizingInfo(scene.sceneDefIndex, flags);
+                                  }).ToArray();
 
-                                   return new StageRandomizingInfo(scene.cachedName, flags);
-                               }).ToArray();
-        });
+            _isInitialized = true;
+        }
 
-        static ReplacementDictionary<string> _stageReplacements;
+        static ReplacementDictionary<SceneIndex> _stageReplacements;
 
         void Awake()
         {
@@ -124,23 +138,32 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
         public static void InitializeStageReplacements(string firstStageSceneName)
         {
+            if (!_isInitialized)
+                return;
+
             if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
             {
 #if DEBUG
                 Log.Debug($"First stage: {firstStageSceneName}");
 
-                foreach (SceneDef nonStageScene in SceneCatalog.allSceneDefs.Where(s => Array.FindIndex(_stages.Get, st => st.SceneName == s.cachedName) == -1))
+                foreach (SceneDef nonStageScene in SceneCatalog.allSceneDefs.Where(s => Array.FindIndex(_stages, st => st.SceneIndex == s.sceneDefIndex) == -1))
                 {
                     Log.Debug($"Excluded scene: {nonStageScene.cachedName}");
                 }
 #endif
 
-                _stageReplacements = ReplacementDictionary<string>.CreateFrom(_stages.Get, s => s.SceneName, (key, value) =>
+                SceneIndex firstStageIndex = SceneCatalog.FindSceneIndex(firstStageSceneName);
+                if (firstStageIndex == SceneIndex.Invalid)
                 {
-                    if (ConfigManager.StageRandomizer.FirstStageBlacklistEnabled && key.SceneName == firstStageSceneName && (value.Flags & StageFlags.FirstStageBlacklist) != 0)
+                    Log.Warning($"Could not find scene index for {firstStageSceneName}");
+                }
+
+                _stageReplacements = ReplacementDictionary<SceneIndex>.CreateFrom(_stages, s => s.SceneIndex, (key, value) =>
+                {
+                    if (ConfigManager.StageRandomizer.FirstStageBlacklistEnabled && firstStageIndex != SceneIndex.Invalid && key.SceneIndex == firstStageIndex && (value.Flags & StageFlags.FirstStageBlacklist) != 0)
                     {
 #if DEBUG
-                        Log.Debug($"Not allowing stage replacement {key.SceneName} -> {value.SceneName}: Candidate cannot be the first stage");
+                        Log.Debug($"Not allowing stage replacement {SceneCatalog.GetSceneDef(key.SceneIndex)?.cachedName} -> {SceneCatalog.GetSceneDef(value.SceneIndex)?.cachedName}: Candidate cannot be the first stage");
 #endif
                         return false;
                     }
@@ -151,7 +174,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                     float weightMultiplier = 1f;
 
                     // Decrease likelyhood of an "ordinary" starting stage being picked as the first stage
-                    if ((key.SceneName == firstStageSceneName) && (value.Flags & StageFlags.PossibleStartingStage) != 0)
+                    if (firstStageIndex != SceneIndex.Invalid && key.SceneIndex == firstStageIndex && (value.Flags & StageFlags.PossibleStartingStage) != 0)
                     {
                         weightMultiplier *= ConfigManager.StageRandomizer.PossibleFirstStageWeightMult;
                     }
@@ -165,7 +188,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             }
         }
 
-        public static bool TryGetReplacementSceneName(string original, out string replacement)
+        public static bool TryGetReplacementSceneIndex(SceneIndex original, out SceneIndex replacement)
         {
             if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled && _stageReplacements != null)
             {
@@ -176,11 +199,31 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             return false;
         }
 
+        public static bool TryGetReplacementSceneName(string original, out string replacement)
+        {
+            SceneIndex originalIndex = SceneCatalog.FindSceneIndex(original);
+            if (originalIndex != SceneIndex.Invalid)
+            {
+                if (TryGetReplacementSceneIndex(originalIndex, out SceneIndex replacementIndex))
+                {
+                    SceneDef replacementScene = SceneCatalog.GetSceneDef(replacementIndex);
+                    if (replacementScene)
+                    {
+                        replacement = replacementScene.cachedName;
+                        return true;
+                    }
+                }
+            }
+
+            replacement = default;
+            return false;
+        }
+
         public static bool TryGetReplacementSceneDef(SceneDef original, out SceneDef replacement)
         {
-            if (TryGetReplacementSceneName(original.cachedName, out string replacementSceneName))
+            if (TryGetReplacementSceneIndex(original.sceneDefIndex, out SceneIndex replacementSceneIndex))
             {
-                replacement = SceneCatalog.FindSceneDef(replacementSceneName);
+                replacement = SceneCatalog.GetSceneDef(replacementSceneIndex);
                 return (bool)replacement;
             }
 
@@ -192,9 +235,9 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
         {
             if (ConfigManager.StageRandomizer.Enabled)
             {
-                if (replacement && _stageReplacements != null && _stageReplacements.TryGetOriginal(replacement.cachedName, out string originalSceneName))
+                if (replacement && _stageReplacements != null && _stageReplacements.TryGetOriginal(replacement.sceneDefIndex, out SceneIndex originalSceneIndex))
                 {
-                    originalScene = SceneCatalog.FindSceneDef(originalSceneName);
+                    originalScene = SceneCatalog.GetSceneDef(originalSceneIndex);
                     return (bool)originalScene;
                 }
             }

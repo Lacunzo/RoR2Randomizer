@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoR2;
+using System;
 
 namespace RoR2Randomizer.RandomizerControllers.Stage
 {
@@ -12,14 +13,14 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
     public readonly struct StageRandomizingInfo
     {
-        public readonly string SceneName;
+        public readonly SceneIndex SceneIndex;
         public readonly StageFlags Flags;
 
         public readonly float BaseSelectionWeight;
 
-        public StageRandomizingInfo(string sceneName, StageFlags flags, float baseSelectionWeight = 1f)
+        public StageRandomizingInfo(SceneIndex sceneIndex, StageFlags flags, float baseSelectionWeight = 1f)
         {
-            SceneName = sceneName;
+            SceneIndex = sceneIndex;
             Flags = flags;
             BaseSelectionWeight = baseSelectionWeight;
         }

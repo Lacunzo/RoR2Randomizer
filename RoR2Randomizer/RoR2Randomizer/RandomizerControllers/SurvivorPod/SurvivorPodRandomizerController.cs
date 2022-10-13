@@ -13,15 +13,17 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
     [RandomizerController]
     public class SurvivorPodRandomizerController : MonoBehaviour
     {
-        static readonly InitializeOnAccess<CharacterBody[]> _bodiesWithPods = new InitializeOnAccess<CharacterBody[]>(() =>
-        {
-            return BodyCatalog.allBodyPrefabBodyBodyComponents.Where(b => b && (b.preferredPodPrefab || !b.preferredInitialStateType.IsNothing())).ToArray();
-        });
+        static CharacterBody[] _bodiesWithPods;
+        static SpawnPodPrefabData[] _distinctPodPrefabs;
 
-        static readonly InitializeOnAccess<SpawnPodPrefabData[]> _distinctPodPrefabs = new InitializeOnAccess<SpawnPodPrefabData[]>(() =>
+        [SystemInitializer(typeof(BodyCatalog))]
+        static void Init()
         {
-            return _bodiesWithPods.Get.Select(getDefaultSpawnData).Distinct(SpawnPodPrefabData.EqualityComparer).ToArray();
-        });
+            IEnumerable<CharacterBody> bodiesWithPods = BodyCatalog.allBodyPrefabBodyBodyComponents.Where(b => b && (b.preferredPodPrefab || !b.preferredInitialStateType.IsNothing()));
+            _bodiesWithPods = bodiesWithPods.ToArray();
+
+            _distinctPodPrefabs = bodiesWithPods.Select(getDefaultSpawnData).Distinct(SpawnPodPrefabData.EqualityComparer).ToArray();
+        }
 
         static SpawnPodPrefabData getDefaultSpawnData(CharacterBody body)
         {
@@ -47,10 +49,10 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             {
                 result = new Dictionary<BodyIndex, SpawnPodPrefabData>();
 
-                foreach (CharacterBody body in _bodiesWithPods.Get)
+                foreach (CharacterBody body in _bodiesWithPods)
                 {
                     SpawnPodPrefabData defaultSpawnData = getDefaultSpawnData(body);
-                    result.Add(body.bodyIndex, _distinctPodPrefabs.Get.PickWeighted(s => s == defaultSpawnData ? 0.5f : 1f));
+                    result.Add(body.bodyIndex, _distinctPodPrefabs.PickWeighted(s => s == defaultSpawnData ? 0.5f : 1f));
                 }
 
                 return true;

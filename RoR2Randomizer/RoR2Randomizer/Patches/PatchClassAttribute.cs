@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoR2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +9,7 @@ using UnityModdingUtility;
 namespace RoR2Randomizer.Patches
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    sealed class PatchClassAttribute : Attribute
+    sealed class PatchClassAttribute : HG.Reflection.SearchableAttribute
     {
         readonly struct PatchClassInfo
         {
@@ -62,9 +63,8 @@ namespace RoR2Randomizer.Patches
 
         static readonly InitializeOnAccess<PatchClassInfo[]> _patchClasses = new InitializeOnAccess<PatchClassInfo[]>(() =>
         {
-            return (from type in Assembly.GetExecutingAssembly().GetTypes()
-                    where type.GetCustomAttribute(typeof(PatchClassAttribute)) != null
-                    select new PatchClassInfo(type)).ToArray();
+            return (from attr in GetInstances<PatchClassAttribute>()
+                    select new PatchClassInfo((Type)attr.target)).ToArray();
         });
 
         public static void ApplyAllPatches()

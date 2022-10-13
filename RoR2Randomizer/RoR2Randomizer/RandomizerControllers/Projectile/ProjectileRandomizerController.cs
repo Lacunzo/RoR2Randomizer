@@ -15,66 +15,70 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     [RandomizerController]
     public class ProjectileRandomizerController : MonoBehaviour
     {
-        static readonly InitializeOnAccess<int[]> _projectileIndicesToRandomize = new InitializeOnAccess<int[]>(() =>
+        static int[] _projectileIndicesToRandomize;
+
+        [SystemInitializer(typeof(ProjectileCatalog))]
+        static void Init()
         {
-            return ProjectileCatalog.projectilePrefabProjectileControllerComponents
-                                    .Where(projectile =>
-                                    {
-                                        if (!projectile)
-                                            return false;
+            _projectileIndicesToRandomize =
+                ProjectileCatalog.projectilePrefabProjectileControllerComponents
+                                 .Where(projectile =>
+                                 {
+                                     if (!projectile)
+                                         return false;
 
-                                        if (projectile.TryGetComponent<ProjectileFireChildren>(out ProjectileFireChildren projectileFireChildren)
-                                            && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
-                                        {
+                                     if (projectile.TryGetComponent<ProjectileFireChildren>(out ProjectileFireChildren projectileFireChildren)
+                                         && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
+                                     {
 #if DEBUG
-                                            Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
+                                         Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
 #endif
 
-                                            return false;
-                                        }
+                                         return false;
+                                     }
 
-                                        switch (projectile.name)
-                                        {
-                                            case "AACannon": // Does nothing
-                                            case "AncientWispCannon": // Does nothing
-                                            case "BanditBomblets": // Does nothing
-                                            case "BanditClusterBombSeed": // Clusterbombs fall through ground and do nothing
-                                            case "BanditClusterGrenadeProjectile": // No collision, cannot deal damage
-                                            case "BeetleQueenAcid": // Does nothing
-                                            case "BellBallSmall": // Does nothing
-                                            case "DroneRocket": // Does nothing
-                                            case "EngiMineDeployer": // Constant NullRef in FixedUpdate
-                                            case "EngiSeekerGrenadeProjectile": // Does nothing
-                                            case "EngiWallShield": // Unfinished engi shield
-                                            case "GatewayProjectile": // Does nothing
-                                            case "MinorConstructOnKillProjectile": // Does nothing
-                                            case "NullifierBombProjectile": // Does nothing
-                                            case "PaladinBigRocket": // Does nothing
-                                            case "RedAffixMissileProjectile": // Does nothing
-                                            case "ScoutGrenade": // Does nothing
-                                            case "Rocket": // Does nothing
-                                            case "Spine": // No collision, cannot deal damage
-                                            case "ToolbotDroneHeal": // Does nothing
-                                            case "ToolbotDroneStun": // Does nothing
-                                            case "TreebotPounderProjectile": // Does nothing
+                                     switch (projectile.name)
+                                     {
+                                         case "AACannon": // Does nothing
+                                         case "AncientWispCannon": // Does nothing
+                                         case "BanditBomblets": // Does nothing
+                                         case "BanditClusterBombSeed": // Clusterbombs fall through ground and do nothing
+                                         case "BanditClusterGrenadeProjectile": // No collision, cannot deal damage
+                                         case "BeetleQueenAcid": // Does nothing
+                                         case "BellBallSmall": // Does nothing
+                                         case "DroneRocket": // Does nothing
+                                         case "EngiMineDeployer": // Constant NullRef in FixedUpdate
+                                         case "EngiSeekerGrenadeProjectile": // Does nothing
+                                         case "EngiWallShield": // Unfinished engi shield
+                                         case "GatewayProjectile": // Does nothing
+                                         case "MinorConstructOnKillProjectile": // Does nothing
+                                         case "NullifierBombProjectile": // Does nothing
+                                         case "PaladinBigRocket": // Does nothing
+                                         case "RedAffixMissileProjectile": // Does nothing
+                                         case "ScoutGrenade": // Does nothing
+                                         case "Rocket": // Does nothing
+                                         case "Spine": // No collision, cannot deal damage
+                                         case "ToolbotDroneHeal": // Does nothing
+                                         case "ToolbotDroneStun": // Does nothing
+                                         case "TreebotPounderProjectile": // Does nothing
 
-                                            // Excluded because I think it's more fun that way
-                                            case "MageIcewallWalkerProjectile":
-                                            case "MageFirewallWalkerProjectile":
+                                         // Excluded because I think it's more fun that way
+                                         case "MageIcewallWalkerProjectile":
+                                         case "MageFirewallWalkerProjectile":
 
-                                            // Excluded because it seems like a huge pain getting it to work, might look into it in the future.
-                                            case "LunarSunProjectile":
+                                         // Excluded because it seems like a huge pain getting it to work, might look into it in the future.
+                                         case "LunarSunProjectile":
 #if DEBUG
-                                                Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
+                                             Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
 #endif
-                                                return false;
-                                        }
+                                             return false;
+                                     }
 
-                                        return true;
-                                    })
-                                    .Select(p => p.catalogIndex)
-                                    .ToArray();
-        });
+                                     return true;
+                                 })
+                                 .Select(p => p.catalogIndex)
+                                 .ToArray();
+        }
 
         static readonly RunSpecific<bool> _hasReceivedProjectileReplacementsFromServer = new RunSpecific<bool>();
 
@@ -82,7 +86,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         {
             if (NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled)
             {
-                result = ReplacementDictionary<int>.CreateFrom(_projectileIndicesToRandomize.Get);
+                result = ReplacementDictionary<int>.CreateFrom(_projectileIndicesToRandomize);
 
 #if DEBUG
                 Log.Debug($"Sending {nameof(SyncProjectileReplacements)} to clients");
@@ -126,7 +130,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 switch (ConfigManager.ProjectileRandomizer.DebugMode.Entry.Value)
                 {
                     case DebugMode.Manual:
-                        replacement = _projectileIndicesToRandomize.Get[_forcedProjectileIndex];
+                        replacement = _projectileIndicesToRandomize[_forcedProjectileIndex];
                         return true;
                     case DebugMode.Forced:
                         return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
@@ -196,7 +200,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 bool changedProjectileIndex = false;
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
                 {
-                    if (++_forcedProjectileIndex >= _projectileIndicesToRandomize.Get.Length)
+                    if (++_forcedProjectileIndex >= _projectileIndicesToRandomize.Length)
                         _forcedProjectileIndex = 0;
 
                     changedProjectileIndex = true;
@@ -204,14 +208,14 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 else if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
                     if (--_forcedProjectileIndex < 0)
-                        _forcedProjectileIndex = _projectileIndicesToRandomize.Get.Length - 1;
+                        _forcedProjectileIndex = _projectileIndicesToRandomize.Length - 1;
 
                     changedProjectileIndex = true;
                 }
 
                 if (changedProjectileIndex)
                 {
-                    Log.Debug($"Current projectile override: {ProjectileCatalog.GetProjectilePrefab(_projectileIndicesToRandomize.Get[_forcedProjectileIndex]).name} ({_projectileIndicesToRandomize.Get[_forcedProjectileIndex]})");
+                    Log.Debug($"Current projectile override: {ProjectileCatalog.GetProjectilePrefab(_projectileIndicesToRandomize[_forcedProjectileIndex]).name} ({_projectileIndicesToRandomize[_forcedProjectileIndex]})");
                 }
             }
         }

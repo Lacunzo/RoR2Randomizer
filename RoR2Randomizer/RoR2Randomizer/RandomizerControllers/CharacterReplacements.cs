@@ -36,16 +36,18 @@ namespace RoR2Randomizer.RandomizerControllers
         public static DebugMode DebugMode => ConfigManager.Debug.CharacterDebugMode;
 #endif
 
-        public static readonly InitializeOnAccess<EquipmentIndex[]> AvailableDroneEquipments = new InitializeOnAccess<EquipmentIndex[]>(() =>
-        {
-            return EquipmentCatalog.equipmentDefs.Where(eq => eq && (eq.canDrop || eq.name == "BossHunterConsumed"))
-                                                 .Select(e => e.equipmentIndex)
-                                                 .ToArray();
-        });
+        public static ReadOnlyArray<EquipmentIndex> AvailableDroneEquipments;
 
-        static readonly InitializeOnAccess<int[]> _masterIndicesToRandomize = new InitializeOnAccess<int[]>(() =>
+        static int[] _masterIndicesToRandomize;
+
+        [SystemInitializer(typeof(EquipmentCatalog), typeof(MasterCatalog))]
+        static void Init()
         {
-            return MasterCatalog.masterPrefabs.Where(master =>
+            AvailableDroneEquipments = EquipmentCatalog.equipmentDefs.Where(eq => eq && (eq.canDrop || eq.name == "BossHunterConsumed"))
+                                                                     .Select(e => e.equipmentIndex)
+                                                                     .ToArray();
+
+            _masterIndicesToRandomize = MasterCatalog.masterPrefabs.Where(master =>
             {
                 if (!master || !master.GetComponent<CharacterMaster>())
                     return false;
@@ -67,14 +69,14 @@ namespace RoR2Randomizer.RandomizerControllers
 
                 return true;
             }).Distinct().Select(go => (int)MasterCatalog.FindMasterIndex(go)).ToArray();
-        });
+        }
 
         static readonly RunSpecific<bool> _hasReceivedMasterIndexReplacementsFromServer = new RunSpecific<bool>(1);
         static readonly RunSpecific<ReplacementDictionary<int>> _masterIndexReplacements = new RunSpecific<ReplacementDictionary<int>>((out ReplacementDictionary<int> result) =>
         {
             if (NetworkServer.active)
             {
-                result = ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize.Get);
+                result = ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize);
 
                 new SyncCharacterMasterReplacements(result).Send(NetworkDestination.Clients);
 
@@ -139,7 +141,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 bool changed = false;
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
                 {
-                    if (++_forcedMasterIndex >= _masterIndicesToRandomize.Get.Length)
+                    if (++_forcedMasterIndex >= _masterIndicesToRandomize.Length)
                         _forcedMasterIndex = 0;
 
                     changed = true;
@@ -147,14 +149,14 @@ namespace RoR2Randomizer.RandomizerControllers
                 else if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
                     if (--_forcedMasterIndex < 0)
-                        _forcedMasterIndex = _masterIndicesToRandomize.Get.Length - 1;
+                        _forcedMasterIndex = _masterIndicesToRandomize.Length - 1;
 
                     changed = true;
                 }
 
                 if (changed)
                 {
-                    Log.Debug($"Character master: {MasterCatalog.GetMasterPrefab((MasterCatalog.MasterIndex)_masterIndicesToRandomize.Get[_forcedMasterIndex])?.name} ({_forcedMasterIndex})");
+                    Log.Debug($"Character master: {MasterCatalog.GetMasterPrefab((MasterCatalog.MasterIndex)_masterIndicesToRandomize[_forcedMasterIndex])?.name} ({_forcedMasterIndex})");
                 }
             }
         }
@@ -202,7 +204,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 {
                     if (DebugMode == DebugMode.Manual)
                     {
-                        int masterIndex = ArrayUtils.GetSafe(_masterIndicesToRandomize.Get, _forcedMasterIndex, -1);
+                        int masterIndex = ArrayUtils.GetSafe(_masterIndicesToRandomize, _forcedMasterIndex, -1);
                         if (masterIndex != -1)
                         {
                             return (MasterCatalog.MasterIndex)masterIndex;

@@ -23,11 +23,14 @@ namespace RoR2Randomizer.Utility
             _controllersRoot = new GameObject(Main.PluginName + ".Controllers");
             UnityEngine.Object.DontDestroyOnLoad(_controllersRoot);
 
-            foreach (Type controllerType in RandomizerControllerAttribute.RandomizerControllerTypes.Get)
+            foreach (HG.Reflection.SearchableAttribute attr in RandomizerControllerAttribute.GetInstances<RandomizerControllerAttribute>())
             {
-                if (controllerType != null)
+                if (attr != null && attr.target is Type type)
                 {
-                    _controllersRoot.AddComponent(controllerType);
+                    _controllersRoot.AddComponent(type);
+#if DEBUG
+                    Log.Debug($"Added randomizer controller {type.Name} to main object");
+#endif
                 }
             }
         }
