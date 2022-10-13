@@ -101,12 +101,16 @@ namespace RoR2Randomizer.Patches.Fixes
 
         public static void Try_get_gameObject(ILCursor c)
         {
-            c.Remove(); // Remove get_gameObject
-
-            c.EmitDelegate((Component comp) =>
+            ReplaceCall(c, (Component comp) =>
             {
                 return comp ? comp.gameObject : null;
             });
+        }
+
+        public static void ReplaceCall<T>(this ILCursor c, T del) where T : Delegate
+        {
+            c.Remove();
+            c.EmitDelegate(del);
         }
     }
 }

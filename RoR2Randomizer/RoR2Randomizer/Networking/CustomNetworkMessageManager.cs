@@ -3,6 +3,9 @@ using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Networking.CharacterReplacements;
 using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
+#if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
+using RoR2Randomizer.Networking.HoldoutZoneRandomizer;
+#endif
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using System;
 using System.Collections.Generic;
@@ -20,6 +23,9 @@ namespace RoR2Randomizer.Networking
             NetworkingAPI.RegisterMessageType<SyncProjectileReplacements>();
             NetworkingAPI.RegisterMessageType<SyncCharacterMasterReplacements>();
             NetworkingAPI.RegisterMessageType<SyncEffectReplacements>();
+#if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
+            NetworkingAPI.RegisterMessageType<SyncHoldoutZoneReplacements>();
+#endif
 
 #if DEBUG
             NetworkingAPI.RegisterMessageType<Debug.SyncConsoleLog>();

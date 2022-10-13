@@ -65,7 +65,7 @@ namespace RoR2Randomizer.Utility
                 {
                     Inventory inventory = playerMasterController.master.inventory;
 
-                    //inventory.GiveRandomItems(100, false, false);
+                    inventory.GiveRandomItems(100, false, false);
                     //inventory.SetEquipmentIndex(RoR2Content.Equipment.Scanner.equipmentIndex);
 
                     // inventory.GiveItem(RoR2Content.Items.RoboBallBuddy);
@@ -73,7 +73,7 @@ namespace RoR2Randomizer.Utility
 
                     //inventory.SetEquipmentIndex(RoR2Content.Equipment.DroneBackup.equipmentIndex);
 
-                    inventory.GiveItem(RoR2Content.Items.BleedOnHit, 10);
+                    //inventory.GiveItem(RoR2Content.Items.BleedOnHit, 10);
                 }
             }
             else if (Input.GetKeyDown(KeyCode.Keypad6))
@@ -102,6 +102,11 @@ namespace RoR2Randomizer.Utility
             {
                 Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
                 Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.ABANDONED_AQUEDUCT_SCENE_NAME));
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftBracket))
+            {
+                Run.instance.SetRunStopwatch(Run.instance.GetRunStopwatch() + (20f * 60f));
+                Run.instance.AdvanceStage(SceneCatalog.GetSceneDefFromSceneName(Constants.SceneNames.VOID_FIELDS_SCENE_NAME));
             }
         }
     }
