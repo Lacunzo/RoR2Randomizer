@@ -69,24 +69,5 @@ namespace RoR2Randomizer.Extensions
                 return false;
             }
         }
-
-        public static bool TryGetBodyRadius(this GameObject bodyPrefab, out float radius)
-        {
-            if (bodyPrefab.TryGetComponent<SphereCollider>(out SphereCollider sphereCollider))
-            {
-                radius = sphereCollider.radius;
-                return true;
-            }
-            else if (bodyPrefab.TryGetComponent<CapsuleCollider>(out CapsuleCollider capsuleCollider))
-            {
-                radius = capsuleCollider.radius;
-                return true;
-            }
-            else
-            {
-                radius = -1f;
-                return false;
-            }
-        }
     }
 }

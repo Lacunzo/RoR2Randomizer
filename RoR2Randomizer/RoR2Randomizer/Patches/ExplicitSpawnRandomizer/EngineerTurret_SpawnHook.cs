@@ -7,6 +7,7 @@ using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerControllers;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -83,16 +84,13 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     GameObject turretReplacementMasterObject = ExplicitSpawnRandomizerController.GetSummonReplacement(instance.turretMasterPrefab);
                     if (turretReplacementMasterObject && turretReplacementMasterObject.TryGetComponent<CharacterMaster>(out CharacterMaster replacementTurretMaster))
                     {
-                        if (replacementTurretMaster.bodyPrefab)
+                        if (replacementTurretMaster.bodyPrefab && Caches.CharacterBodyRadius.TryGetValue(replacementTurretMaster.bodyPrefab, out float radius))
                         {
-                            if (replacementTurretMaster.bodyPrefab.TryGetBodyRadius(out float radius))
-                            {
-                                float result = radius + (TURRET_PLACE_DISTANCE - TURRET_RADUIS);
+                            float result = radius + (TURRET_PLACE_DISTANCE - TURRET_RADUIS);
 #if DEBUG
-                                Log.Debug($"Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
+                            Log.Debug($"Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
 #endif
-                                return Mathf.Max(originalDistance, result);
-                            }
+                            return Mathf.Max(originalDistance, result);
                         }
                     }
 
