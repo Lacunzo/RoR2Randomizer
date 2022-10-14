@@ -57,7 +57,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                                   .Concat(new string[]
                                   {
                                       Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME,
-                                      "bazaar",
+                                      Constants.SceneNames.NEWT_SHOP_SCENE_NAME,
                                       Constants.SceneNames.GOLD_SHORES_SCENE_NAME,
                                       Constants.SceneNames.OBLITERATE_SCENE_NAME,
                                       Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME
