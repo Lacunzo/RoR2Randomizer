@@ -22,6 +22,8 @@ namespace RoR2Randomizer.Configuration
     {
         static readonly List<ConfigCategory> _allCategories = new List<ConfigCategory>();
 
+        internal static MetadataConfig Metadata;
+
         public static BuffRandomizerConfig BuffRandomizer;
         public static BossRandomizerConfig BossRandomizer;
 #if !DISABLE_SKILL_RANDOMIZER
@@ -60,6 +62,8 @@ namespace RoR2Randomizer.Configuration
 #if DEBUG
             _allCategories.Add(Debug = new DebugConfig(file));
 #endif
+
+            _allCategories.Insert(0, Metadata = new MetadataConfig(file));
 
             foreach (ConfigCategory category in _allCategories)
             {

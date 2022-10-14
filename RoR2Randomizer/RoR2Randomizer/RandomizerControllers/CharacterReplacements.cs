@@ -99,20 +99,8 @@ namespace RoR2Randomizer.RandomizerControllers
             _hasReceivedMasterIndexReplacementsFromServer.Value = true;
         }
 
-        static readonly Dictionary<string, string> _characterNamesLanguageAdditions = new Dictionary<string, string>
-        {
-            { "ARCHWISP_BODY_NAME", "Arch Wisp" },
-
-            { "BEETLE_CRYSTAL_BODY_NAME", "Crystal Beetle" },
-
-            { "MAJORCONSTRUCT_BODY_NAME", "Major Construct" },
-            { "MAJORCONSTRUCT_BODY_SUBTITLE", "Defense System" }
-        };
-
         public static void Initialize()
         {
-            LanguageAPI.Add(_characterNamesLanguageAdditions);
-
             SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
 
 #if DEBUG

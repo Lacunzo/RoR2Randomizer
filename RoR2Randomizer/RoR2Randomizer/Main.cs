@@ -24,7 +24,7 @@ namespace RoR2Randomizer
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(Constants.R2API_GUID)]
-    [BepInDependency(Constants.RISK_OF_OPTIONS_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(Constants.RISK_OF_OPTIONS_GUID)]
     [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(R2APIContentManager), nameof(LanguageAPI))]
     public class Main : BaseUnityPlugin
     {
