@@ -52,6 +52,8 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                             {
                                 shopKeeperMaster.bodyPrefab = replacementPrefab.bodyPrefab;
 
+                                ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(shopKeeperMaster.gameObject, _shopkeeperMasterIndex);
+
 #if DEBUG
                                 Log.Debug("Replaced Shopkeeper");
 #endif
