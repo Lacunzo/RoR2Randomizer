@@ -29,15 +29,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
             if (hasReplaced)
             {
-                if (originalPrefab.GetComponent<SetDontDestroyOnLoad>())
-                {
-                    result.gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
-                }
-                else if (result.TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
-                {
-                    GameObject.Destroy(setDontDestroyOnLoad);
-                }
-
                 self.masterPrefab = originalPrefab;
 
                 if (result && originalPrefab && originalPrefab.TryGetComponent<CharacterMaster>(out CharacterMaster originalMasterPrefab))

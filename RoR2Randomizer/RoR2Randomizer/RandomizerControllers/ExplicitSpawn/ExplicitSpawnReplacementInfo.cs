@@ -1,6 +1,7 @@
 ﻿using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using System;
 using System.Collections;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {
@@ -38,6 +40,25 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             base.initializeServer();
 
             new SyncExplicitSpawnReplacement(_master.gameObject, _originalMasterIndex).Send(NetworkDestination.Clients);
+        }
+
+        protected override void initializeClient()
+        {
+            base.initializeClient();
+
+            if (originalMasterPrefab.GetComponent<SetDontDestroyOnLoad>())
+            {
+                gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
+            }
+            else if (TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
+            {
+                Destroy(setDontDestroyOnLoad);
+
+                if (RoR2.Util.IsDontDestroyOnLoad(gameObject))
+                {
+                    SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
+                }
+            }
         }
     }
 }
