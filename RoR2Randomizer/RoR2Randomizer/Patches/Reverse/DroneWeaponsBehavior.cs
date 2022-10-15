@@ -19,7 +19,7 @@ namespace RoR2Randomizer.Patches.Reverse
         }
 
         [HarmonyPatch(nameof(RoR2.DroneWeaponsBehavior.UpdateMinionInventory))]
-        [HarmonyReversePatch(HarmonyReversePatchType.Snapshot)]
+        [HarmonyReversePatch]
         static void setNumDroneParts(int numParts, Inventory inventory, CharacterBody.BodyFlags bodyFlags, int newStack)
         {
             void Manipulator(ILContext il)
