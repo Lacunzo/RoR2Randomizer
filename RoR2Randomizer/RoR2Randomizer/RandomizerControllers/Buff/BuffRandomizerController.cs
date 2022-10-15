@@ -143,16 +143,19 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             }
         }
 
-        static bool tryGetDebugOverrideReplacement(out BuffIndex replacement)
+        static bool tryGetDebugOverrideReplacement(BuffIndex original, out BuffIndex replacement)
         {
-            switch (ConfigManager.BuffRandomizer.BuffDebugMode.Entry.Value)
+            if (_buffReplacements.Value.ContainsKey(original))
             {
-                case DebugMode.Manual:
-                    replacement = _debugIndex;
-                    return true;
-                case DebugMode.Forced:
-                    replacement = BuffCatalog.FindBuffIndex(ConfigManager.BuffRandomizer.ForcedBuffName);
-                    return replacement != BuffIndex.None;
+                switch (ConfigManager.BuffRandomizer.BuffDebugMode.Entry.Value)
+                {
+                    case DebugMode.Manual:
+                        replacement = _debugIndex;
+                        return true;
+                    case DebugMode.Forced:
+                        replacement = BuffCatalog.FindBuffIndex(ConfigManager.BuffRandomizer.ForcedBuffName);
+                        return replacement != BuffIndex.None;
+                }
             }
 
             replacement = BuffIndex.None;
@@ -165,6 +168,10 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             _buffReplacements.Dispose();
         }
 
+#if DEBUG
+        public static uint SuppressBuffReplacementLogCount = 0;
+#endif
+
         public static bool TryReplaceBuffIndex(ref BuffIndex index)
         {
             if (IsActive)
@@ -172,12 +179,15 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                 BuffIndex replacement;
                 if (
 #if DEBUG
-                    tryGetDebugOverrideReplacement(out replacement) ||
+                    tryGetDebugOverrideReplacement(index, out replacement) ||
 #endif
                     _buffReplacements.Value.TryGetReplacement(index, out replacement))
                 {
 #if DEBUG
-                    Log.Debug($"Buff Randomizer: Replaced {toLogString(index)} -> {toLogString(replacement)}");
+                    if (SuppressBuffReplacementLogCount == 0)
+                    {
+                        Log.Debug($"Buff Randomizer: Replaced {toLogString(index)} -> {toLogString(replacement)}");
+                    }
 #endif
 
                     index = replacement;

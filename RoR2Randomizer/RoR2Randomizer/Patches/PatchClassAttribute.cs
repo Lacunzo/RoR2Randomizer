@@ -13,11 +13,14 @@ namespace RoR2Randomizer.Patches
     {
         readonly struct PatchClassInfo
         {
+            readonly Type _type;
             readonly MethodInfo _applyMethod;
             readonly MethodInfo _cleanupMethod;
 
             public PatchClassInfo(Type type)
             {
+                _type = type;
+
                 const string APPLY_METHOD_NAME = "Apply";
                 const string ALT_APPLY_METHOD_NAME = "ApplyPatches";
 
@@ -59,12 +62,27 @@ namespace RoR2Randomizer.Patches
 #endif
                 }
             }
+
+            public static readonly IEqualityComparer<PatchClassInfo> Comparer = new EqualityComparer();
+
+            class EqualityComparer : IEqualityComparer<PatchClassInfo>
+            {
+                public bool Equals(PatchClassInfo x, PatchClassInfo y)
+                {
+                    return x._type.Equals(y._type);
+                }
+
+                public int GetHashCode(PatchClassInfo obj)
+                {
+                    return obj._type.GetHashCode();
+                }
+            }
         }
 
         static readonly InitializeOnAccess<PatchClassInfo[]> _patchClasses = new InitializeOnAccess<PatchClassInfo[]>(() =>
         {
             return (from attr in GetInstances<PatchClassAttribute>()
-                    select new PatchClassInfo((Type)attr.target)).ToArray();
+                    select new PatchClassInfo((Type)attr.target)).Distinct(PatchClassInfo.Comparer).ToArray();
         });
 
         public static void ApplyAllPatches()
