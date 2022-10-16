@@ -2,6 +2,8 @@
 
 A randomizer mod for Risk of Rain 2!
 
+It is *highly* recommended to take a look over the mod settings before starting a run. By default most randomizers are enabled, which can be a bit much to take in at once.
+
 Current features:
 * Multiplayer Compatible. Every player needs to have the mod.
 * Compatibile with Risk of Options for easy configuration in-game.
@@ -9,7 +11,7 @@ Current features:
 * Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers and Alloy Worship Unit are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
-* Projectile Randomizer: Randomizes all projectiles.
+* Projectile Randomizer: Randomizes projectiles. Hitscan attacks are not affected by this. Certain attacks are also not technically projectiles (even if they have travel time), most notably almost all of Huntress' attacks, meaning they are also not affected by this randomizer.
 * Summon Randomizer: Randomizes summoned characters.
   * Buying drones
   * Squid Polyp
@@ -22,10 +24,32 @@ Current features:
   * Quiet Probe and Delighted Probe spawned from the Solus Probes item
   * Strike Drone spawned from The back-up equipment
   * Col. Droneman spawned from Spare Drone Parts
+  * Shopkeeper Newt
+  * Solus Probes spawned by Solus Control Unit and Alloy Worship Unit
+* Effect Randomizer: Randomizes visual effects.
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.5.0 Changes:**
+
+* Effect Randomizer:
+  * Added Effect Randomizer
+
+* Status Effect Randomizer:
+  * Fixed DOT status effects not being properly randomized. (An effect randomized into bleed did not inflict bleed, and if bleed was randomized into a non-DOT effect, bleed would still be applied)
+  * Fixed Safer Spaces never going on cooldown
+  * Fixed Shurikens giving a new stack of buff every frame
+  * Fixed Void Fiend getting stuck at 100% corruption if status effect randomizer was enabled
+
+* Summon Randomizer:
+  * Added Shopkeeper Newt to Summon Randomizer
+  * Added Solus Probes to Summon Randomizer
+
+* Misc:
+  * Added an info message on first startup
+  * Added Risk of Options as a required dependency
 
 **0.4.0 Changes:**
 
