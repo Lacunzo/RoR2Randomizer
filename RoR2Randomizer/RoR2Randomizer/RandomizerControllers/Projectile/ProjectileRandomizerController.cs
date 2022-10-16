@@ -147,6 +147,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             if (shouldBeActive)
             {
                 int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
+                if (originalIndex != -1)
+                {
                 int replacementIndex;
                 if (
 #if DEBUG
@@ -165,6 +167,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     }
                 }
             }
+        }
         }
 
         public static bool TryGetOriginalProjectileIndex(int replacementIndex, out int originalIndex)
