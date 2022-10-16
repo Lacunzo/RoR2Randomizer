@@ -17,13 +17,9 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
         static bool _isInitialized;
         static StageRandomizingInfo[] _stages;
 
-        public static SceneIndex ArtifactTrialSceneIndex { get; private set; }
-
-        [SystemInitializer(typeof(SceneCatalog), typeof(GameModeCatalog))]
+        [SystemInitializer(typeof(Caches.Scene), typeof(SceneCatalog), typeof(GameModeCatalog))]
         static void Init()
         {
-            ArtifactTrialSceneIndex = SceneCatalog.FindSceneIndex(Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME);
-
             SceneIndex[] excludeScenes = new SceneIndex[]
             {
                 // Simulacrum maps
@@ -54,26 +50,26 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
             _stages = SceneCatalog.allStageSceneDefs
                                   .Where(s => Array.IndexOf(excludeScenes, s.sceneDefIndex) == -1)
-                                  .Concat(new string[]
+                                  // These are not normal stages, but will be included anyway
+                                  .Concat(new SceneIndex[]
                                   {
-                                      Constants.SceneNames.ARTIFACT_TRIAL_SCENE_NAME,
-                                      Constants.SceneNames.NEWT_SHOP_SCENE_NAME,
-                                      Constants.SceneNames.GOLD_SHORES_SCENE_NAME,
-                                      Constants.SceneNames.OBLITERATE_SCENE_NAME,
-                                      Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME
-                                  }.Select(SceneCatalog.FindSceneDef))
+                                      Caches.Scene.ArtifactTrialSceneIndex,
+                                      Caches.Scene.NewtShopSceneIndex,
+                                      Caches.Scene.GoldShoresSceneIndex,
+                                      Caches.Scene.ObliterateSceneIndex,
+                                      Caches.Scene.LunarScavFightSceneIndex
+                                  }.Where(s => s != SceneIndex.Invalid).Select(SceneCatalog.GetSceneDef))
                                   .Select(scene =>
                                   {
                                       StageFlags flags = StageFlags.None;
-                                  
-                                      switch (scene.cachedName)
+
+                                      SceneIndex index = scene.sceneDefIndex;
+                                      if ((Caches.Scene.CommencementSceneIndex != SceneIndex.Invalid && index == Caches.Scene.CommencementSceneIndex) ||
+                                          (Caches.Scene.LunarScavFightSceneIndex != SceneIndex.Invalid && index == Caches.Scene.LunarScavFightSceneIndex) ||
+                                          (Caches.Scene.VoidlingFightSceneIndex != SceneIndex.Invalid && index == Caches.Scene.VoidlingFightSceneIndex) ||
+                                          (Caches.Scene.VoidLocusSceneIndex != SceneIndex.Invalid && index == Caches.Scene.VoidLocusSceneIndex))
                                       {
-                                          case Constants.SceneNames.COMMENCEMENT_SCENE_NAME:
-                                          case Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME:
-                                          case Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME:
-                                          case Constants.SceneNames.VOID_LOCUS_SCENE_NAME:
-                                              flags |= StageFlags.FirstStageBlacklist;
-                                              break;
+                                          flags |= StageFlags.FirstStageBlacklist;
                                       }
 
                                       if (possibleStartingStages != null && Array.IndexOf(possibleStartingStages, scene.sceneDefIndex) != -1)

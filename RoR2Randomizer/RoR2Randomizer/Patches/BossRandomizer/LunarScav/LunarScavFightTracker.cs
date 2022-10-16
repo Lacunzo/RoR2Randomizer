@@ -58,7 +58,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.LunarScav
         {
             base.onSceneLoaded(scene);
 
-            if (scene.cachedName == Constants.SceneNames.LUNAR_SCAV_FIGHT_SCENE_NAME)
+            if (Caches.Scene.LunarScavFightSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.LunarScavFightSceneIndex)
             {
                 IsInFight.Value = true;
             }

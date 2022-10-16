@@ -27,7 +27,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
         {
             if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
             {
-                if (scene.cachedName == Constants.SceneNames.ABANDONED_AQUEDUCT_SCENE_NAME)
+                if (Caches.Scene.AbandonedAqueductSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.AbandonedAqueductSceneIndex)
                 {
                     Main.Instance.StartCoroutine(waitThenReplaceRingEventEnemies());
                 }

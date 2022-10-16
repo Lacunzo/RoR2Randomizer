@@ -90,9 +90,9 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                 }
             }
 
-            static void SceneCatalog_onMostRecentSceneDefChanged(SceneDef obj)
+            static void SceneCatalog_onMostRecentSceneDefChanged(SceneDef newScene)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && obj.cachedName == Constants.SceneNames.VOIDLING_FIGHT_SCENE_NAME)
+                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && Caches.Scene.VoidlingFightSceneIndex != SceneIndex.Invalid && newScene.sceneDefIndex == Caches.Scene.VoidlingFightSceneIndex)
                 {
                     GameObject levelRoot = GameObject.Find("RaidVoid");
                     if (levelRoot)
