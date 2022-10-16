@@ -14,6 +14,8 @@ namespace RoR2Randomizer.RandomizerControllers
 {
     public abstract class CharacterReplacementInfo : MonoBehaviour
     {
+        bool _initializeOnEnable;
+
         protected CharacterMaster _master;
         protected CharacterBody _body;
 
@@ -38,16 +40,32 @@ namespace RoR2Randomizer.RandomizerControllers
             _master = GetComponent<CharacterMaster>();
         }
 
+        void Start()
+        {
+            if (_initializeOnEnable)
+            {
+                _initializeOnEnable = false;
+                Initialize();
+            }
+        }
+
         public void Initialize()
         {
-            StartCoroutine(waitForBodyInitialized());
-
-            if (NetworkServer.active)
+            if (gameObject.activeInHierarchy)
             {
-                initializeServer();
-            }
+                StartCoroutine(waitForBodyInitialized());
 
-            initializeClient();
+                if (NetworkServer.active)
+                {
+                    initializeServer();
+                }
+
+                initializeClient();
+            }
+            else
+            {
+                _initializeOnEnable = true;
+            }
         }
 
         IEnumerator waitForBodyInitialized()
