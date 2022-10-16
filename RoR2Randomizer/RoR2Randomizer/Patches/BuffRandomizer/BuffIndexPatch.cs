@@ -1,6 +1,7 @@
 ﻿using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.Buff;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.BuffRandomizer
@@ -37,7 +38,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 #if DEBUG
         static void CharacterBody_RemoveBuff_BuffDef(On.RoR2.CharacterBody.orig_RemoveBuff_BuffDef orig, CharacterBody self, BuffDef buffDef)
         {
-            Log.Debug("CharacterBody_RemoveBuff_BuffDef on client stacktrace: " + new System.Diagnostics.StackTrace().ToString());
+            Log.LogType("CharacterBody_RemoveBuff_BuffDef on client stacktrace: " + new System.Diagnostics.StackTrace().ToString(), BepInEx.Logging.LogLevel.Debug);
             orig(self, buffDef);
         }
 #endif
@@ -50,8 +51,10 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
             {
                 if (BuffRandomizerController.TryGetDotIndex(buffType, out DotController.DotIndex dot))
                 {
+                    int diff = newCount - self.buffs[(int)buffType];
+
                     // Only apply DOT if buff stack is increasing
-                    if (newCount > self.buffs[(int)buffType])
+                    if (diff > 0)
                     {
 #if DEBUG
                         Log.Debug($"Buff randomizer: Applying dot {dot}");
@@ -72,9 +75,46 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                         DotRandomizerPatch.SkipApplyBuffCount++;
                         DotController.InflictDot(self.gameObject, attacker ?? self.gameObject, dot);
                         DotRandomizerPatch.SkipApplyBuffCount--;
-                    }
 
-                    return;
+                        return;
+                    }
+                    else if (diff < 0)
+                    {
+                        DotController dotController = DotController.FindDotController(self.gameObject);
+                        if (dotController)
+                        {
+                            int foundStacks = 0;
+
+                            List<DotController.DotStack> stacks = dotController.dotStackList;
+                            for (int i = stacks.Count - 1; i >= 0 && foundStacks < -diff; i--)
+                            {
+                                DotController.DotStack dotStack = stacks[i];
+                                if (dotStack != null && dotStack.dotIndex == dot)
+                                {
+                                    DotController.DotDef dotDef = dotStack.dotDef;
+                                    if (dotDef != null)
+                                    {
+                                        BuffDef associatedBuff = dotDef.associatedBuff;
+                                        if (associatedBuff)
+                                        {
+                                            if (associatedBuff.buffIndex == buffType)
+                                            {
+                                                foundStacks++;
+                                                SkipApplyDotCount++;
+                                                dotController.RemoveDotStackAtServer(i);
+                                                SkipApplyDotCount--;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (foundStacks == -diff)
+                            {
+                                return;
+                            }
+                        }
+                    }
                 }
             }
 
