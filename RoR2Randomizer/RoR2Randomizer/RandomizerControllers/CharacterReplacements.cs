@@ -17,7 +17,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityModdingUtility;
-using static UnityEngine.UI.Image;
 
 namespace RoR2Randomizer.RandomizerControllers
 {
@@ -49,8 +48,52 @@ namespace RoR2Randomizer.RandomizerControllers
 
             _masterIndicesToRandomize = MasterCatalog.masterPrefabs.Where(master =>
             {
-                if (!master || !master.GetComponent<CharacterMaster>())
+                const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(Init)} ";
+
+                if (!master)
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"excluding null master");
+#endif
+
                     return false;
+                }
+
+                if (!master.TryGetComponent<CharacterMaster>(out CharacterMaster masterComponent))
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no {nameof(CharacterMaster)} component");
+#endif
+
+                    return false;
+                }
+
+                if (!masterComponent.bodyPrefab)
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)}");
+#endif
+
+                    return false;
+                }
+
+                if (!masterComponent.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)} {nameof(CharacterBody)} component");
+#endif
+
+                    return false;
+                }
+
+                if (!body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator) || !modelLocator.modelTransform)
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no model");
+#endif
+
+                    return false;
+                }
 
                 switch (master.name)
                 {
@@ -64,6 +107,9 @@ namespace RoR2Randomizer.RandomizerControllers
                     case "RailgunnerMaster": // Does not exist
                     case "VoidRaidCrabJointMaster": // Balls
                     case "VoidRaidCrabMaster": // Beta voidling, half invisible
+#if DEBUG
+                        Log.Debug(LOG_PREFIX + $"excluding master {master.name}: blacklist");
+#endif
                         return false;
                 }
 
