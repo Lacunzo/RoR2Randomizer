@@ -86,10 +86,20 @@ namespace RoR2Randomizer.RandomizerControllers
                     return false;
                 }
 
-                if (!body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator) || !modelLocator.modelTransform)
+                Transform modelTransform;
+                if (!body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator) || !(modelTransform = modelLocator.modelTransform))
                 {
 #if DEBUG
                     Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no model");
+#endif
+
+                    return false;
+                }
+
+                if (modelTransform.childCount == 0)
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: empty model");
 #endif
 
                     return false;
@@ -99,7 +109,6 @@ namespace RoR2Randomizer.RandomizerControllers
                 {
                     case "AncientWispMaster": // Does nothing
                     case "ArtifactShellMaster": // No model, does not attack, cannot be damaged
-                    case "BrotherHauntMaster": // No model
                     case "ClaymanMaster": // No hitboxes
                     case "EngiBeamTurretMaster": // Seems to ignore the player
                     case "MinorConstructAttachableMaster": // Instantly dies
