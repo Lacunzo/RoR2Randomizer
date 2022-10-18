@@ -26,7 +26,22 @@ namespace RoR2Randomizer.Utility
             set
             {
                 _value = value;
-                HasValue = !EqualityComparer<T>.Default.Equals(value, _defaultValue);
+
+                bool equal;
+                if (value is IEquatable<T> equatable)
+                {
+                    equal = equatable.Equals(_defaultValue);
+                }
+                else if (_defaultValue is IEquatable<T> defaultEquatable)
+                {
+                    equal = defaultEquatable.Equals(value);
+                }
+                else
+                {
+                    equal = EqualityComparer<T>.Default.Equals(value, _defaultValue);
+                }
+
+                HasValue = !equal;
             }
         }
 
@@ -51,7 +66,6 @@ namespace RoR2Randomizer.Utility
         {
             if (_callbackHandle.HasValue)
             {
-
 #if DEBUG
                 Log.Warning($"{HarmonyLib.GeneralExtensions.FullDescription(GetType())} was not properly disposed");
 #endif
