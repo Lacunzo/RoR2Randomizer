@@ -26,17 +26,17 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                  {
                                      if (!projectile)
                                          return false;
-
+                                     
                                      if (projectile.TryGetComponent<ProjectileFireChildren>(out ProjectileFireChildren projectileFireChildren)
-                                         && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
+                                      && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
                                      {
-#if DEBUG
+#if DEBUG                            
                                          Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
-#endif
-
+#endif                               
+                                     
                                          return false;
                                      }
-
+                                     
                                      switch (projectile.name)
                                      {
                                          case "AACannon": // Does nothing
@@ -61,19 +61,19 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                          case "ToolbotDroneHeal": // Does nothing
                                          case "ToolbotDroneStun": // Does nothing
                                          case "TreebotPounderProjectile": // Does nothing
-
+                                     
                                          // Excluded because I think it's more fun that way
                                          case "MageIcewallWalkerProjectile":
                                          case "MageFirewallWalkerProjectile":
-
+                                     
                                          // Excluded because it seems like a huge pain getting it to work, might look into it in the future.
                                          case "LunarSunProjectile":
-#if DEBUG
+#if DEBUG                            
                                              Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
-#endif
+#endif                               
                                              return false;
                                      }
-
+                                     
                                      return true;
                                  })
                                  .Select(p => p.catalogIndex)
@@ -82,11 +82,13 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         static readonly RunSpecific<bool> _hasReceivedProjectileReplacementsFromServer = new RunSpecific<bool>();
 
-        static readonly RunSpecific<ReplacementDictionary<int>> _projectileIndicesReplacements = new RunSpecific<ReplacementDictionary<int>>((out ReplacementDictionary<int> result) =>
+        static readonly RunSpecific<IndexReplacementsCollection> _projectileIndicesReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
             if (NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled)
             {
-                result = ReplacementDictionary<int>.CreateFrom(_projectileIndicesToRandomize);
+                ReplacementDictionary<int> dict = ReplacementDictionary<int>.CreateFrom(_projectileIndicesToRandomize);
+
+                result = new IndexReplacementsCollection(dict, ProjectileCatalog.projectilePrefabCount);
 
 #if DEBUG
                 Log.Debug($"Sending {nameof(SyncProjectileReplacements)} to clients");
@@ -103,7 +105,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         static bool shouldBeActive => ((NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled) || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
 
-        static void onProjectileReplacementsReceivedFromServer(ReplacementDictionary<int> replacements)
+        static void onProjectileReplacementsReceivedFromServer(IndexReplacementsCollection replacements)
         {
             _projectileIndicesReplacements.Value = replacements;
             _hasReceivedProjectileReplacementsFromServer.Value = true;
@@ -149,25 +151,25 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
                 if (originalIndex != -1)
                 {
-                int replacementIndex;
-                if (
+                    int replacementIndex;
+                    if (
 #if DEBUG
-                    getDebugProjectileReplacement(originalIndex, out replacementIndex) ||
+                        getDebugProjectileReplacement(originalIndex, out replacementIndex) ||
 #endif
-                    _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
-                {
-                    GameObject replacementPrefab = ProjectileCatalog.GetProjectilePrefab(replacementIndex);
-                    if (replacementPrefab)
+                        _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
                     {
+                        GameObject replacementPrefab = ProjectileCatalog.GetProjectilePrefab(replacementIndex);
+                        if (replacementPrefab)
+                        {
 #if DEBUG
-                        Log.Debug($"Projectile randomizer: Replaced projectile: {prefab.name} ({originalIndex}) -> {replacementPrefab.name} ({replacementIndex})");
+                            Log.Debug($"Projectile randomizer: Replaced projectile: {prefab.name} ({originalIndex}) -> {replacementPrefab.name} ({replacementIndex})");
 #endif
 
-                        prefab = replacementPrefab;
+                            prefab = replacementPrefab;
+                        }
                     }
                 }
             }
-        }
         }
 
         public static bool TryGetOriginalProjectileIndex(int replacementIndex, out int originalIndex)
@@ -204,13 +206,13 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 if (Input.GetKeyDown(KeyCode.KeypadPlus))
                 {
                     if (++_forcedProjectileIndex >= _projectileIndicesToRandomize.Length)
-                        _forcedProjectileIndex = 0;
+                            _forcedProjectileIndex = 0;
 
                     changedProjectileIndex = true;
                 }
                 else if (Input.GetKeyDown(KeyCode.KeypadMinus))
                 {
-                    if (--_forcedProjectileIndex < 0)
+                        if (--_forcedProjectileIndex < 0)
                         _forcedProjectileIndex = _projectileIndicesToRandomize.Length - 1;
 
                     changedProjectileIndex = true;

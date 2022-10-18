@@ -1,5 +1,6 @@
 ﻿using RoR2;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 
         public static bool IsActive => NetworkServer.active && ConfigManager.BuffRandomizer.Enabled && _buffReplacements.HasValue;
 
-        static readonly RunSpecific<ReplacementDictionary<BuffIndex>> _buffReplacements = new RunSpecific<ReplacementDictionary<BuffIndex>>((out ReplacementDictionary<BuffIndex> result) =>
+        static readonly RunSpecific<IndexReplacementsCollection> _buffReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
             if (ConfigManager.BuffRandomizer.Enabled && NetworkServer.active)
             {
@@ -66,7 +67,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                 }
 #endif
 
-                result = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, b => b.buffIndex, (key, value) =>
+                ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, b => b.buffIndex, (key, value) =>
                 {
                     if (!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs && key.isDebuff != value.isDebuff)
                     {
@@ -80,8 +81,10 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                     return true;
                 });
 
+                result = IndexReplacementsCollection.Create(dict, BuffCatalog.buffCount);
+
 #if DEBUG
-                foreach (KeyValuePair<BuffIndex, BuffIndex> pair in result)
+                foreach (KeyValuePair<BuffIndex, BuffIndex> pair in dict)
                 {
                     Log.Debug($"Replaced buff: {toLogString(pair.Key)} -> {toLogString(pair.Value)}");
                 }
@@ -145,7 +148,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 
         static bool tryGetDebugOverrideReplacement(BuffIndex original, out BuffIndex replacement)
         {
-            if (_buffReplacements.Value.ContainsKey(original))
+            if (_buffReplacements.Value.HasReplacement(original))
             {
                 switch (ConfigManager.BuffRandomizer.BuffDebugMode.Entry.Value)
                 {

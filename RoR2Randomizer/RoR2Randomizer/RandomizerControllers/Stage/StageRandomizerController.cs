@@ -1,5 +1,6 @@
 ﻿using RoR2;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections;
@@ -83,7 +84,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             _isInitialized = true;
         }
 
-        static ReplacementDictionary<SceneIndex> _stageReplacements;
+        static IndexReplacementsCollection? _stageIndexReplacements;
 
         void Awake()
         {
@@ -154,7 +155,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                     Log.Warning($"Could not find scene index for {firstStageSceneName}");
                 }
 
-                _stageReplacements = ReplacementDictionary<SceneIndex>.CreateFrom(_stages, s => s.SceneIndex, (key, value) =>
+                _stageIndexReplacements = IndexReplacementsCollection.Create(ReplacementDictionary<SceneIndex>.CreateFrom(_stages, s => s.SceneIndex, (key, value) =>
                 {
                     if (ConfigManager.StageRandomizer.FirstStageBlacklistEnabled && firstStageIndex != SceneIndex.Invalid && key.SceneIndex == firstStageIndex && (value.Flags & StageFlags.FirstStageBlacklist) != 0)
                     {
@@ -176,19 +177,19 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                     }
 
                     return value.BaseSelectionWeight * weightMultiplier;
-                });
+                }), SceneCatalog.sceneDefCount);
             }
             else
             {
-                _stageReplacements = null;
+                _stageIndexReplacements = null;
             }
         }
 
         public static bool TryGetReplacementSceneIndex(SceneIndex original, out SceneIndex replacement)
         {
-            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled && _stageReplacements != null)
+            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled && _stageIndexReplacements.HasValue)
             {
-                return _stageReplacements.TryGetReplacement(original, out replacement);
+                return _stageIndexReplacements.Value.TryGetReplacement(original, out replacement);
             }
 
             replacement = default;
@@ -231,7 +232,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
         {
             if (ConfigManager.StageRandomizer.Enabled)
             {
-                if (replacement && _stageReplacements != null && _stageReplacements.TryGetOriginal(replacement.sceneDefIndex, out SceneIndex originalSceneIndex))
+                if (replacement && _stageIndexReplacements.HasValue && _stageIndexReplacements.Value.TryGetOriginal(replacement.sceneDefIndex, out SceneIndex originalSceneIndex))
                 {
                     originalScene = SceneCatalog.GetSceneDef(originalSceneIndex);
                     return (bool)originalScene;

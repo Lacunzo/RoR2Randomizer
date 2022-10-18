@@ -11,42 +11,29 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
 {
     public sealed class SyncProjectileReplacements : INetMessage
     {
-        public delegate void OnReceiveDelegate(ReplacementDictionary<int> projectileReplacements);
+        public delegate void OnReceiveDelegate(IndexReplacementsCollection projectileReplacements);
 
         public static event OnReceiveDelegate OnReceive;
 
-        ReplacementDictionary<int> _projectileReplacements;
+        IndexReplacementsCollection _projectileReplacements;
 
         public SyncProjectileReplacements()
         {
         }
 
-        public SyncProjectileReplacements(ReplacementDictionary<int> projectileReplacements)
+        public SyncProjectileReplacements(IndexReplacementsCollection projectileReplacements)
         {
             _projectileReplacements = projectileReplacements;
         }
 
         void ISerializableObject.Serialize(NetworkWriter writer)
         {
-            writer.WritePackedUInt32((uint)_projectileReplacements.Count);
-            foreach (KeyValuePair<int, int> pair in _projectileReplacements)
-            {
-                writer.WritePackedIndex32(pair.Key);
-                writer.WritePackedIndex32(pair.Value);
-            }
+            _projectileReplacements.Serialize(writer);
         }
 
         void ISerializableObject.Deserialize(NetworkReader reader)
         {
-            Dictionary<int, int> projectileReplacements = new Dictionary<int, int>();
-
-            uint count = reader.ReadPackedUInt32();
-            for (uint i = 0; i < count; i++)
-            {
-                projectileReplacements.Add(reader.ReadPackedIndex32(), reader.ReadPackedIndex32());
-            }
-
-            _projectileReplacements = new ReplacementDictionary<int>(projectileReplacements);
+            _projectileReplacements = IndexReplacementsCollection.Deserialize(reader);
         }
 
         void INetMessage.OnReceived()

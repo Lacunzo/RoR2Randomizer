@@ -116,11 +116,11 @@ namespace RoR2Randomizer.RandomizerControllers
         }
 
         static readonly RunSpecific<bool> _hasReceivedMasterIndexReplacementsFromServer = new RunSpecific<bool>(1);
-        static readonly RunSpecific<ReplacementDictionary<int>> _masterIndexReplacements = new RunSpecific<ReplacementDictionary<int>>((out ReplacementDictionary<int> result) =>
+        static readonly RunSpecific<IndexReplacementsCollection> _masterIndexReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
             if (NetworkServer.active)
             {
-                result = ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize);
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize), MasterCatalog.masterPrefabs.Length);
 
                 new SyncCharacterMasterReplacements(result).Send(NetworkDestination.Clients);
 
@@ -128,12 +128,14 @@ namespace RoR2Randomizer.RandomizerControllers
             }
             else
             {
-                result = null;
+                result = default;
                 return false;
             }
         }, 1);
 
-        static void onMasterReplacementsReceivedFromServer(ReplacementDictionary<int> masterIndexReplacements)
+        public static bool IsEnabled => NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer);
+
+        static void onMasterReplacementsReceivedFromServer(IndexReplacementsCollection masterIndexReplacements)
         {
 #if DEBUG
             Log.Debug("Received master index replacements from server");
@@ -229,7 +231,7 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static MasterCatalog.MasterIndex GetReplacementForMasterIndex(MasterCatalog.MasterIndex original)
         {
-            if (original.isValid && (NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer)))
+            if (original.isValid && IsEnabled)
             {
 #if DEBUG
                 if (NetworkServer.active)
@@ -261,7 +263,7 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static MasterCatalog.MasterIndex GetOriginalMasterIndex(MasterCatalog.MasterIndex replacement)
         {
-            if (replacement.isValid && (NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer)))
+            if (replacement.isValid && IsEnabled)
             {
                 if (_masterIndexReplacements.HasValue && _masterIndexReplacements.Value.TryGetOriginal((int)replacement, out int originalIndex))
                 {

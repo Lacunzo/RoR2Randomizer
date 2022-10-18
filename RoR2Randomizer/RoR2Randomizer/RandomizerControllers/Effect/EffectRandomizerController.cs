@@ -2,6 +2,7 @@
 using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Utility;
 using System.Linq;
@@ -14,24 +15,24 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
     public sealed class EffectRandomizerController : MonoBehaviour
     {
         static readonly RunSpecific<bool> _hasRecievedEffectReplacementsFromServer = new RunSpecific<bool>();
-        static readonly RunSpecific<ReplacementDictionary<EffectIndex>> _effectReplacements = new RunSpecific<ReplacementDictionary<EffectIndex>>((out ReplacementDictionary<EffectIndex> result) =>
+        static readonly RunSpecific<IndexReplacementsCollection> _effectReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
             if (NetworkServer.active && ConfigManager.Misc.EffectRandomizerEnabled)
             {
-                result = ReplacementDictionary<EffectIndex>.CreateFrom(Enumerable.Range(0, EffectCatalog.effectCount).Select(i => (EffectIndex)i));
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(Enumerable.Range(0, EffectCatalog.effectCount)), EffectCatalog.effectCount);
 
                 SyncEffectReplacements.SendToClients(result);
 
                 return true;
             }
 
-            result = null;
+            result = default;
             return false;
         });
 
         static bool shouldBeEnabled => ((NetworkServer.active && ConfigManager.Misc.EffectRandomizerEnabled) || (NetworkClient.active && _hasRecievedEffectReplacementsFromServer)) && _effectReplacements.HasValue;
 
-        void setEffectReplacementsFromServerEvent(ReplacementDictionary<EffectIndex> replacements)
+        void setEffectReplacementsFromServerEvent(IndexReplacementsCollection replacements)
         {
             _effectReplacements.Value = replacements;
             _hasRecievedEffectReplacementsFromServer.Value = _effectReplacements.HasValue;

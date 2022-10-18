@@ -1,4 +1,5 @@
-﻿using R2API.Networking;
+﻿using HG;
+using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.Networking;
@@ -14,26 +15,26 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
 {
     public sealed class SyncEffectReplacements : INetMessage
     {
-        public delegate void OnCompleteMessageReceivedDelegate(ReplacementDictionary<EffectIndex> effectReplacements);
+        public delegate void OnCompleteMessageReceivedDelegate(IndexReplacementsCollection effectReplacements);
         public static event OnCompleteMessageReceivedDelegate OnCompleteMessageReceived;
 
         static readonly Dictionary<Guid, EffectReplacementMessageChunk?[]> _recordedChunksByID = new Dictionary<Guid, EffectReplacementMessageChunk?[]>();
 
-        const int MAX_EFFECTS_PER_MESSAGE = 200;
+        const int MAX_EFFECTS_PER_MESSAGE = 400;
 
         readonly struct EffectReplacementMessageChunk
         {
             public readonly Guid MessageID;
             public readonly ulong MessageIndex;
             public readonly ulong MessageCount;
-            public readonly KeyValuePair<EffectIndex, EffectIndex>[] EffectIndexPairs;
+            public readonly int[] EffectIndexReplacements;
 
-            public EffectReplacementMessageChunk(Guid messageID, ulong messageIndex, ulong messageCount, KeyValuePair<EffectIndex, EffectIndex>[] effectIndexPairs)
+            public EffectReplacementMessageChunk(Guid messageID, ulong messageIndex, ulong messageCount, int[] effectIndexReplacements)
             {
                 MessageID = messageID;
                 MessageIndex = messageIndex;
                 MessageCount = messageCount;
-                EffectIndexPairs = effectIndexPairs;
+                EffectIndexReplacements = effectIndexReplacements;
             }
 
             public void Serialize(NetworkWriter writer)
@@ -43,17 +44,16 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
                 writer.WritePackedUInt64(MessageIndex);
                 writer.WritePackedUInt64(MessageCount);
 
-                writer.WritePackedUInt64((ulong)EffectIndexPairs.LongLength);
-                foreach (KeyValuePair<EffectIndex, EffectIndex> pair in EffectIndexPairs)
+                writer.WritePackedUInt64((ulong)EffectIndexReplacements.LongLength);
+                foreach (int effectIndex in EffectIndexReplacements)
                 {
-                    writer.WriteEffectIndex(pair.Key);
-                    writer.WriteEffectIndex(pair.Value);
+                    writer.WriteEffectIndex((EffectIndex)effectIndex);
                 }
             }
 
             public override string ToString()
             {
-                return $"{MessageID}, {MessageIndex + 1}/{MessageCount} ({EffectIndexPairs.Length})";
+                return $"{MessageID}, {MessageIndex + 1}/{MessageCount} ({EffectIndexReplacements.Length})";
             }
 
             public static EffectReplacementMessageChunk Deserialize(NetworkReader reader)
@@ -64,35 +64,44 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
                 ulong messageCount = reader.ReadPackedUInt64();
 
                 ulong length = reader.ReadPackedUInt64();
-                KeyValuePair<EffectIndex, EffectIndex>[] effectIndexPairs = new KeyValuePair<EffectIndex, EffectIndex>[length];
-
+                int[] effectIndexReplacements = new int[length];
                 for (ulong i = 0; i < length; i++)
                 {
-                    effectIndexPairs[i] = new KeyValuePair<EffectIndex, EffectIndex>(reader.ReadEffectIndex(), reader.ReadEffectIndex());
+                    effectIndexReplacements[i] = (int)reader.ReadEffectIndex();
                 }
 
-                return new EffectReplacementMessageChunk(messageID, messageIndex, messageCount, effectIndexPairs);
+                return new EffectReplacementMessageChunk(messageID, messageIndex, messageCount, effectIndexReplacements);
             }
 
-            public static ReplacementDictionary<EffectIndex> BuildReplacementDictionary(EffectReplacementMessageChunk?[] messageChunks)
+            public static IndexReplacementsCollection BuildReplacementCollection(EffectReplacementMessageChunk?[] messageChunks)
             {
-                Dictionary<EffectIndex, EffectIndex> dict = new Dictionary<EffectIndex, EffectIndex>();
+                const string LOG_PREFIX = $"{nameof(SyncEffectReplacements)}+{nameof(EffectReplacementMessageChunk)}.{nameof(BuildReplacementCollection)} ";
 
-                foreach (EffectReplacementMessageChunk? chunk in messageChunks)
+                // It won't matter if the array is too large, IndexReplacementsCollection will deal with it :)
+                int[] replacementIndices = new int[messageChunks.Length * MAX_EFFECTS_PER_MESSAGE];
+
+                int currentArrayIndex = 0;
+                foreach (EffectReplacementMessageChunk? nChunk in messageChunks)
                 {
-                    if (!chunk.HasValue)
+                    if (nChunk.HasValue)
                     {
-                        Log.Warning("Chunk has no value!");
-                        continue;
-                    }
+                        EffectReplacementMessageChunk chunk = nChunk.Value;
 
-                    foreach (KeyValuePair<EffectIndex, EffectIndex> pair in chunk.Value.EffectIndexPairs)
+                        int chunkReplacementsLength = chunk.EffectIndexReplacements.Length;
+
+                        // Just in case the predicted length isn't enough
+                        ArrayUtils.EnsureCapacity(ref replacementIndices, currentArrayIndex + chunkReplacementsLength);
+
+                        Array.Copy(chunk.EffectIndexReplacements, 0, replacementIndices, currentArrayIndex, chunkReplacementsLength);
+                        currentArrayIndex += chunkReplacementsLength;
+                    }
+                    else
                     {
-                        dict.Add(pair.Key, pair.Value);
+                        Log.Warning(LOG_PREFIX + $"null chunk!");
                     }
                 }
 
-                return new ReplacementDictionary<EffectIndex>(dict);
+                return new IndexReplacementsCollection(replacementIndices, currentArrayIndex);
             }
         }
 
@@ -102,7 +111,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
         {
         }
 
-        SyncEffectReplacements(Guid messageID, ulong messageIndex, ulong messageCount, ReplacementDictionary<EffectIndex> effectReplacements)
+        SyncEffectReplacements(Guid messageID, ulong messageIndex, ulong messageCount, IndexReplacementsCollection effectReplacements)
         {
             static IEnumerable<T> getRange<T>(IEnumerable<T> collection, ulong startIndex, int count)
             {
@@ -118,14 +127,14 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
                 }
             }
 
-            _chunk = new EffectReplacementMessageChunk(messageID, messageIndex, messageCount, getRange(effectReplacements, messageIndex * MAX_EFFECTS_PER_MESSAGE, MAX_EFFECTS_PER_MESSAGE).ToArray());            
+            _chunk = new EffectReplacementMessageChunk(messageID, messageIndex, messageCount, getRange(effectReplacements, messageIndex * MAX_EFFECTS_PER_MESSAGE, MAX_EFFECTS_PER_MESSAGE).ToArray());
         }
 
-        public static void SendToClients(ReplacementDictionary<EffectIndex> effectReplacements)
+        public static void SendToClients(IndexReplacementsCollection effectReplacements)
         {
             Guid messageID = Guid.NewGuid();
 
-            ulong messageCount = (ulong)Mathf.Ceil(effectReplacements.Count / (float)MAX_EFFECTS_PER_MESSAGE);
+            ulong messageCount = (ulong)Mathf.Ceil(effectReplacements.Length / (float)MAX_EFFECTS_PER_MESSAGE);
 
             for (ulong i = 0; i < messageCount; i++)
             {
@@ -203,7 +212,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
 
                     _recordedChunksByID.Remove(messageChunk.MessageID);
 
-                    OnCompleteMessageReceived?.Invoke(EffectReplacementMessageChunk.BuildReplacementDictionary(recordedChunks));
+                    OnCompleteMessageReceived?.Invoke(EffectReplacementMessageChunk.BuildReplacementCollection(recordedChunks));
                 }
             }
         }

@@ -12,41 +12,28 @@ namespace RoR2Randomizer.Networking.CharacterReplacements
 {
     public sealed class SyncCharacterMasterReplacements : INetMessage
     {
-        public delegate void OnReceivedDelegate(ReplacementDictionary<int> masterReplacements);
+        public delegate void OnReceivedDelegate(IndexReplacementsCollection masterReplacements);
         public static event OnReceivedDelegate OnReceive;
 
-        ReplacementDictionary<int> _masterReplacements;
+        IndexReplacementsCollection _masterReplacements;
 
         public SyncCharacterMasterReplacements()
         {
         }
 
-        public SyncCharacterMasterReplacements(ReplacementDictionary<int> masterReplacements)
+        public SyncCharacterMasterReplacements(IndexReplacementsCollection masterReplacements)
         {
             _masterReplacements = masterReplacements;
         }
 
         void ISerializableObject.Serialize(NetworkWriter writer)
         {
-            writer.WritePackedUInt32((uint)_masterReplacements.Count);
-            foreach (KeyValuePair<int, int> pair in _masterReplacements)
-            {
-                writer.WritePackedIndex32(pair.Key);
-                writer.WritePackedIndex32(pair.Value);
-            }
+            _masterReplacements.Serialize(writer);
         }
 
         void ISerializableObject.Deserialize(NetworkReader reader)
         {
-            Dictionary<int, int> masterReplacements = new Dictionary<int, int>();
-
-            uint count = reader.ReadPackedUInt32();
-            for (uint i = 0; i < count; i++)
-            {
-                masterReplacements.Add(reader.ReadPackedIndex32(), reader.ReadPackedIndex32());
-            }
-
-            _masterReplacements = new ReplacementDictionary<int>(masterReplacements);
+            _masterReplacements = IndexReplacementsCollection.Deserialize(reader);
         }
 
         void INetMessage.OnReceived()
