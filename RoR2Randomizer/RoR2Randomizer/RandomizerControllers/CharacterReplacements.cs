@@ -103,8 +103,6 @@ namespace RoR2Randomizer.RandomizerControllers
                     case "ClaymanMaster": // No hitboxes
                     case "EngiBeamTurretMaster": // Seems to ignore the player
                     case "MinorConstructAttachableMaster": // Instantly dies
-                    case "PlayerMaster": // Does not exist
-                    case "RailgunnerMaster": // Does not exist
                     case "VoidRaidCrabJointMaster": // Balls
                     case "VoidRaidCrabMaster": // Beta voidling, half invisible
 #if DEBUG
