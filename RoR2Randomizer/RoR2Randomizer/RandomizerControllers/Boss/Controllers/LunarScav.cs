@@ -63,10 +63,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                                             return;
                                         }
 
-                                        for (int i = 0; i < multiSpawn.masterPrefabs.Length; i++)
-                                        {
-                                            multiSpawn.masterPrefabs[i] = originalMasterPrefabs[i];
-                                        }
+                                        Array.Copy(originalMasterPrefabs, multiSpawn.masterPrefabs, originalMasterPrefabs.Length);
                                     };
 
                                     for (int i = 0; i < multiCard.masterPrefabs.Length; i++)
