@@ -36,6 +36,8 @@ namespace RoR2Randomizer.Configuration
         public static HoldoutZoneRandomizerConfig HoldoutZoneRandomizer;
 #endif
 
+        public static PerformanceConfig Performance;
+
         public static MiscConfig Misc;
 
 #if DEBUG
@@ -57,6 +59,8 @@ namespace RoR2Randomizer.Configuration
 #endif
 
             _allCategories.Sort((a, b) => a.CategoryName.CompareTo(b.CategoryName));
+
+            _allCategories.Add(Performance = new PerformanceConfig(file));
 
             _allCategories.Add(Misc = new MiscConfig(file));
 #if DEBUG
