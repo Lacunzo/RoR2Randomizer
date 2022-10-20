@@ -32,6 +32,12 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.1 Changes:**
+
+* Performance:
+  * Added options to limit how much characters can self-duplicate themselves (no more infinite Goobo spawns yay)
+  * Decreased size of most network messages sent by the mod
+
 **0.5.0 Changes:**
 
 * Effect Randomizer:
