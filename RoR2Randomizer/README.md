@@ -32,6 +32,14 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.2 Changes:**
+
+* Status Effect Randomizer:
+  * Fixed DOTs randomizing into non-DOT effects being permanent
+
+* Misc:
+  * Fixed some incorrect dependency package references
+
 **0.5.1 Changes:**
 
 * Performance:
