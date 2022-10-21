@@ -4,6 +4,7 @@ using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -21,20 +22,50 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
         [SystemInitializer(typeof(Caches.Scene), typeof(SceneCatalog), typeof(GameModeCatalog))]
         static void Init()
         {
-            SceneIndex[] excludeScenes = new SceneIndex[]
+            const string LOG_PREFIX = $"{nameof(StageRandomizerController)}.{nameof(Init)} ";
+
+            HashSet<SceneIndex> excludeScenesHS = new HashSet<SceneIndex>();
+
+            const string IT_RUN_NAME = "InfiniteTowerRun";
+            Run itRunPrefab = GameModeCatalog.FindGameModePrefabComponent(IT_RUN_NAME);
+            if (itRunPrefab)
             {
-                // Simulacrum maps
-                SceneCatalog.FindSceneIndex("itancientloft"),
-                SceneCatalog.FindSceneIndex("itdampcave"),
-                SceneCatalog.FindSceneIndex("itfrozenwall"),
-                SceneCatalog.FindSceneIndex("itgolemplains"),
-                SceneCatalog.FindSceneIndex("itgoolake"),
-                SceneCatalog.FindSceneIndex("itmoon"),
-                SceneCatalog.FindSceneIndex("itskymeadow")
-            };
+                SceneCollection startingSceneGroup = itRunPrefab.startingSceneGroup;
+                if (startingSceneGroup)
+                {
+                    static void handleCollection(SceneCollection collection, in HashSet<SceneCollection> alreadyHandledCollections, in HashSet<SceneIndex> excludeScenes)
+                    {
+                        if (alreadyHandledCollections.Add(collection))
+                        {
+                            foreach (SceneCollection.SceneEntry entry in collection.sceneEntries)
+                            {
+                                SceneDef scene = entry.sceneDef;
+                                if (scene)
+                                {
+                                    excludeScenes.Add(scene.sceneDefIndex);
+
+                                    SceneCollection destinationsGroup = scene.destinationsGroup;
+                                    if (destinationsGroup)
+                                    {
+                                        handleCollection(destinationsGroup, alreadyHandledCollections, excludeScenes);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    handleCollection(startingSceneGroup, new HashSet<SceneCollection>(), excludeScenesHS);
+                }
+            }
+            else
+            {
+                Log.Warning($"{LOG_PREFIX} unable to find run prefab {IT_RUN_NAME}");
+            }
+
+            SceneIndex[] excludeScenesArray = excludeScenesHS.Where(i => i != SceneIndex.Invalid).ToArray();
 
             SceneIndex[] possibleStartingStages = null;
-            Run runPrefab = PreGameController.GameModeConVar.instance.runPrefabComponent;
+            Run runPrefab = GameModeCatalog.FindGameModePrefabComponent("ClassicRun");
             if (runPrefab)
             {
                 SceneCollection startingSceneGroup = runPrefab.startingSceneGroup;
@@ -50,7 +81,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             }
 
             _stages = SceneCatalog.allStageSceneDefs
-                                  .Where(s => Array.IndexOf(excludeScenes, s.sceneDefIndex) == -1)
+                                  .Where(s => Array.IndexOf(excludeScenesArray, s.sceneDefIndex) == -1)
                                   // These are not normal stages, but will be included anyway
                                   .Concat(new SceneIndex[]
                                   {
