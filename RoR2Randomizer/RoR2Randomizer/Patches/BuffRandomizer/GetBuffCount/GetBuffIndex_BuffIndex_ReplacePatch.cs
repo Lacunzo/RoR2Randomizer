@@ -10,6 +10,8 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
     [PatchClass]
     static partial class GetBuffIndex_BuffIndex_ReplacePatch
     {
+        public static bool ForceDisable = false;
+
         static bool _patchEnabled = false;
 
         static readonly MethodInfo enablePatch_MI = SymbolExtensions.GetMethodInfo(() => enablePatch());
@@ -46,7 +48,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
         static int CharacterBody_GetBuffCount_BuffIndex(On.RoR2.CharacterBody.orig_GetBuffCount_BuffIndex orig, RoR2.CharacterBody self, RoR2.BuffIndex buffType)
         {
-            if (_patchEnabled)
+            if (_patchEnabled && !ForceDisable)
             {
 #if DEBUG
                 BuffRandomizerController.SuppressBuffReplacementLogCount++;

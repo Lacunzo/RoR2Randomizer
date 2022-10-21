@@ -9,7 +9,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
     [PatchClass]
     public static class BuffIndexPatch
     {
-        public static uint SkipApplyDotCount = 0;
+        public static uint SkipPatchCount = 0;
 
         static void Apply()
         {
@@ -45,8 +45,8 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
         static void CharacterBody_SetBuffCount(On.RoR2.CharacterBody.orig_SetBuffCount orig, CharacterBody self, BuffIndex buffType, int newCount)
         {
-            if (BuffRandomizerController.IsActive &&
-                SkipApplyDotCount == 0 &&
+            if (SkipPatchCount == 0 &&
+                BuffRandomizerController.IsActive &&
                 BuffRandomizerController.TryReplaceBuffIndex(ref buffType))
             {
                 if (BuffRandomizerController.TryGetDotIndex(buffType, out DotController.DotIndex dot))
@@ -60,7 +60,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                         Log.Debug($"Buff randomizer: Applying dot {dot}");
 #endif
 
-                        GameObject attacker = null;
+                        GameObject attacker = self.gameObject;
 
                         HealthComponent healthComponent = self.healthComponent;
                         if (healthComponent)
@@ -73,13 +73,20 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                         }
 
                         DotRandomizerPatch.SkipApplyBuffCount++;
-                        DotController.InflictDot(self.gameObject, attacker ?? self.gameObject, dot);
+
+                        for (int i = 0; i < diff; i++)
+                        {
+                            DotController.InflictDot(self.gameObject, attacker, dot);
+                        }
+
                         DotRandomizerPatch.SkipApplyBuffCount--;
 
                         return;
                     }
                     else if (diff < 0)
                     {
+                        // Buff stack is decreasing, do stacks should be removed
+
                         DotController dotController = DotController.FindDotController(self.gameObject);
                         if (dotController)
                         {
@@ -89,23 +96,23 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                             for (int i = stacks.Count - 1; i >= 0 && foundStacks < -diff; i--)
                             {
                                 DotController.DotStack dotStack = stacks[i];
-                                if (dotStack != null && dotStack.dotIndex == dot)
+                                if (dotStack == null || dotStack.dotIndex != dot)
+                                    continue;
+
+                                DotController.DotDef dotDef = dotStack.dotDef;
+                                if (dotDef == null)
+                                    continue;
+
+                                BuffDef associatedBuff = dotDef.associatedBuff;
+                                if (!associatedBuff)
+                                    continue;
+
+                                if (associatedBuff.buffIndex == buffType)
                                 {
-                                    DotController.DotDef dotDef = dotStack.dotDef;
-                                    if (dotDef != null)
-                                    {
-                                        BuffDef associatedBuff = dotDef.associatedBuff;
-                                        if (associatedBuff)
-                                        {
-                                            if (associatedBuff.buffIndex == buffType)
-                                            {
-                                                foundStacks++;
-                                                SkipApplyDotCount++;
-                                                dotController.RemoveDotStackAtServer(i);
-                                                SkipApplyDotCount--;
-                                            }
-                                        }
-                                    }
+                                    foundStacks++;
+                                    SkipPatchCount++;
+                                    dotController.RemoveDotStackAtServer(i);
+                                    SkipPatchCount--;
                                 }
                             }
 
@@ -131,7 +138,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 ILCursor last = cursors[cursors.Length - 1];
                 last.EmitDelegate((int buffIndex) =>
                 {
-                    if (BuffRandomizerController.IsActive && SkipApplyDotCount == 0)
+                    if (SkipPatchCount == 0 && BuffRandomizerController.IsActive)
                     {
                         BuffRandomizerController.TryReplaceBuffIndex(ref buffIndex);
                     }

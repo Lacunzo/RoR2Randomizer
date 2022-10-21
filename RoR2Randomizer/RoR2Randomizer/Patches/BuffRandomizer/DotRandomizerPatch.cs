@@ -34,9 +34,23 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                     {
                         if (healthComponent.body)
                         {
-                            BuffIndexPatch.SkipApplyDotCount++;
-                            healthComponent.body.AddBuff(buff);
-                            BuffIndexPatch.SkipApplyDotCount--;
+                            // This is not an ideal way of doing things, but fuck it, I just want it to work
+                            BuffIndexPatch.SkipPatchCount++;
+                            GetBuffIndex_BuffIndex_ReplacePatch.ForceDisable = true;
+
+                            float buffDuration = inflictDotInfo.duration;
+                            if (buffDuration <= 0f)
+                            {
+                                // TODO: Calculate this value according to how DotController.AddDot would
+                                buffDuration = 8f;
+                            }
+
+#if DEBUG
+                            Log.Debug($"Replacing dot {inflictDotInfo.dotIndex} with timed buff {BuffCatalog.GetBuffDef(buff)?.name ?? "null"} for {buffDuration} seconds");
+#endif
+                            healthComponent.body.AddTimedBuff(buff, buffDuration);
+                            GetBuffIndex_BuffIndex_ReplacePatch.ForceDisable = false;
+                            BuffIndexPatch.SkipPatchCount--;
                         }
                         else
                         {
@@ -59,9 +73,9 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 }
             }
 
-            BuffIndexPatch.SkipApplyDotCount++;
+            BuffIndexPatch.SkipPatchCount++;
             orig(ref inflictDotInfo);
-            BuffIndexPatch.SkipApplyDotCount--;
+            BuffIndexPatch.SkipPatchCount--;
         }
     }
 }
