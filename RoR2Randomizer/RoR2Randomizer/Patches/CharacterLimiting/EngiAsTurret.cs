@@ -47,9 +47,9 @@ namespace RoR2Randomizer.Patches.CharacterLimiting
                         if (summoned && summoned.masterIndex == _engiMasterIndex)
                         {
                             GameObject ownerObj;
-                            if (owner && owner.masterObject)
+                            if (owner && owner.master)
                             {
-                                ownerObj = owner.masterObject;
+                                ownerObj = owner.master.gameObject;
 
                                 if (owner.master.masterIndex != _engiMasterIndex)
                                     return;
