@@ -30,9 +30,7 @@ namespace RoR2Randomizer.Networking.Generic
         {
             const string LOG_PREFIX = $"{nameof(SyncGameObjectReference)}.{nameof(waitForNetIdInitialized)} ";
 
-#if DEBUG
             float timeStarted = Time.unscaledTime;
-#endif
 
             while (obj && !obj.activeInHierarchy)
             {
