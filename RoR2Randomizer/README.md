@@ -8,6 +8,7 @@ Current features:
 * Multiplayer Compatible. Every player needs to have the mod.
 * Compatibile with Risk of Options for easy configuration in-game.
 * Stage Randomizer: Swaps every stage for a random playable map.
+  * Each stage is paired one-to-one with a replacement stage (for example bazaar will always be randomized to the same stage during the course of a run)
 * Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers and Alloy Worship Unit are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
@@ -27,10 +28,28 @@ Current features:
   * Shopkeeper Newt
   * Solus Probes spawned by Solus Control Unit and Alloy Worship Unit
 * Effect Randomizer: Randomizes visual effects.
+* Weak Point Randomizer: Randomizes which hitboxes are considered weak points by Railgunner's scoped shot. The number of weak points per character remain the same.
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.5.3 Changes:**
+
+* Stage Randomizer:
+  * Added Stages to pool:
+    * Old Commencement
+    * ai_test
+    * testscene
+
+* Summon Randomizer:
+  * Fixed Grandparents replacing Engineer turrets pushing the user into the ground
+
+* Weak Point Randomizer:
+  * Added Weak Point Randomizer.
+
+* Mod Compatibility:
+  * Added [DropInMultiplayer](https://thunderstore.io/package/niwith/DropinMultiplayer/) Compatibility
 
 **0.5.2 Changes:**
 
