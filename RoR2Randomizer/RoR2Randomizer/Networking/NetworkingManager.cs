@@ -38,6 +38,7 @@ namespace RoR2Randomizer.Networking
 
         static void NetworkUser_onPostNetworkUserStart(NetworkUser networkUser)
         {
+            // Run instance exists, this client joined mid-run
             if (NetworkServer.active && Run.instance)
             {
                 foreach (INetMessage message in collectAllMessages())
