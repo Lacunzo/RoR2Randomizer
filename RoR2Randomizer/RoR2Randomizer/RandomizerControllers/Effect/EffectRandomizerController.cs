@@ -4,7 +4,9 @@ using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.EffectRandomizer;
+using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Utility;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -12,7 +14,7 @@ using UnityEngine.Networking;
 namespace RoR2Randomizer.RandomizerControllers.Effect
 {
     [RandomizerController]
-    public sealed class EffectRandomizerController : MonoBehaviour
+    public sealed class EffectRandomizerController : BaseRandomizerController
     {
         static readonly RunSpecific<bool> _hasRecievedEffectReplacementsFromServer = new RunSpecific<bool>();
         static readonly RunSpecific<IndexReplacementsCollection> _effectReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
@@ -20,9 +22,6 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             if (NetworkServer.active && ConfigManager.Misc.EffectRandomizerEnabled)
             {
                 result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(Enumerable.Range(0, EffectCatalog.effectCount)), EffectCatalog.effectCount);
-
-                SyncEffectReplacements.SendToClients(result);
-
                 return true;
             }
 
@@ -32,14 +31,29 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
 
         static bool shouldBeEnabled => ((NetworkServer.active && ConfigManager.Misc.EffectRandomizerEnabled) || (NetworkClient.active && _hasRecievedEffectReplacementsFromServer)) && _effectReplacements.HasValue;
 
+        public override bool IsRandomizerEnabled => shouldBeEnabled;
+
+        protected override bool isNetworked => true;
+
+        protected override IEnumerable<INetMessage> getNetMessages()
+        {
+#if DEBUG
+            Log.Debug($"Sending {nameof(SyncEffectReplacements)} to clients");
+#endif
+
+            return SyncEffectReplacements.CreateMessagesFor(_effectReplacements);
+        }
+
         void setEffectReplacementsFromServerEvent(IndexReplacementsCollection replacements)
         {
             _effectReplacements.Value = replacements;
             _hasRecievedEffectReplacementsFromServer.Value = _effectReplacements.HasValue;
         }
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             SyncEffectReplacements.OnCompleteMessageReceived += setEffectReplacementsFromServerEvent;
         }
 

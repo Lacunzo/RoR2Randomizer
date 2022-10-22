@@ -14,7 +14,7 @@ using UnityModdingUtility;
 namespace RoR2Randomizer.RandomizerControllers.Stage
 {
     [RandomizerController]
-    public class StageRandomizerController : MonoBehaviour
+    public class StageRandomizerController : BaseRandomizerController
     {
         static bool _isInitialized;
         static StageRandomizingInfo[] _stages;
@@ -117,8 +117,15 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
         static IndexReplacementsCollection? _stageIndexReplacements;
 
-        void Awake()
+        static bool shouldBeActive => NetworkServer.active && ConfigManager.StageRandomizer.Enabled;
+        public override bool IsRandomizerEnabled => shouldBeActive;
+
+        protected override bool isNetworked => false;
+
+        protected override void Awake()
         {
+            base.Awake();
+
             SceneCatalog.onMostRecentSceneDefChanged += sceneLoaded;
         }
 
@@ -129,7 +136,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
         void sceneLoaded(SceneDef scene)
         {
-            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
+            if (shouldBeActive)
             {
                 StartCoroutine(waitThenCheckForStageLooping(scene));
             }
@@ -169,7 +176,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             if (!_isInitialized)
                 return;
 
-            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled)
+            if (shouldBeActive)
             {
 #if DEBUG
                 Log.Debug($"First stage: {firstStageSceneName}");
@@ -218,7 +225,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
         public static bool TryGetReplacementSceneIndex(SceneIndex original, out SceneIndex replacement)
         {
-            if (NetworkServer.active && ConfigManager.StageRandomizer.Enabled && _stageIndexReplacements.HasValue)
+            if (shouldBeActive && _stageIndexReplacements.HasValue)
             {
                 return _stageIndexReplacements.Value.TryGetReplacement(original, out replacement);
             }
@@ -261,7 +268,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
         public static bool TryGetOriginalSceneDef(SceneDef replacement, out SceneDef originalScene)
         {
-            if (ConfigManager.StageRandomizer.Enabled)
+            if (shouldBeActive)
             {
                 if (replacement && _stageIndexReplacements.HasValue && _stageIndexReplacements.Value.TryGetOriginal(replacement.sceneDefIndex, out SceneIndex originalSceneIndex))
                 {

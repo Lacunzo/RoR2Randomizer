@@ -51,8 +51,6 @@ namespace RoR2Randomizer
 
             ConfigManager.Initialize(Config);
 
-            CharacterReplacements.Initialize();
-
             InitializationManager.Init();
 
             new ContentPackManager().Init();
@@ -66,6 +64,8 @@ namespace RoR2Randomizer
             InitializationManager.Cleanup();
 
             CharacterReplacements.Uninitialize();
+
+            NetworkingManager.Uninitialize();
         }
     }
 }

@@ -17,10 +17,12 @@ using HarmonyLib;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {
-    public partial class BossRandomizerController : MonoBehaviour
+    public partial class BossRandomizerController
     {
         public static class Voidling
         {
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.RandomizeVoidling;
+
             public static readonly SerializableEntityStateType EscapeDeathState = new SerializableEntityStateType(typeof(EntityStates.VoidRaidCrab.EscapeDeath));
             public static readonly SerializableEntityStateType FinalDeathState = new SerializableEntityStateType(typeof(EntityStates.VoidRaidCrab.DeathState));
 
@@ -60,13 +62,13 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void IsInFight_OnChanged(bool isInFight)
             {
-                if (NetworkServer.active)
+                if (IsEnabled)
                 {
                     if (isInFight)
                     {
                         GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (ref SpawnCard card, out GenericScriptedSpawnHook.ResetCardDelegate resetCardFunc) =>
                         {
-                            if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && SpawnCardTracker.IsAnyVoidlingPhase(card))
+                            if (SpawnCardTracker.IsAnyVoidlingPhase(card))
                             {
                                 GameObject originalPrefab = card.prefab;
 
@@ -92,7 +94,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void SceneCatalog_onMostRecentSceneDefChanged(SceneDef newScene)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && Caches.Scene.VoidlingFightSceneIndex != SceneIndex.Invalid && newScene.sceneDefIndex == Caches.Scene.VoidlingFightSceneIndex)
+                if (IsEnabled && Caches.Scene.VoidlingFightSceneIndex != SceneIndex.Invalid && newScene.sceneDefIndex == Caches.Scene.VoidlingFightSceneIndex)
                 {
                     GameObject levelRoot = GameObject.Find("RaidVoid");
                     if (levelRoot)
@@ -134,7 +136,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void handleSpawnedVoidlingCharacterServer(SpawnCard.SpawnResult spawnResult)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeVoidling && VoidlingPhaseTracker.Instance != null && VoidlingPhaseTracker.Instance.IsInFight)
+                if (IsEnabled && VoidlingPhaseTracker.Instance != null && VoidlingPhaseTracker.Instance.IsInFight)
                 {
                     VoidlingReplacement voidlingReplacement = spawnResult.spawnedInstance.AddComponent<VoidlingReplacement>();
                     voidlingReplacement.Phase = VoidlingPhaseTracker.Instance.Phase;

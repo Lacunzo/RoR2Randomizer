@@ -130,7 +130,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
             _chunk = new EffectReplacementMessageChunk(messageID, messageIndex, messageCount, getRange(effectReplacements, messageIndex * MAX_EFFECTS_PER_MESSAGE, MAX_EFFECTS_PER_MESSAGE).ToArray());
         }
 
-        public static void SendToClients(IndexReplacementsCollection effectReplacements)
+        public static IEnumerable<SyncEffectReplacements> CreateMessagesFor(IndexReplacementsCollection effectReplacements)
         {
             Guid messageID = Guid.NewGuid();
 
@@ -139,11 +139,12 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
             for (ulong i = 0; i < messageCount; i++)
             {
                 SyncEffectReplacements message = new SyncEffectReplacements(messageID, i, messageCount, effectReplacements);
-                message.Send(NetworkDestination.Clients);
 
 #if DEBUG
-                Log.Debug($"Sent effect replacement chunk {message._chunk} to clients");
+                Log.Debug($"Created effect replacement chunk {message._chunk}");
 #endif
+
+                yield return message;
             }
         }
 
@@ -160,7 +161,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
         void INetMessage.OnReceived()
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncEffectReplacements)} received");
+            Log.Debug($"{nameof(SyncEffectReplacements)} received ({_chunk})");
 #endif
 
             if (!NetworkServer.active && NetworkClient.active)

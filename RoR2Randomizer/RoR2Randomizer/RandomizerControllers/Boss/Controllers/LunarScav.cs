@@ -11,10 +11,12 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {
-    public partial class BossRandomizerController : MonoBehaviour
+    public partial class BossRandomizerController
     {
         public static class LunarScav
         {
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.RandomizeLunarScav;
+
             public static event Action<LunarScavReplacement> LunarScavReplacementReceivedClient;
 
             public static void Initialize()
@@ -39,7 +41,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void IsInFight_OnChanged(bool isInFight)
             {
-                if (NetworkServer.active)
+                if (IsEnabled)
                 {
                     if (isInFight)
                     {
@@ -47,7 +49,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                         {
                             resetCardFunc = null;
 
-                            if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeLunarScav && SpawnCardTracker.LunarScavSpawnCard == card)
+                            if (SpawnCardTracker.LunarScavSpawnCard == card)
                             {
                                 if (card is MultiCharacterSpawnCard multiCard)
                                 {
@@ -117,7 +119,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void handleSpawnedLunarScavCharacterServer(SpawnCard.SpawnResult spawnResult)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeLunarScav &&
+                if (IsEnabled &&
                     LunarScavFightTracker.Instance != null && LunarScavFightTracker.Instance.IsInFight &&
                     SpawnCardTracker.LunarScavSpawnCard == spawnResult.spawnRequest.spawnCard)
                 {

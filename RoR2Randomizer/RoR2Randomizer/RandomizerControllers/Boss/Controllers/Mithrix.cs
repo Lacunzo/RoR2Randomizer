@@ -13,10 +13,12 @@ using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {
-    public partial class BossRandomizerController : MonoBehaviour
+    public partial class BossRandomizerController
     {
         public static class Mithrix
         {
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled;
+
             public static readonly SerializableEntityStateType MithrixHurtInitialState = new SerializableEntityStateType(typeof(SpellChannelEnterState));
 
             public static readonly InitializeOnAccess<ReturnStolenItemsOnGettingHit> MithrixReturnItemsComponent = new InitializeOnAccess<ReturnStolenItemsOnGettingHit>(() =>
@@ -46,7 +48,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void IsInFight_OnChanged(bool isInFight)
             {
-                if (NetworkServer.active)
+                if (IsEnabled)
                 {
                     if (isInFight)
                     {
@@ -54,17 +56,14 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                         {
                             resetCardFunc = null;
 
-                            if (ConfigManager.BossRandomizer.Enabled)
+                            if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
+                             || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
                             {
-                                if ((ConfigManager.BossRandomizer.RandomizeMithrix && (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard))
-                                 || (ConfigManager.BossRandomizer.RandomizeMithrixPhase2 && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
-                                {
-                                    GameObject originalPrefab = card.prefab;
+                                GameObject originalPrefab = card.prefab;
 
-                                    resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
+                                resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
 
-                                    CharacterReplacements.TryReplaceMasterPrefab(ref card.prefab);
-                                }
+                                CharacterReplacements.TryReplaceMasterPrefab(ref card.prefab);
                             }
                         };
 
@@ -131,7 +130,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void handleSpawnedMithrixCharacterServer(SpawnCard.SpawnResult spawnResult)
             {
-                if (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && MithrixPhaseTracker.Instance != null && MithrixPhaseTracker.Instance.IsInFight)
+                if (IsEnabled && MithrixPhaseTracker.Instance != null && MithrixPhaseTracker.Instance.IsInFight)
                 {
                     BaseMithrixReplacement baseMithrixReplacement = null;
                     if (MithrixPhaseTracker.Instance.Phase == 2)

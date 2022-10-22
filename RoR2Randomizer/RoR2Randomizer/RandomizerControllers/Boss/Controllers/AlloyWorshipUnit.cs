@@ -10,10 +10,12 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {
-    public partial class BossRandomizerController : MonoBehaviour
+    public partial class BossRandomizerController
     {
         public static class AlloyWorshipUnit
         {
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.RandomizeAlloyWorshipUnit;
+
             public static void Initialize()
             {
                 if (AlloyWorshipUnitFightTracker.Instance != null)
@@ -36,13 +38,13 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void IsInFight_OnChanged(bool isInFight)
             {
-                if (NetworkServer.active)
+                if (IsEnabled)
                 {
                     if (isInFight)
                     {
                         GenericScriptedSpawnHook.OverrideSpawnPrefabFunc = (ref SpawnCard card, out GenericScriptedSpawnHook.ResetCardDelegate resetCardFunc) =>
                         {
-                            if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAlloyWorshipUnit && card == SpawnCardTracker.AlloyWorshipUnitSpawnCard)
+                            if (card == SpawnCardTracker.AlloyWorshipUnitSpawnCard)
                             {
                                 GameObject originalPrefab = card.prefab;
                                 resetCardFunc = (ref SpawnCard c) => c.prefab = originalPrefab;
@@ -86,7 +88,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void handleSpawnedAWUCharacterServer(SpawnCard.SpawnResult spawnResult)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAlloyWorshipUnit &&
+                if (IsEnabled &&
                     AlloyWorshipUnitFightTracker.Instance != null && AlloyWorshipUnitFightTracker.Instance.IsInFight &&
                     spawnResult.spawnRequest.spawnCard == SpawnCardTracker.AlloyWorshipUnitSpawnCard)
                 {

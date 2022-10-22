@@ -1,4 +1,5 @@
-﻿using RoR2;
+﻿using R2API.Networking.Interfaces;
+using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
@@ -12,8 +13,10 @@ using UnityModdingUtility;
 namespace RoR2Randomizer.RandomizerControllers.Buff
 {
     [RandomizerController]
-    public class BuffRandomizerController : MonoBehaviour
+    public class BuffRandomizerController : BaseRandomizerController
     {
+        static BuffRandomizerController _instance;
+
         static BuffIndex[] _invincibilityBuffs;
 
         static Dictionary<BuffIndex, DotController.DotIndex> _buffToDotIndex;
@@ -51,11 +54,16 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             }
         }
 
-        public static bool IsActive => NetworkServer.active && ConfigManager.BuffRandomizer.Enabled && _buffReplacements.HasValue;
+        static bool shouldBeActive => NetworkServer.active && ConfigManager.BuffRandomizer.Enabled;
+        public override bool IsRandomizerEnabled => shouldBeActive && _buffReplacements.HasValue;
+
+        protected override bool isNetworked => false;
+
+        public static bool IsActive => _instance && _instance.IsRandomizerEnabled;
 
         static readonly RunSpecific<IndexReplacementsCollection> _buffReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
-            if (ConfigManager.BuffRandomizer.Enabled && NetworkServer.active)
+            if (shouldBeActive)
             {
                 IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None &&
                    (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.IndexOf(_invincibilityBuffs, b.buffIndex) == -1));
@@ -166,9 +174,18 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
         }
 #endif
 
+        protected override void Awake()
+        {
+            base.Awake();
+
+            SingletonHelper.Assign(ref _instance, this);
+        }
+
         void OnDestroy()
         {
             _buffReplacements.Dispose();
+
+            SingletonHelper.Unassign(ref _instance, this);
         }
 
 #if DEBUG

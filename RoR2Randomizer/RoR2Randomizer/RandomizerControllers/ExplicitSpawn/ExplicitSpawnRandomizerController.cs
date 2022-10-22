@@ -8,8 +8,12 @@ using UnityEngine.Networking;
 namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {
     [RandomizerController]
-    public sealed class ExplicitSpawnRandomizerController : MonoBehaviour
+    public sealed class ExplicitSpawnRandomizerController : BaseRandomizerController
     {
+        public override bool IsRandomizerEnabled => ConfigManager.ExplicitSpawnRandomizer.Enabled;
+
+        protected override bool isNetworked => false;
+
         public static MasterCatalog.MasterIndex GetOriginalMasterIndex(GameObject replacementObject)
         {
             if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
@@ -121,8 +125,10 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             }
         }
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             SyncExplicitSpawnReplacement.OnReceive += RegisterSpawnedReplacement;
         }
 

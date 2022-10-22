@@ -5,6 +5,7 @@ using RoR2.Projectile;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Utility;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,7 +14,7 @@ using UnityModdingUtility;
 namespace RoR2Randomizer.RandomizerControllers.Projectile
 {
     [RandomizerController]
-    public class ProjectileRandomizerController : MonoBehaviour
+    public class ProjectileRandomizerController : BaseRandomizerController
     {
         static int[] _projectileIndicesToRandomize;
 
@@ -84,17 +85,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         static readonly RunSpecific<IndexReplacementsCollection> _projectileIndicesReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
-            if (NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled)
+            if (shouldBeActive)
             {
                 ReplacementDictionary<int> dict = ReplacementDictionary<int>.CreateFrom(_projectileIndicesToRandomize);
 
                 result = new IndexReplacementsCollection(dict, ProjectileCatalog.projectilePrefabCount);
-
-#if DEBUG
-                Log.Debug($"Sending {nameof(SyncProjectileReplacements)} to clients");
-#endif
-
-                new SyncProjectileReplacements(result).Send(NetworkDestination.Clients);
 
                 return true;
             }
@@ -103,7 +98,21 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return false;
         });
 
-        static bool shouldBeActive => ((NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled) || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
+        static bool shouldBeActive => NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled;
+        static bool isActive => (shouldBeActive || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
+
+        public override bool IsRandomizerEnabled => isActive;
+
+        protected override bool isNetworked => true;
+
+        protected override IEnumerable<INetMessage> getNetMessages()
+        {
+#if DEBUG
+            Log.Debug($"Sending {nameof(SyncProjectileReplacements)} to clients");
+#endif
+
+            yield return new SyncProjectileReplacements(_projectileIndicesReplacements);
+        }
 
         static void onProjectileReplacementsReceivedFromServer(IndexReplacementsCollection replacements)
         {
@@ -111,8 +120,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             _hasReceivedProjectileReplacementsFromServer.Value = true;
         }
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
         }
 
@@ -146,7 +157,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static void TryOverrideProjectilePrefab(ref GameObject prefab)
         {
-            if (shouldBeActive)
+            if (isActive)
             {
                 int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
                 if (originalIndex != -1)
@@ -174,7 +185,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryGetOriginalProjectileIndex(int replacementIndex, out int originalIndex)
         {
-            if (shouldBeActive && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
+            if (isActive && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
             {
                 return true;
             }

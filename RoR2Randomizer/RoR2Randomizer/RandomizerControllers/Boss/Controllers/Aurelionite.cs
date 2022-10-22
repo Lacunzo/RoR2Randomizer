@@ -12,15 +12,17 @@ using R2API;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {
-    public partial class BossRandomizerController : MonoBehaviour
+    public partial class BossRandomizerController
     {
         public static class Aurelionite
         {
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.RandomizeAurelionite;
+
             const string MASTER_NAME = "TitanGoldMaster";
 
             static readonly RunSpecific<GameObject> _aurelioniteMasterReplacementPrefab = new RunSpecific<GameObject>((out GameObject overridePrefab) =>
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAurelionite)
+                if (IsEnabled)
                 {
                     overridePrefab = CharacterReplacements.GetReplacementMasterPrefab(MASTER_NAME);
                     if (overridePrefab &&
@@ -51,7 +53,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             public static bool TryGetAurelioniteMasterReplacementPrefab(out GameObject replacementPrefab)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAurelionite)
+                if (IsEnabled)
                 {
 #if DEBUG
                     if (CharacterReplacements.DebugMode != DebugMode.None)
@@ -121,7 +123,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void IsInFight_OnChanged(bool isInFight)
             {
-                if (NetworkServer.active)
+                if (IsEnabled)
                 {
                     if (isInFight)
                     {
@@ -176,7 +178,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void handleSpawnedAurelioniteCharacterServer(SpawnCard.SpawnResult spawnResult)
             {
-                if (ConfigManager.BossRandomizer.Enabled && ConfigManager.BossRandomizer.RandomizeAurelionite && 
+                if (IsEnabled && 
                     AurelioniteFightTracker.Instance != null && AurelioniteFightTracker.Instance.IsInFight && 
                     spawnResult.spawnRequest.spawnCard == SpawnCardTracker.AurelioniteSpawnCard)
                 {

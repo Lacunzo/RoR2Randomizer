@@ -8,6 +8,7 @@ using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.CharacterReplacements;
 using RoR2Randomizer.Utility;
 using System;
@@ -29,8 +30,10 @@ namespace RoR2Randomizer.RandomizerControllers
     }
 #endif
 
-    public static class CharacterReplacements
+    public class CharacterReplacements : INetMessageProvider
     {
+        static CharacterReplacements _instance;
+
 #if DEBUG
         public static DebugMode DebugMode => ConfigManager.Debug.CharacterDebugMode;
 #endif
@@ -122,6 +125,15 @@ namespace RoR2Randomizer.RandomizerControllers
 
                 return true;
             }).Distinct().Select(go => (int)MasterCatalog.FindMasterIndex(go)).ToArray();
+
+            _instance = new CharacterReplacements();
+            NetworkingManager.RegisterMessageProvider(_instance);
+
+            SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
+
+#if DEBUG
+            RoR2Application.onFixedUpdate += Update;
+#endif
         }
 
         static readonly RunSpecific<bool> _hasReceivedMasterIndexReplacementsFromServer = new RunSpecific<bool>(1);
@@ -130,8 +142,6 @@ namespace RoR2Randomizer.RandomizerControllers
             if (NetworkServer.active)
             {
                 result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize), MasterCatalog.masterPrefabs.Length);
-
-                new SyncCharacterMasterReplacements(result).Send(NetworkDestination.Clients);
 
                 return true;
             }
@@ -144,6 +154,17 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static bool IsEnabled => NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer);
 
+        public bool SendMessages => _masterIndexReplacements.HasValue;
+
+        public IEnumerable<INetMessage> GetNetMessages()
+        {
+#if DEBUG
+            Log.Debug($"Sending {nameof(SyncCharacterMasterReplacements)} to clients");
+#endif
+
+            yield return new SyncCharacterMasterReplacements(_masterIndexReplacements);
+        }
+
         static void onMasterReplacementsReceivedFromServer(IndexReplacementsCollection masterIndexReplacements)
         {
 #if DEBUG
@@ -152,15 +173,6 @@ namespace RoR2Randomizer.RandomizerControllers
 
             _masterIndexReplacements.Value = masterIndexReplacements;
             _hasReceivedMasterIndexReplacementsFromServer.Value = true;
-        }
-
-        public static void Initialize()
-        {
-            SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
-
-#if DEBUG
-            RoR2Application.onFixedUpdate += Update;
-#endif
         }
 
         public static void Uninitialize()
@@ -173,6 +185,8 @@ namespace RoR2Randomizer.RandomizerControllers
 #if DEBUG
             RoR2Application.onFixedUpdate -= Update;
 #endif
+
+            _instance = null;
         }
 
 #if DEBUG

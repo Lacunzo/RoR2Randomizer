@@ -12,20 +12,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {
     [RandomizerController]
-    public partial class BossRandomizerController : MonoBehaviour
+    public partial class BossRandomizerController : BaseRandomizerController
     {
         public static bool IsReplacedBossCharacter(GameObject masterObject)
         {
             return masterObject && masterObject.GetComponent<BaseBossReplacement>();
         }
 
-        void Awake()
+        public override bool IsRandomizerEnabled => NetworkServer.active && ConfigManager.BossRandomizer.Enabled;
+
+        protected override bool isNetworked => false;
+
+        static BossRandomizerController _instance;
+
+        protected override void Awake()
         {
+            base.Awake();
+
+            SingletonHelper.Assign(ref _instance, this);
+
             Mithrix.Initialize();
             Voidling.Initialize();
             Aurelionite.Initialize();
@@ -40,6 +51,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
             Aurelionite.Uninitialize();
             LunarScav.Uninitialize();
             AlloyWorshipUnit.Uninitialize();
+
+            SingletonHelper.Unassign(ref _instance, this);
         }
     }
 }

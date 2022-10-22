@@ -11,7 +11,7 @@ using UnityModdingUtility;
 namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 {
     [RandomizerController]
-    public class SurvivorPodRandomizerController : MonoBehaviour
+    public class SurvivorPodRandomizerController : BaseRandomizerController
     {
         static CharacterBody[] _bodiesWithPods;
         static SpawnPodPrefabData[] _distinctPodPrefabs;
@@ -45,7 +45,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         static readonly RunSpecific<Dictionary<BodyIndex, SpawnPodPrefabData>> _overrideSpawnPodPrefabs = new RunSpecific<Dictionary<BodyIndex, SpawnPodPrefabData>>((out Dictionary<BodyIndex, SpawnPodPrefabData> result) =>
         {
-            if (NetworkServer.active && ConfigManager.Misc.SurvivorPodRandomizerEnabled)
+            if (shouldBeActive)
             {
                 result = new Dictionary<BodyIndex, SpawnPodPrefabData>();
 
@@ -62,6 +62,11 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             return false;
         });
 
+        static bool shouldBeActive => NetworkServer.active && ConfigManager.Misc.SurvivorPodRandomizerEnabled;
+        public override bool IsRandomizerEnabled => shouldBeActive;
+
+        protected override bool isNetworked => false;
+
         void OnDestroy()
         {
             _overrideSpawnPodPrefabs.Dispose();
@@ -69,7 +74,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         public static void TryOverrideIntroAnimation(CharacterBody body)
         {
-            if (NetworkServer.active && _overrideSpawnPodPrefabs.HasValue && _overrideSpawnPodPrefabs.Value.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
+            if (shouldBeActive && _overrideSpawnPodPrefabs.HasValue && _overrideSpawnPodPrefabs.Value.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
             {
                 if (replacementPod.IsSpawnState)
                 {
