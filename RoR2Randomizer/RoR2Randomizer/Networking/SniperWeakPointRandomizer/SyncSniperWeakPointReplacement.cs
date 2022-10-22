@@ -61,11 +61,6 @@ namespace RoR2Randomizer.Networking.SniperWeakPointRandomizer
                     yield return 0;
                 }
 
-                //for (int i = 0; i < 3; i++)
-                //{
-                //    yield return new WaitForFixedUpdate();
-                //}
-
                 if (!hurtBox)
                     yield break;
 
