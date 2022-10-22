@@ -1,4 +1,10 @@
-﻿using RoR2;
+﻿// #define DISPLAY_OOB_TRIGGERS
+
+#if !DEBUG
+#undef DISPLAY_OOB_TRIGGERS
+#endif
+
+using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
@@ -19,69 +25,13 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
         static bool _isInitialized;
         static StageRandomizingInfo[] _stages;
 
-        [SystemInitializer(typeof(Caches.Scene), typeof(SceneCatalog), typeof(GameModeCatalog))]
+        [SystemInitializer(typeof(Caches.Scene), typeof(SceneCatalog))]
         static void Init()
         {
             const string LOG_PREFIX = $"{nameof(StageRandomizerController)}.{nameof(Init)} ";
 
-            HashSet<SceneIndex> excludeScenesHS = new HashSet<SceneIndex>();
-
-            const string IT_RUN_NAME = "InfiniteTowerRun";
-            Run itRunPrefab = GameModeCatalog.FindGameModePrefabComponent(IT_RUN_NAME);
-            if (itRunPrefab)
-            {
-                SceneCollection startingSceneGroup = itRunPrefab.startingSceneGroup;
-                if (startingSceneGroup)
-                {
-                    static void handleCollection(SceneCollection collection, in HashSet<SceneCollection> alreadyHandledCollections, in HashSet<SceneIndex> excludeScenes)
-                    {
-                        if (alreadyHandledCollections.Add(collection))
-                        {
-                            foreach (SceneCollection.SceneEntry entry in collection.sceneEntries)
-                            {
-                                SceneDef scene = entry.sceneDef;
-                                if (scene)
-                                {
-                                    excludeScenes.Add(scene.sceneDefIndex);
-
-                                    SceneCollection destinationsGroup = scene.destinationsGroup;
-                                    if (destinationsGroup)
-                                    {
-                                        handleCollection(destinationsGroup, alreadyHandledCollections, excludeScenes);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    handleCollection(startingSceneGroup, new HashSet<SceneCollection>(), excludeScenesHS);
-                }
-            }
-            else
-            {
-                Log.Warning($"{LOG_PREFIX} unable to find run prefab {IT_RUN_NAME}");
-            }
-
-            SceneIndex[] excludeScenesArray = excludeScenesHS.Where(i => i != SceneIndex.Invalid).ToArray();
-
-            SceneIndex[] possibleStartingStages = null;
-            Run runPrefab = GameModeCatalog.FindGameModePrefabComponent("ClassicRun");
-            if (runPrefab)
-            {
-                SceneCollection startingSceneGroup = runPrefab.startingSceneGroup;
-                if (startingSceneGroup)
-                {
-                    HG.ReadOnlyArray<SceneCollection.SceneEntry> sceneEntries = startingSceneGroup.sceneEntries;
-                    possibleStartingStages = new SceneIndex[sceneEntries.Length];
-                    for (int i = 0; i < sceneEntries.Length; i++)
-                    {
-                        possibleStartingStages[i] = sceneEntries[i].sceneDef.sceneDefIndex;
-                    }
-                }
-            }
-
             _stages = SceneCatalog.allStageSceneDefs
-                                  .Where(s => Array.IndexOf(excludeScenesArray, s.sceneDefIndex) == -1)
+                                  .Where(s => !Caches.Scene.IsSimulacrumStage(s))
                                   // These are not normal stages, but will be included anyway
                                   .Concat(new SceneIndex[]
                                   {
@@ -89,27 +39,43 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                                       Caches.Scene.NewtShopSceneIndex,
                                       Caches.Scene.GoldShoresSceneIndex,
                                       Caches.Scene.ObliterateSceneIndex,
-                                      Caches.Scene.LunarScavFightSceneIndex
+                                      Caches.Scene.LunarScavFightSceneIndex,
+                                      Caches.Scene.OldCommencementSceneIndex,
+                                      Caches.Scene.AITestSceneIndex,
+                                      Caches.Scene.TestSceneSceneIndex
                                   }.Where(s => s != SceneIndex.Invalid).Select(SceneCatalog.GetSceneDef))
                                   .Select(scene =>
                                   {
-                                      StageFlags flags = StageFlags.None;
-
                                       SceneIndex index = scene.sceneDefIndex;
+
+                                      StageFlags flags = StageFlags.None;
+                                      if ((Caches.Scene.OldCommencementSceneIndex != SceneIndex.Invalid && index == Caches.Scene.OldCommencementSceneIndex) ||
+                                          (Caches.Scene.AITestSceneIndex != SceneIndex.Invalid && index == Caches.Scene.AITestSceneIndex) ||
+                                          (Caches.Scene.TestSceneSceneIndex != SceneIndex.Invalid && index == Caches.Scene.TestSceneSceneIndex))
+                                      {
+                                          flags |= StageFlags.Inaccessible;
+                                      }
+
                                       if ((Caches.Scene.CommencementSceneIndex != SceneIndex.Invalid && index == Caches.Scene.CommencementSceneIndex) ||
                                           (Caches.Scene.LunarScavFightSceneIndex != SceneIndex.Invalid && index == Caches.Scene.LunarScavFightSceneIndex) ||
                                           (Caches.Scene.VoidlingFightSceneIndex != SceneIndex.Invalid && index == Caches.Scene.VoidlingFightSceneIndex) ||
+                                          (Caches.Scene.OldCommencementSceneIndex != SceneIndex.Invalid && index == Caches.Scene.OldCommencementSceneIndex))
+                                      {
+                                          flags |= StageFlags.EndsRun;
+                                      }
+
+                                      if ((flags & StageFlags.EndsRun) != 0 ||
                                           (Caches.Scene.VoidLocusSceneIndex != SceneIndex.Invalid && index == Caches.Scene.VoidLocusSceneIndex))
                                       {
                                           flags |= StageFlags.FirstStageBlacklist;
                                       }
 
-                                      if (possibleStartingStages != null && Array.IndexOf(possibleStartingStages, scene.sceneDefIndex) != -1)
+                                      if (Caches.Scene.IsPossibleStartingStage(index))
                                       {
                                           flags |= StageFlags.PossibleStartingStage;
                                       }
                                   
-                                      return new StageRandomizingInfo(scene.sceneDefIndex, flags);
+                                      return new StageRandomizingInfo(index, flags);
                                   }).ToArray();
 
             _isInitialized = true;
@@ -139,6 +105,50 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             if (shouldBeActive)
             {
                 StartCoroutine(waitThenCheckForStageLooping(scene));
+
+                if (Caches.Scene.AITestSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.AITestSceneIndex)
+                {
+                    const string ZONES_HOLDER_NAME = "HOLDER: Zones";
+                    Transform zonesHolder = (GameObject.Find(ZONES_HOLDER_NAME) ?? new GameObject(ZONES_HOLDER_NAME)).transform;
+
+                    void addOOBTrigger(Vector3 position, Vector3 scale)
+                    {
+                        const string NAME = "OOB_TRIGGER";
+
+                        GameObject oobObj;
+#if DISPLAY_OOB_TRIGGERS
+                        oobObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        oobObj.name = NAME;
+#else
+                        oobObj = new GameObject(NAME);
+#endif
+
+                        oobObj.transform.SetParent(zonesHolder, false);
+
+                        oobObj.transform.position = position;
+                        oobObj.transform.localScale = scale;
+
+                        BoxCollider boxCollider;
+#if DISPLAY_OOB_TRIGGERS
+                        boxCollider = oobObj.GetComponent<BoxCollider>();
+#else
+                        boxCollider = oobObj.AddComponent<BoxCollider>();
+#endif
+
+                        boxCollider.isTrigger = true;
+
+                        MapZone mapZone = oobObj.AddComponent<MapZone>();
+                        mapZone.triggerType = MapZone.TriggerType.TriggerEnter;
+                        mapZone.zoneType = MapZone.ZoneType.OutOfBounds;
+                    }
+
+                    addOOBTrigger(new Vector3(0f, -300f, 0f), new Vector3(1000f, 500f, 1000f));
+                    addOOBTrigger(new Vector3(600f, 200f, 0f), new Vector3(1000f, 500f, 1000f));
+                    addOOBTrigger(new Vector3(-800f, 200f, 0f), new Vector3(1000f, 500f, 1000f));
+                    addOOBTrigger(new Vector3(0f, 200f, 750f), new Vector3(1000f, 500f, 1000f));
+                    addOOBTrigger(new Vector3(0f, 200f, -750f), new Vector3(1000f, 500f, 1000f));
+                    addOOBTrigger(new Vector3(0f, 500f, 0f), new Vector3(1000f, 500f, 1000f));
+                }
             }
         }
 
@@ -199,6 +209,14 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                     {
 #if DEBUG
                         Log.Debug($"Not allowing stage replacement {SceneCatalog.GetSceneDef(key.SceneIndex)?.cachedName} -> {SceneCatalog.GetSceneDef(value.SceneIndex)?.cachedName}: Candidate cannot be the first stage");
+#endif
+                        return false;
+                    }
+
+                    if ((key.Flags & StageFlags.Inaccessible) != 0 && (value.Flags & StageFlags.EndsRun) != 0)
+                    {
+#if DEBUG
+                        Log.Debug($"Not allowing stage replacement {SceneCatalog.GetSceneDef(key.SceneIndex)?.cachedName} -> {SceneCatalog.GetSceneDef(value.SceneIndex)?.cachedName}: {nameof(StageFlags.Inaccessible)} stages cannot become {nameof(StageFlags.EndsRun)}");
 #endif
                         return false;
                     }

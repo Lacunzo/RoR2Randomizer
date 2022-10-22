@@ -8,7 +8,9 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
     {
         None = 0,
         FirstStageBlacklist = 1 << 0,
-        PossibleStartingStage = 1 << 1
+        PossibleStartingStage = 1 << 1,
+        Inaccessible = 1 << 2,
+        EndsRun = 1 << 3
     }
 
     public readonly struct StageRandomizingInfo
@@ -24,5 +26,12 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             Flags = flags;
             BaseSelectionWeight = baseSelectionWeight;
         }
+
+#if DEBUG
+        public override string ToString()
+        {
+            return $"{SceneCatalog.GetSceneDef(SceneIndex).cachedName} {nameof(Flags)}={Flags:F}";
+        }
+#endif
     }
 }

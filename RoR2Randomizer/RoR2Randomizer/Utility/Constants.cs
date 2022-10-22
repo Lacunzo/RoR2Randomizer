@@ -22,6 +22,10 @@ namespace RoR2Randomizer.Utility
             public const string SIRENS_CALL_SCENE_NAME = "shipgraveyard";
             public const string ABANDONED_AQUEDUCT_SCENE_NAME = "goolake";
             public const string NEWT_SHOP_SCENE_NAME = "bazaar";
+            
+            public const string OLD_COMMENCEMENT_SCENE_NAME = "moon";
+            public const string AI_TEST_SCENE_NAME = "ai_test";
+            public const string TESTSCENE_SCENE_NAME = "testscene";
         }
     }
 }
