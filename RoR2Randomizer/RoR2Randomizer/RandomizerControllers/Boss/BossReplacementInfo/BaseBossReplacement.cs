@@ -59,7 +59,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
             Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeServer)}");
 #endif
 
-            new SyncBossReplacementCharacter(_master.gameObject, replacementType).Send(NetworkDestination.Clients);
+            new SyncBossReplacementCharacter(_master.gameObject, replacementType).SendTo(NetworkDestination.Clients);
 
 #if DEBUG
             Log.Debug($"Sent {nameof(SyncBossReplacementCharacter)} to clients");

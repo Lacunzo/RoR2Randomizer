@@ -39,7 +39,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         {
             base.initializeServer();
 
-            new SyncExplicitSpawnReplacement(_master.gameObject, _originalMasterIndex).Send(NetworkDestination.Clients);
+            new SyncExplicitSpawnReplacement(_master.gameObject, _originalMasterIndex).SendTo(NetworkDestination.Clients);
         }
 
         protected override void initializeClient()
