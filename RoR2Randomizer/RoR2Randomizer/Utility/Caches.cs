@@ -17,22 +17,66 @@ namespace RoR2Randomizer.Utility
 
         public static readonly InitializeOnAccessDictionary<GameObject, float> CharacterBodyRadius = new InitializeOnAccessDictionary<GameObject, float>((GameObject bodyPrefab, out float radius) =>
         {
-            if (bodyPrefab.TryGetComponent<SphereCollider>(out SphereCollider sphereCollider))
+            static bool tryGetRadius(Collider collider, out float radius)
             {
-                radius = sphereCollider.radius;
-                return true;
+                if (collider is SphereCollider sphereCollider)
+                {
+                    radius = sphereCollider.radius;
+                    return true;
+                }
+                else if (collider is CapsuleCollider capsuleCollider)
+                {
+                    radius = capsuleCollider.radius;
+                    return true;
+                }
+                else
+                {
+                    radius = -1f;
+                    return false;
+                }
             }
-            else if (bodyPrefab.TryGetComponent<CapsuleCollider>(out CapsuleCollider capsuleCollider))
+
+            foreach (Collider collider in bodyPrefab.GetComponents<Collider>())
             {
-                radius = capsuleCollider.radius;
-                return true;
+                if (tryGetRadius(collider, out radius))
+                {
+                    return true;
+                }
             }
-            else
+
+            if (bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body) && body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator))
             {
-                radius = -1f;
-                return false;
+                Transform model = modelLocator.modelTransform;
+                if (model)
+                {
+                    if (Bodies.GrandparentBodyIndex != BodyIndex.None && body.bodyIndex == Bodies.GrandparentBodyIndex)
+                    {
+                        Transform centerColliderObj = model.Find("GrandparentArmature/ROOT/base/stomach/chest/Collision");
+                        if (centerColliderObj && centerColliderObj.TryGetComponent<Collider>(out Collider collider) && tryGetRadius(collider, out radius))
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
+
+            radius = -1f;
+            return false;
         });
+
+        public static class Bodies
+        {
+            public static BodyIndex GrandparentBodyIndex { get; private set; } = BodyIndex.None;
+
+            [SystemInitializer(typeof(BodyCatalog))]
+            static void Init()
+            {
+                GrandparentBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.GRANDPARENT_NAME);
+#if DEBUG
+                if (GrandparentBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.GRANDPARENT_NAME}'");
+#endif
+            }
+        }
 
         public static class Scene
         {

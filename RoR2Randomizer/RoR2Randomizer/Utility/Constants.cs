@@ -27,5 +27,10 @@ namespace RoR2Randomizer.Utility
             public const string AI_TEST_SCENE_NAME = "ai_test";
             public const string TESTSCENE_SCENE_NAME = "testscene";
         }
+
+        public static class BodyNames
+        {
+            public const string GRANDPARENT_NAME = "GrandParentBody";
+        }
     }
 }
