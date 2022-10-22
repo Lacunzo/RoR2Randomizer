@@ -1,4 +1,6 @@
 ﻿#if DEBUG
+using RoR2;
+using RoR2.EntitlementManagement;
 using RoR2.Networking;
 using RoR2Randomizer.Configuration;
 using System;
@@ -23,18 +25,35 @@ namespace RoR2Randomizer.Patches.Debug
         static void Apply()
         {
             On.RoR2.Networking.NetworkManagerSystem.ClientSendAuth += NetworkManagerSystem_ClientSendAuth;
+
+            On.RoR2.PlayerCharacterMasterControllerEntitlementTracker.HasEntitlement += PlayerCharacterMasterControllerEntitlementTracker_HasEntitlement;
         }
 
         static void Cleanup()
         {
             On.RoR2.Networking.NetworkManagerSystem.ClientSendAuth -= NetworkManagerSystem_ClientSendAuth;
+
+            On.RoR2.PlayerCharacterMasterControllerEntitlementTracker.HasEntitlement -= PlayerCharacterMasterControllerEntitlementTracker_HasEntitlement;
         }
 
         static void NetworkManagerSystem_ClientSendAuth(On.RoR2.Networking.NetworkManagerSystem.orig_ClientSendAuth orig, NetworkManagerSystem self, NetworkConnection conn)
         {
-            if (!ConfigManager.Debug.AllowSelfNetworkJoin)
+            if (!ConfigManager.Debug.AllowLocalhostConnect)
             {
                 orig(self, conn);
+            }
+        }
+
+        // The client player does not have any entitlements when connected for some reason, so just force them enabled in that case
+        static bool PlayerCharacterMasterControllerEntitlementTracker_HasEntitlement(On.RoR2.PlayerCharacterMasterControllerEntitlementTracker.orig_HasEntitlement orig, PlayerCharacterMasterControllerEntitlementTracker self, EntitlementDef entitlementDef)
+        {
+            if (ConfigManager.Debug.AllowLocalhostConnect)
+            {
+                return true;
+            }
+            else
+            {
+                return orig(self, entitlementDef);
             }
         }
     }

@@ -3,9 +3,6 @@ using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Extensions;
-#if DEBUG
-using RoR2Randomizer.Networking.Debug;
-#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,13 +40,16 @@ namespace RoR2Randomizer.Utility
 #if DEBUG
         public static void TryNetworkLog(string message, LogLevel type)
         {
+            if (Configuration.ConfigManager.Debug.AllowLocalhostConnect)
+                return;
+
             LocalUser localUser = LocalUserManager.GetFirstLocalUser();
             if (localUser != null)
             {
                 NetworkUser networkUser = localUser.currentNetworkUser;
                 if (networkUser)
                 {
-                    SyncConsoleLog syncConsoleLog = new SyncConsoleLog(message, type, networkUser.id);
+                    Networking.Debug.SyncConsoleLog syncConsoleLog = new Networking.Debug.SyncConsoleLog(message, type, networkUser.id);
                     if (NetworkServer.active)
                     {
                         syncConsoleLog.Send(NetworkDestination.Clients);

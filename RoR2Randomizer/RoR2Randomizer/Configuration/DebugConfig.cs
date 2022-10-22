@@ -15,14 +15,14 @@ namespace RoR2Randomizer.Configuration
         public readonly EnumConfigValue<DebugMode> CharacterDebugMode;
         public readonly StringConfigValue ForcedMasterName;
 
-        public readonly BoolConfigValue AllowSelfNetworkJoin;
+        public readonly BoolConfigValue AllowLocalhostConnect;
 
         public DebugConfig(ConfigFile file) : base("Debug", file)
         {
             CharacterDebugMode = new EnumConfigValue<DebugMode>(getEntry("Character Debug Mode", DebugMode.None));
             ForcedMasterName = new StringConfigValue(getEntry("Forced Master Name", string.Empty));
 
-            AllowSelfNetworkJoin = new BoolConfigValue(getEntry("Allow Self Network Join", false));
+            AllowLocalhostConnect = new BoolConfigValue(getEntry("Allow Localhost Connect", false));
         }
     }
 }
