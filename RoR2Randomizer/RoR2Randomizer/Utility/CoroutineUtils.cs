@@ -15,8 +15,6 @@ namespace RoR2Randomizer.Utility
 
             while (baseRoutine.MoveNext())
             {
-                yield return baseRoutine.Current;
-
                 float elapsed = Time.unscaledTime - timeStarted;
                 if (elapsed >= timeout)
                 {
@@ -29,6 +27,8 @@ namespace RoR2Randomizer.Utility
 
                     yield break;
                 }
+
+                yield return baseRoutine.Current;
             }
 
             if (result != null)
