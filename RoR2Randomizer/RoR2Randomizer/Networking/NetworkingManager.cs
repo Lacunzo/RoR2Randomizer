@@ -87,7 +87,7 @@ namespace RoR2Randomizer.Networking
         static void NetworkUser_onPostNetworkUserStart(NetworkUser networkUser)
         {
             // Run instance exists, this client joined mid-run
-            if (NetworkServer.active && Run.instance)
+            if (NetworkServer.active && !NetworkServer.dontListen && Run.instance)
             {
                 foreach (NetworkMessageBase message in collectAllMessages(false))
                 {
@@ -112,7 +112,7 @@ namespace RoR2Randomizer.Networking
 
         static void runStart(Run _)
         {
-            if (!NetworkServer.active)
+            if (!NetworkServer.active || NetworkServer.dontListen)
                 return;
 
             foreach (NetworkMessageBase message in collectAllMessages(true))
