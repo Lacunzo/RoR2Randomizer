@@ -87,6 +87,16 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                     }
 
                     return true;
+                }, static (key, value) =>
+                {
+                    float weight = 1f;
+
+                    if (key.isDebuff != value.isDebuff)
+                    {
+                        weight *= ConfigManager.BuffRandomizer.SwapBuffDebuffWeightMult;
+                    }
+
+                    return weight;
                 });
 
                 result = IndexReplacementsCollection.Create(dict, BuffCatalog.buffCount);

@@ -18,7 +18,7 @@ namespace RoR2Randomizer.Configuration.ConfigValue
             _type = type;
             _min = min;
             _max = max;
-            _format = format;
+            _format = string.IsNullOrEmpty(format) ? "{0}" : "{0:" + format + "}";
             _increment = increment;
         }
 
@@ -26,7 +26,7 @@ namespace RoR2Randomizer.Configuration.ConfigValue
         {
         }
 
-        public SliderConfigValue(ConfigEntry<T> entry, SliderType type, float min, float max) : this(entry, type, min, max, "{0:F1}")
+        public SliderConfigValue(ConfigEntry<T> entry, SliderType type, float min, float max) : this(entry, type, min, max, "F1")
         {
         }
 
