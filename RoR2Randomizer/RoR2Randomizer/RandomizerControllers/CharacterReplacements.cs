@@ -10,6 +10,7 @@ using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.CharacterReplacements;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -127,7 +128,7 @@ namespace RoR2Randomizer.RandomizerControllers
             }).Distinct().Select(go => (int)MasterCatalog.FindMasterIndex(go)).ToArray();
 
             _instance = new CharacterReplacements();
-            NetworkingManager.RegisterMessageProvider(_instance);
+            NetworkingManager.RegisterMessageProvider(_instance, MessageProviderFlags.Persistent);
 
             SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
 
@@ -156,7 +157,7 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public bool SendMessages => _masterIndexReplacements.HasValue;
 
-        public IEnumerable<INetMessage> GetNetMessages()
+        public IEnumerable<NetworkMessageBase> GetNetMessages()
         {
 #if DEBUG
             Log.Debug($"Sending {nameof(SyncCharacterMasterReplacements)} to clients");

@@ -1,6 +1,7 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Networking.BossRandomizer;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.CharacterReplacements
 {
-    public sealed class SyncCharacterMasterReplacements : INetMessage
+    public sealed class SyncCharacterMasterReplacements : NetworkMessageBase
     {
         public delegate void OnReceivedDelegate(IndexReplacementsCollection masterReplacements);
         public static event OnReceivedDelegate OnReceive;
@@ -26,17 +27,17 @@ namespace RoR2Randomizer.Networking.CharacterReplacements
             _masterReplacements = masterReplacements;
         }
 
-        void ISerializableObject.Serialize(NetworkWriter writer)
+        public override void Serialize(NetworkWriter writer)
         {
             _masterReplacements.Serialize(writer);
         }
 
-        void ISerializableObject.Deserialize(NetworkReader reader)
+        public override void Deserialize(NetworkReader reader)
         {
             _masterReplacements = IndexReplacementsCollection.Deserialize(reader);
         }
 
-        void INetMessage.OnReceived()
+        public override void OnReceived()
         {
             if (NetworkServer.active)
             {

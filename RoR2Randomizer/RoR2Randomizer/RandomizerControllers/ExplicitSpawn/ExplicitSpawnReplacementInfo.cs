@@ -3,6 +3,7 @@ using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
+using RoR2Randomizer.Networking.Generic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,11 +36,11 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         CharacterMaster _cachedMasterPrefab;
         protected override CharacterMaster originalMasterPrefab => _cachedMasterPrefab;
 
-        protected override void initializeServer()
-        {
-            base.initializeServer();
+        protected override bool isNetworked => true;
 
-            new SyncExplicitSpawnReplacement(_master.gameObject, _originalMasterIndex).SendTo(NetworkDestination.Clients);
+        protected override IEnumerable<NetworkMessageBase> getNetMessages()
+        {
+            yield return new SyncExplicitSpawnReplacement(_master.gameObject, _originalMasterIndex);
         }
 
         protected override void initializeClient()

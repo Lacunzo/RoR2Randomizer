@@ -1,5 +1,6 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.RandomizerControllers.Projectile;
 using RoR2Randomizer.Utility;
 using System;
@@ -9,7 +10,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.ProjectileRandomizer
 {
-    public sealed class SyncProjectileReplacements : INetMessage
+    public sealed class SyncProjectileReplacements : NetworkMessageBase
     {
         public delegate void OnReceiveDelegate(IndexReplacementsCollection projectileReplacements);
 
@@ -26,17 +27,17 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
             _projectileReplacements = projectileReplacements;
         }
 
-        void ISerializableObject.Serialize(NetworkWriter writer)
+        public override void Serialize(NetworkWriter writer)
         {
             _projectileReplacements.Serialize(writer);
         }
 
-        void ISerializableObject.Deserialize(NetworkReader reader)
+        public override void Deserialize(NetworkReader reader)
         {
             _projectileReplacements = IndexReplacementsCollection.Deserialize(reader);
         }
 
-        void INetMessage.OnReceived()
+        public override void OnReceived()
         {
             if (NetworkServer.active)
             {

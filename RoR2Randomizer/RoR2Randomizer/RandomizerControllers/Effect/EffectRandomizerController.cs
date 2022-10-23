@@ -4,6 +4,7 @@ using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.EffectRandomizer;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
 
         protected override bool isNetworked => true;
 
-        protected override IEnumerable<INetMessage> getNetMessages()
+        protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
 #if DEBUG
             Log.Debug($"Sending {nameof(SyncEffectReplacements)} to clients");

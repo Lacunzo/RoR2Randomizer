@@ -111,9 +111,6 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void SyncBossReplacementCharacter_OnReceive(GameObject masterObject, BossReplacementType replacementType)
             {
-                if (VoidlingPhaseTracker.Instance == null || !VoidlingPhaseTracker.Instance.IsInFight)
-                    return;
-
                 switch (replacementType)
                 {
                     case BossReplacementType.VoidlingPhase1:

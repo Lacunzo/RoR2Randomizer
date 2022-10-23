@@ -52,11 +52,11 @@ namespace RoR2Randomizer.Utility
                     Networking.Debug.SyncConsoleLog syncConsoleLog = new Networking.Debug.SyncConsoleLog(message, type, networkUser.id);
                     if (NetworkServer.active)
                     {
-                        syncConsoleLog.Send(NetworkDestination.Clients);
+                        syncConsoleLog.SendTo(NetworkDestination.Clients);
                     }
                     else if (NetworkClient.active)
                     {
-                        syncConsoleLog.Send(NetworkDestination.Server);
+                        syncConsoleLog.SendTo(NetworkDestination.Server);
                     }
                 }
             }

@@ -1,7 +1,10 @@
 ﻿using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.BossRandomizer;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
 using System;
 using System.Collections;
@@ -12,7 +15,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers
 {
-    public abstract class CharacterReplacementInfo : MonoBehaviour
+    public abstract class CharacterReplacementInfo : MonoBehaviour, INetMessageProvider
     {
         bool _initializeOnEnable;
 
@@ -35,9 +38,25 @@ namespace RoR2Randomizer.RandomizerControllers
             }
         }
 
+        protected abstract bool isNetworked { get; }
+        bool INetMessageProvider.SendMessages => isNetworked;
+
         void Awake()
         {
             _master = GetComponent<CharacterMaster>();
+
+            if (isNetworked)
+            {
+                NetworkingManager.RegisterMessageProvider(this);
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (isNetworked)
+            {
+                NetworkingManager.UnregisterMessageProvider(this);
+            }
         }
 
         void Start()
@@ -142,6 +161,22 @@ namespace RoR2Randomizer.RandomizerControllers
 
         protected virtual void initializeServer()
         {
+            if (isNetworked)
+            {
+                foreach (NetworkMessageBase message in getNetMessages())
+                {
+                    message.SendTo(NetworkDestination.Clients);
+                }
+            }
+        }
+
+        protected virtual IEnumerable<NetworkMessageBase> getNetMessages()
+        {
+            yield break;
+        }
+        IEnumerable<NetworkMessageBase> INetMessageProvider.GetNetMessages()
+        {
+            return getNetMessages();
         }
     }
 }

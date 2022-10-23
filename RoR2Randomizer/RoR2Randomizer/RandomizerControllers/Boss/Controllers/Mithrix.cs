@@ -79,9 +79,6 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
             static void SyncBossReplacementCharacter_OnReceive(GameObject masterObject, BossReplacementType replacementType)
             {
-                if (MithrixPhaseTracker.Instance == null || !MithrixPhaseTracker.Instance.IsInFight)
-                    return;
-
                 switch (replacementType)
                 {
                     case BossReplacementType.MithrixNormal:

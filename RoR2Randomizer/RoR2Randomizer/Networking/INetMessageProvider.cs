@@ -1,4 +1,5 @@
 ﻿using R2API.Networking.Interfaces;
+using RoR2Randomizer.Networking.Generic;
 using System.Collections.Generic;
 
 namespace RoR2Randomizer.Networking
@@ -7,6 +8,6 @@ namespace RoR2Randomizer.Networking
     {
         bool SendMessages { get; }
 
-        IEnumerable<INetMessage> GetNetMessages();
+        IEnumerable<NetworkMessageBase> GetNetMessages();
     }
 }

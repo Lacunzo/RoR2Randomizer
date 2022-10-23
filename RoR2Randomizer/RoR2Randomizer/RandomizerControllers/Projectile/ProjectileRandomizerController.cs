@@ -3,6 +3,7 @@ using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.Projectile;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
@@ -105,7 +106,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         protected override bool isNetworked => true;
 
-        protected override IEnumerable<INetMessage> getNetMessages()
+        protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
 #if DEBUG
             Log.Debug($"Sending {nameof(SyncProjectileReplacements)} to clients");

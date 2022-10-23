@@ -1,5 +1,6 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2Randomizer.Networking;
+using RoR2Randomizer.Networking.Generic;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,15 +18,15 @@ namespace RoR2Randomizer.RandomizerControllers
         {
             if (isNetworked)
             {
-                NetworkingManager.RegisterMessageProvider(this);
+                NetworkingManager.RegisterMessageProvider(this, MessageProviderFlags.Persistent);
             }
         }
 
-        IEnumerable<INetMessage> INetMessageProvider.GetNetMessages()
+        IEnumerable<NetworkMessageBase> INetMessageProvider.GetNetMessages()
         {
             return getNetMessages();
         }
-        protected virtual IEnumerable<INetMessage> getNetMessages()
+        protected virtual IEnumerable<NetworkMessageBase> getNetMessages()
         {
             yield break;
         }

@@ -3,7 +3,9 @@ using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.BossRandomizer;
+using RoR2Randomizer.Networking.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -17,6 +19,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         protected abstract BossReplacementType replacementType { get; }
 
         protected virtual bool replaceBossDropEvenIfExisting => false;
+
+        protected override bool isNetworked => true;
 
         protected override void bodyResolved()
         {
@@ -53,17 +57,13 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
             }
         }
 
-        protected override void initializeServer()
+        protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
 #if DEBUG
-            Log.Debug($"{nameof(BaseBossReplacement)} {nameof(initializeServer)}");
+            Log.Debug($"Sending {nameof(SyncBossReplacementCharacter)} to clients");
 #endif
 
-            new SyncBossReplacementCharacter(_master.gameObject, replacementType).SendTo(NetworkDestination.Clients);
-
-#if DEBUG
-            Log.Debug($"Sent {nameof(SyncBossReplacementCharacter)} to clients");
-#endif
+            yield return new SyncBossReplacementCharacter(_master.gameObject, replacementType);
         }
 
         protected void setBodySubtitleIfNull(string subtitleToken)

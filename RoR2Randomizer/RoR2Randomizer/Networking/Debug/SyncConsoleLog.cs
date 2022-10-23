@@ -2,6 +2,7 @@
 using BepInEx.Logging;
 using R2API.Networking.Interfaces;
 using RoR2;
+using RoR2Randomizer.Networking.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.Debug
 {
-    public class SyncConsoleLog : INetMessage
+    public class SyncConsoleLog : NetworkMessageBase
     {
         LogLevel _logLevel;
         NetworkUserId _fromClient;
@@ -29,21 +30,21 @@ namespace RoR2Randomizer.Networking.Debug
             _log = log;
         }
 
-        void ISerializableObject.Serialize(NetworkWriter writer)
+        public override void Serialize(NetworkWriter writer)
         {
             writer.Write((int)_logLevel);
             GeneratedNetworkCode._WriteNetworkUserId_None(writer, _fromClient);
             writer.Write(_log);
         }
 
-        void ISerializableObject.Deserialize(NetworkReader reader)
+        public override void Deserialize(NetworkReader reader)
         {
             _logLevel = (LogLevel)reader.ReadInt32();
             _fromClient = GeneratedNetworkCode._ReadNetworkUserId_None(reader);
             _log = reader.ReadString();
         }
 
-        void INetMessage.OnReceived()
+        public override void OnReceived()
         {
             if (_fromClient.HasValidValue())
             {

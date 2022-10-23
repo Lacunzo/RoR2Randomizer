@@ -10,7 +10,7 @@ using UnityModdingUtility;
 
 namespace RoR2Randomizer.Networking.Generic
 {
-    public abstract class SyncGameObjectReference : INetMessage
+    public abstract class SyncGameObjectReference : NetworkMessageBase
     {
         const float OBJECT_WAIT_TIMEOUT = 2f;
 
@@ -77,7 +77,7 @@ namespace RoR2Randomizer.Networking.Generic
 #endif
         }
 
-        static IEnumerator waitForNetIdThenSend(SyncGameObjectReference message, Action<SyncGameObjectReference> sendMessageFunc)
+        static IEnumerator waitForNetIdThenSend(SyncGameObjectReference message, Action sendMessageFunc)
         {
             CoroutineOut<NetworkInstanceId?> netId = new CoroutineOut<NetworkInstanceId?>();
             yield return waitForNetIdInitialized(message._obj, netId);
@@ -85,7 +85,7 @@ namespace RoR2Randomizer.Networking.Generic
             if (netId.Result.HasValue)
             {
                 message._objectId = netId.Result.Value;
-                sendMessageFunc(message);
+                sendMessageFunc();
             }
 #if DEBUG
             else
@@ -95,22 +95,22 @@ namespace RoR2Randomizer.Networking.Generic
 #endif
         }
 
-        public void SendTo(NetworkDestination destination)
+        public override void SendTo(NetworkDestination destination)
         {
-            Main.Instance.StartCoroutine(waitForNetIdThenSend(this, m => m.Send(destination)));
+            Main.Instance.StartCoroutine(waitForNetIdThenSend(this, () => base.SendTo(destination)));
         }
 
-        public void SendTo(NetworkConnection target)
+        public override void SendTo(NetworkConnection target)
         {
-            Main.Instance.StartCoroutine(waitForNetIdThenSend(this, m => m.Send(target)));
+            Main.Instance.StartCoroutine(waitForNetIdThenSend(this, () => base.SendTo(target)));
         }
 
-        public virtual void Serialize(NetworkWriter writer)
+        public override void Serialize(NetworkWriter writer)
         {
             writer.Write(_objectId);
         }
 
-        public virtual void Deserialize(NetworkReader reader)
+        public override void Deserialize(NetworkReader reader)
         {
             _objectId = reader.ReadNetworkId();
         }
@@ -140,7 +140,7 @@ namespace RoR2Randomizer.Networking.Generic
             onReceivedObjectResolved(obj);
         }
 
-        void INetMessage.OnReceived()
+        public override void OnReceived()
         {
 #if DEBUG
             Log.Debug($"{nameof(SyncGameObjectReference)} received");

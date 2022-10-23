@@ -3,6 +3,7 @@ using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.Networking;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.EffectRandomizer
 {
-    public sealed class SyncEffectReplacements : INetMessage
+    public sealed class SyncEffectReplacements : NetworkMessageBase
     {
         public delegate void OnCompleteMessageReceivedDelegate(IndexReplacementsCollection effectReplacements);
         public static event OnCompleteMessageReceivedDelegate OnCompleteMessageReceived;
@@ -148,17 +149,17 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
             }
         }
 
-        void ISerializableObject.Serialize(NetworkWriter writer)
+        public override void Serialize(NetworkWriter writer)
         {
             _chunk.Serialize(writer);
         }
 
-        void ISerializableObject.Deserialize(NetworkReader reader)
+        public override void Deserialize(NetworkReader reader)
         {
             _chunk = EffectReplacementMessageChunk.Deserialize(reader);
         }
 
-        void INetMessage.OnReceived()
+        public override void OnReceived()
         {
 #if DEBUG
             Log.Debug($"{nameof(SyncEffectReplacements)} received ({_chunk})");
