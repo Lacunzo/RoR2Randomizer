@@ -32,25 +32,24 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                 BuffCatalog.FindBuffIndex("bdImmune"),
                 BuffCatalog.FindBuffIndex("bdIntangible"),
                 BuffCatalog.FindBuffIndex("bdBearVoidReady")
-            };
+            }.OrderBy(i => i).ToArray();
 
             _buffToDotIndex = new Dictionary<BuffIndex, DotController.DotIndex>();
-
             for (int i = 0; i < DotController.dotDefs.Length; i++)
             {
                 DotController.DotDef dotDef = DotController.dotDefs[i];
-                if (dotDef != null)
-                {
-                    BuffDef buffDef = dotDef.associatedBuff;
-                    if (buffDef)
-                    {
-                        BuffIndex buffIndex = buffDef.buffIndex;
-                        if (!_buffToDotIndex.ContainsKey(buffIndex))
-                        {
-                            _buffToDotIndex[buffIndex] = (DotController.DotIndex)i;
-                        }
-                    }
-                }
+                if (dotDef == null)
+                    continue;
+
+                BuffDef buffDef = dotDef.associatedBuff;
+                if (!buffDef)
+                    continue;
+
+                BuffIndex buffIndex = buffDef.buffIndex;
+                if (_buffToDotIndex.ContainsKey(buffIndex))
+                    continue;
+                
+                _buffToDotIndex.Add(buffIndex, (DotController.DotIndex)i);
             }
         }
 
@@ -66,7 +65,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             if (shouldBeActive)
             {
                 IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None &&
-                   (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.IndexOf(_invincibilityBuffs, b.buffIndex) == -1));
+                   (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.BinarySearch(_invincibilityBuffs, b.buffIndex) < 0));
 
 #if DEBUG
                 foreach (BuffDef excludedBuff in BuffCatalog.buffDefs.Except(buffsToRandomize))
@@ -75,7 +74,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                 }
 #endif
 
-                ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, b => b.buffIndex, (key, value) =>
+                ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, b => b.buffIndex, static (key, value) =>
                 {
                     if (!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs && key.isDebuff != value.isDebuff)
                     {
