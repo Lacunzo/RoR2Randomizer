@@ -1,5 +1,6 @@
 ﻿using R2API.Networking;
 using R2API.Networking.Interfaces;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,53 +29,51 @@ namespace RoR2Randomizer.Networking.Generic
 
         static IEnumerator waitForNetIdInitialized(GameObject obj, CoroutineOut<NetworkInstanceId?> netId)
         {
-            const string LOG_PREFIX = $"{nameof(SyncGameObjectReference)}.{nameof(waitForNetIdInitialized)} ";
-
-            float timeStarted = Time.unscaledTime;
-
-            while (obj && !obj.activeInHierarchy)
+            static IEnumerator baseTask(GameObject obj, CoroutineOut<NetworkInstanceId?> netId)
             {
-                yield return 0;
-
-                if (Time.unscaledTime - timeStarted >= OBJECT_WAIT_TIMEOUT)
-                    yield break;
-            }
-
-            if (!obj)
-                yield break;
+                const string LOG_PREFIX = $"{nameof(SyncGameObjectReference)}.{nameof(waitForNetIdInitialized)} ";
 
 #if DEBUG
-            Log.Debug(LOG_PREFIX + $"waited {Time.unscaledTime - timeStarted:F2} seconds for object enabled");
+                float timeStarted = Time.unscaledTime;
 #endif
 
-            NetworkIdentity netIdentity = null;
-            while (obj && !(netIdentity = obj.GetComponent<NetworkIdentity>()))
-            {
-                yield return 0;
+                while (obj && !obj.activeInHierarchy)
+                {
+                    yield return 0;
+                }
 
-                if (Time.unscaledTime - timeStarted >= OBJECT_WAIT_TIMEOUT)
+                if (!obj)
                     yield break;
-            }
-
-            if (!obj)
-                yield break;
-
-            while (netIdentity && netIdentity.netId.IsEmpty())
-            {
-                yield return 0;
-
-                if (Time.unscaledTime - timeStarted >= OBJECT_WAIT_TIMEOUT)
-                    yield break;
-            }
-
-            if (!netIdentity)
-                yield break;
-
-            netId.Result = netIdentity.netId;
 
 #if DEBUG
-            Log.Debug(LOG_PREFIX + $"waited {Time.unscaledTime - timeStarted:F2} seconds for object net init");
+                Log.Debug(LOG_PREFIX + $"waited {Time.unscaledTime - timeStarted:F2} seconds for object {obj} enabled");
 #endif
+
+                NetworkIdentity netIdentity = null;
+                while (obj && !(netIdentity = obj.GetComponent<NetworkIdentity>()))
+                {
+                    yield return 0;
+                }
+
+                if (!obj)
+                    yield break;
+
+                while (netIdentity && netIdentity.netId.IsEmpty())
+                {
+                    yield return 0;
+                }
+
+                if (!netIdentity)
+                    yield break;
+
+                netId.Result = netIdentity.netId;
+
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"waited {Time.unscaledTime - timeStarted:F2} seconds for object {obj} net init");
+#endif
+            }
+
+            return baseTask(obj, netId).AddTimeout(OBJECT_WAIT_TIMEOUT);
         }
 
         static IEnumerator waitForNetIdThenSend(SyncGameObjectReference message, Action sendMessageFunc)
@@ -117,27 +116,26 @@ namespace RoR2Randomizer.Networking.Generic
 
         IEnumerator waitForObjectResolved()
         {
-            float timeStarted = Time.unscaledTime;
-
-            GameObject obj;
-            while (!(obj = ClientScene.FindLocalObject(_objectId)))
+            IEnumerator baseTask()
             {
-                yield return 0;
-
-                if (Time.unscaledTime - timeStarted >= OBJECT_WAIT_TIMEOUT)
-                {
 #if DEBUG
-                    Log.Warning($"{nameof(SyncGameObjectReference)} Timed out resolving object with ID {_objectId}");
+                float timeStarted = Time.unscaledTime;
 #endif
-                    yield break;
+
+                GameObject obj;
+                while (!(obj = ClientScene.FindLocalObject(_objectId)))
+                {
+                    yield return 0;
                 }
+
+#if DEBUG
+                Log.Debug($"{nameof(SyncGameObjectReference)} waited {Time.unscaledTime - timeStarted:F2} seconds for object ({obj})");
+#endif
+
+                onReceivedObjectResolved(obj);
             }
 
-#if DEBUG
-            Log.Debug($"{nameof(SyncGameObjectReference)} waited {Time.unscaledTime - timeStarted:F2} seconds for object");
-#endif
-
-            onReceivedObjectResolved(obj);
+            return baseTask().AddTimeout(OBJECT_WAIT_TIMEOUT);
         }
 
         public override void OnReceived()
