@@ -34,10 +34,21 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.4 Changes:**
+
+* Summon Randomizer:
+  * Added Void allies spawned by Newly Hatched Zoea to Summon Randomizer.
+
+* Status Effect Randomizer:
+  * Added option to control how likely a buff is to be randomized into a debuff and vice versa.
+
+* Mod Compatibility:
+  * Improved [DropInMultiplayer](https://thunderstore.io/package/niwith/DropinMultiplayer/) Compatibility
+
 **0.5.3 Changes:**
 
 * Stage Randomizer:
-  * Added Stages to pool:
+  * Added stages to pool:
     * Old Commencement
     * ai_test
     * testscene
