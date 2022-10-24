@@ -34,7 +34,7 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
             if (NetworkServer.active)
             {
-                if (SendMessages)
+                if (SendMessages && !NetworkServer.dontListen)
                 {
                     foreach (NetworkMessageBase message in GetNetMessages())
                     {

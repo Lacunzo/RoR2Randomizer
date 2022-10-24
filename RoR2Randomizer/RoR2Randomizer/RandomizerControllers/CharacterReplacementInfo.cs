@@ -161,7 +161,7 @@ namespace RoR2Randomizer.RandomizerControllers
 
         protected virtual void initializeServer()
         {
-            if (isNetworked)
+            if (isNetworked && !NetworkServer.dontListen)
             {
                 foreach (NetworkMessageBase message in getNetMessages())
                 {
