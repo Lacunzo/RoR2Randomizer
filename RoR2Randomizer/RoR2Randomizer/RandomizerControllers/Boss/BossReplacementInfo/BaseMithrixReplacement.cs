@@ -26,7 +26,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
                     (Caches.Bodies.VoidlingPhase2 != BodyIndex.None && _body.bodyIndex == Caches.Bodies.VoidlingPhase2) ||
                     (Caches.Bodies.VoidlingPhase3 != BodyIndex.None && _body.bodyIndex == Caches.Bodies.VoidlingPhase3))
                 {
-                    _body.transform.position += new Vector3(0f, 25f, 0f);
+                    TeleportHelper.TeleportBody(_body, _body.transform.position + new Vector3(0f, 25f, 0f));
                 }
             }
         }
