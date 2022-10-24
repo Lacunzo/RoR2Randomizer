@@ -34,6 +34,11 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.5 Changes:**
+
+* Status Effect Randomizer:
+  * Fixed Randomized Timed Buffs not ending.
+
 **0.5.4 Changes:**
 
 * Summon Randomizer:
