@@ -100,9 +100,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         });
 
         static bool shouldBeActive => NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled;
-        static bool isActive => (shouldBeActive || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
+        public static bool IsActive => (shouldBeActive || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
 
-        public override bool IsRandomizerEnabled => isActive;
+        public override bool IsRandomizerEnabled => IsActive;
 
         protected override bool isNetworked => true;
 
@@ -158,35 +158,45 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static void TryOverrideProjectilePrefab(ref GameObject prefab)
         {
-            if (isActive)
+            if (IsActive)
             {
                 int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
-                if (originalIndex != -1)
+                if (originalIndex != -1 && TryGetOverrideProjectileIndex(originalIndex, out int replacementIndex))
                 {
-                    int replacementIndex;
-                    if (
-#if DEBUG
-                        getDebugProjectileReplacement(originalIndex, out replacementIndex) ||
-#endif
-                        _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
+                    GameObject replacementPrefab = ProjectileCatalog.GetProjectilePrefab(replacementIndex);
+                    if (replacementPrefab)
                     {
-                        GameObject replacementPrefab = ProjectileCatalog.GetProjectilePrefab(replacementIndex);
-                        if (replacementPrefab)
-                        {
 #if DEBUG
-                            Log.Debug($"Projectile randomizer: Replaced projectile: {prefab.name} ({originalIndex}) -> {replacementPrefab.name} ({replacementIndex})");
+                        Log.Debug($"Projectile randomizer: Replaced projectile: {prefab.name} ({originalIndex}) -> {replacementPrefab.name} ({replacementIndex})");
 #endif
 
-                            prefab = replacementPrefab;
-                        }
+                        prefab = replacementPrefab;
                     }
                 }
             }
         }
 
+        public static bool TryGetOverrideProjectileIndex(int originalIndex, out int replacementIndex)
+        {
+            if (IsActive)
+            {
+                if (
+#if DEBUG
+                    getDebugProjectileReplacement(originalIndex, out replacementIndex) ||
+#endif
+                    _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
+                {
+                    return true;
+                }
+            }
+
+            replacementIndex = -1;
+            return false;
+        }
+
         public static bool TryGetOriginalProjectileIndex(int replacementIndex, out int originalIndex)
         {
-            if (isActive && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
+            if (IsActive && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
             {
                 return true;
             }
