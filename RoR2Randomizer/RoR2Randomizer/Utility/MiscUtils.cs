@@ -40,7 +40,7 @@ namespace RoR2Randomizer.Utility
 #if DEBUG
         public static void TryNetworkLog(string message, LogLevel type)
         {
-            if (Configuration.ConfigManager.Debug.AllowLocalhostConnect)
+            if (Configuration.ConfigManager.Debug.AllowLocalhostConnect || NetworkServer.dontListen)
                 return;
 
             LocalUser localUser = LocalUserManager.GetFirstLocalUser();
