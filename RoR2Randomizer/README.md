@@ -34,6 +34,14 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.6 Changes:**
+
+* Boss Randomizer:
+  * Fixed Voidling replacing Mithrix sometimes spawning in the ground.
+
+* Projectile Randomizer:
+  * Fixed game sometimes freezing indefinitely after an Overloading character attacks.
+
 **0.5.5 Changes:**
 
 * Status Effect Randomizer:
