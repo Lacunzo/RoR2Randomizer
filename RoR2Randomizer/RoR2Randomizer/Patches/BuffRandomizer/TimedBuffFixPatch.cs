@@ -21,9 +21,11 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
         static void CharacterBody_UpdateBuffs(On.RoR2.CharacterBody.orig_UpdateBuffs orig, CharacterBody self, float deltaTime)
         {
             BuffIndexPatch.SkipPatchCount++;
+            GetBuffIndex_BuffIndex_ReplacePatch.ForceDisable = true;
 
             orig(self, deltaTime);
 
+            GetBuffIndex_BuffIndex_ReplacePatch.ForceDisable = false;
             BuffIndexPatch.SkipPatchCount--;
         }
     }

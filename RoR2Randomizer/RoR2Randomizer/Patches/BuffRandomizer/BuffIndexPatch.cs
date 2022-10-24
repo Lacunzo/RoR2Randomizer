@@ -1,7 +1,10 @@
-﻿using MonoMod.Cil;
+﻿using Mono.Cecil;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.Buff;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.BuffRandomizer
@@ -11,37 +14,123 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
     {
         public static uint SkipPatchCount = 0;
 
+        static ILHook[] CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches;
+
+        static float? _currentAddTimedBuffDuration;
+
         static void Apply()
         {
             On.RoR2.CharacterBody.SetBuffCount += CharacterBody_SetBuffCount;
 
+            IL.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += IL_CharacterBody_AddTimedBuff_BuffDef_float;
+            On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += On_CharacterBody_AddTimedBuff_BuffDef_float;
+
             IL.RoR2.CharacterBody.AddBuff_BuffIndex += replaceReadBuffCountFromArray;
             IL.RoR2.CharacterBody.RemoveBuff_BuffIndex += replaceReadBuffCountFromArray;
+        }
 
-#if DEBUG
-            On.RoR2.CharacterBody.RemoveBuff_BuffDef += CharacterBody_RemoveBuff_BuffDef;
-#endif
+        static void On_CharacterBody_AddTimedBuff_BuffDef_float(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
+        {
+            _currentAddTimedBuffDuration = duration;
+            orig(self, buffDef, duration);
+            _currentAddTimedBuffDuration = null;
         }
 
         static void Cleanup()
         {
             On.RoR2.CharacterBody.SetBuffCount -= CharacterBody_SetBuffCount;
 
+            IL.RoR2.CharacterBody.AddTimedBuff_BuffDef_float -= IL_CharacterBody_AddTimedBuff_BuffDef_float;
+            On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float -= On_CharacterBody_AddTimedBuff_BuffDef_float;
+
             IL.RoR2.CharacterBody.AddBuff_BuffIndex -= replaceReadBuffCountFromArray;
             IL.RoR2.CharacterBody.RemoveBuff_BuffIndex -= replaceReadBuffCountFromArray;
 
-#if DEBUG
-            On.RoR2.CharacterBody.RemoveBuff_BuffDef -= CharacterBody_RemoveBuff_BuffDef;
-#endif
+            if (CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches != null)
+            {
+                foreach (ILHook hook in CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches)
+                {
+                    hook?.Undo();
+                }
+            }
         }
 
-#if DEBUG
-        static void CharacterBody_RemoveBuff_BuffDef(On.RoR2.CharacterBody.orig_RemoveBuff_BuffDef orig, CharacterBody self, BuffDef buffDef)
+        static void IL_CharacterBody_AddTimedBuff_BuffDef_float(ILContext il)
         {
-            Log.LogType("CharacterBody_RemoveBuff_BuffDef on client stacktrace: " + new System.Diagnostics.StackTrace().ToString(), BepInEx.Logging.LogLevel.Debug);
-            orig(self, buffDef);
+            const string LOG_PREFIX = $"{nameof(BuffIndexPatch)}.{nameof(IL_CharacterBody_AddTimedBuff_BuffDef_float)} ";
+
+            static BuffIndex simpleReplaceBuffIndex(BuffIndex original)
+            {
+                if (SkipPatchCount == 0 && BuffRandomizerController.IsActive)
+                {
+                    BuffRandomizerController.TryReplaceBuffIndex(ref original);
+                }
+
+                return original;
+            }
+
+            ILCursor c = new ILCursor(il);
+
+            while (c.TryGotoNext(x => x.MatchStfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
+            {
+                c.EmitDelegate(simpleReplaceBuffIndex);
+
+                c.Index++;
+            }
+
+            c.Index = 0;
+            while (c.TryGotoNext(x => x.MatchLdfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
+            {
+                c.Index++;
+                c.EmitDelegate(simpleReplaceBuffIndex);
+            }
+
+            HashSet<MethodInfo> localFunctionsToHook = new HashSet<MethodInfo>();
+            c.Index = 0;
+            while (c.TryGotoNext(x => x.MatchCallOrCallvirt(out MethodReference method) && method.Name.StartsWith($"<{nameof(CharacterBody.AddTimedBuff)}>g__")))
+            {
+                MethodReference methodRef = (MethodReference)c.Next.Operand;
+                MethodInfo methodInfo = typeof(CharacterBody).GetMethod(methodRef.Name, BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+                if (methodInfo != null)
+                {
+                    localFunctionsToHook.Add(methodInfo);
+                }
+                else
+                {
+                    Log.Warning(LOG_PREFIX + $"unable to find method {methodRef.Name}");
+                }
+            }
+
+            if (CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches == null)
+            {
+                CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches = new ILHook[localFunctionsToHook.Count];
+                using (HashSet<MethodInfo>.Enumerator enumerator = localFunctionsToHook.GetEnumerator())
+                {
+                    ILHookConfig hookConfig = new ILHookConfig { ManualApply = false };
+                    for (int i = 0; enumerator.MoveNext(); i++)
+                    {
+                        CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches[i] = new ILHook(enumerator.Current, static il =>
+                        {
+                            ILCursor c = new ILCursor(il);
+
+                            while (c.TryGotoNext(x => x.MatchStfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
+                            {
+                                c.EmitDelegate(simpleReplaceBuffIndex);
+
+                                c.Index++;
+                            }
+
+                            c.Index = 0;
+                            while (c.TryGotoNext(x => x.MatchLdfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
+                            {
+                                c.Index++;
+                                c.EmitDelegate(simpleReplaceBuffIndex);
+                            }
+                        }, hookConfig);
+                    }
+                }
+            }
         }
-#endif
 
         static void CharacterBody_SetBuffCount(On.RoR2.CharacterBody.orig_SetBuffCount orig, CharacterBody self, BuffIndex buffType, int newCount)
         {
@@ -74,9 +163,15 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
                         DotRandomizerPatch.SkipApplyBuffCount++;
 
+                        float duration = _currentAddTimedBuffDuration ?? float.PositiveInfinity;
+
+#if DEBUG
+                        Log.Debug($"Applying randomized buff->DOT {dot}x{diff} for {duration} seconds");
+#endif
+
                         for (int i = 0; i < diff; i++)
                         {
-                            DotController.InflictDot(self.gameObject, attacker, dot);
+                            DotController.InflictDot(self.gameObject, attacker, dot, duration);
                         }
 
                         DotRandomizerPatch.SkipApplyBuffCount--;
