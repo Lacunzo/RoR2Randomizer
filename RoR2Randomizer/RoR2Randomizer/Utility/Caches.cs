@@ -68,12 +68,33 @@ namespace RoR2Randomizer.Utility
         {
             public static BodyIndex GrandparentBodyIndex { get; private set; } = BodyIndex.None;
 
+            public static BodyIndex VoidlingPhase1 { get; private set; } = BodyIndex.None;
+
+            public static BodyIndex VoidlingPhase2 { get; private set; } = BodyIndex.None;
+
+            public static BodyIndex VoidlingPhase3 { get; private set; } = BodyIndex.None;
+
             [SystemInitializer(typeof(BodyCatalog))]
             static void Init()
             {
                 GrandparentBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.GRANDPARENT_NAME);
 #if DEBUG
                 if (GrandparentBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.GRANDPARENT_NAME}'");
+#endif
+
+                VoidlingPhase1 = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_1_NAME);
+#if DEBUG
+                if (VoidlingPhase1 == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_1_NAME}'");
+#endif
+
+                VoidlingPhase2 = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_2_NAME);
+#if DEBUG
+                if (VoidlingPhase2 == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_2_NAME}'");
+#endif
+
+                VoidlingPhase3 = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_3_NAME);
+#if DEBUG
+                if (VoidlingPhase3 == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_3_NAME}'");
 #endif
             }
         }

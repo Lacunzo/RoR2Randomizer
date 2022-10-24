@@ -31,6 +31,9 @@ namespace RoR2Randomizer.Utility
         public static class BodyNames
         {
             public const string GRANDPARENT_NAME = "GrandParentBody";
+            public const string VOIDLING_PHASE_1_NAME = "MiniVoidRaidCrabBodyPhase1";
+            public const string VOIDLING_PHASE_2_NAME = "MiniVoidRaidCrabBodyPhase2";
+            public const string VOIDLING_PHASE_3_NAME = "MiniVoidRaidCrabBodyPhase3";
         }
     }
 }
