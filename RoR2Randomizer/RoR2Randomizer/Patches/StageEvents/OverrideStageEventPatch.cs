@@ -1,9 +1,12 @@
 ﻿using HarmonyLib;
 using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using RoR2;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -14,14 +17,35 @@ namespace RoR2Randomizer.Patches.StageEvents
     {
         internal static DirectorCardCategorySelection ForcedCategorySelection;
 
+        static Hook[] canFamilyEventTriggerHooks;
+
         static void Apply()
         {
             IL.RoR2.ClassicStageInfo.RebuildCards += ClassicStageInfo_RebuildCards;
+
+            canFamilyEventTriggerHooks = (from type in typeof(Run).Assembly.GetTypes()
+                                          where typeof(Run).IsAssignableFrom(type)
+                                          let property = type.GetProperty("canFamilyEventTrigger", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                                          where property != null
+                                          select new Hook(property.GetMethod, Run_get_canFamilyEventTrigger)).ToArray();
         }
 
         static void Cleanup()
         {
             IL.RoR2.ClassicStageInfo.RebuildCards -= ClassicStageInfo_RebuildCards;
+
+            if (canFamilyEventTriggerHooks != null)
+            {
+                foreach (Hook hook in canFamilyEventTriggerHooks)
+                {
+                    hook?.Undo();
+                }
+            }
+        }
+
+        static bool Run_get_canFamilyEventTrigger(Func<Run, bool> orig, Run self)
+        {
+            return ForcedCategorySelection || orig(self);
         }
 
         static void ClassicStageInfo_RebuildCards(ILContext il)
