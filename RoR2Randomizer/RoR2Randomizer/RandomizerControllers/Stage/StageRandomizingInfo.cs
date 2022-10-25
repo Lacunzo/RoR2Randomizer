@@ -27,11 +27,9 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             BaseSelectionWeight = baseSelectionWeight;
         }
 
-#if DEBUG
         public override string ToString()
         {
             return $"{SceneCatalog.GetSceneDef(SceneIndex).cachedName} {nameof(Flags)}={Flags:F}";
         }
-#endif
     }
 }
