@@ -147,7 +147,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         replacement = _projectileIndicesToRandomize[_forcedProjectileIndex];
                         return true;
                     case DebugMode.Forced:
-                        return int.TryParse(ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Entry.Value.Trim(), out replacement);
+                        return (replacement = ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Parsed) >= 0;
                 }
             }
 

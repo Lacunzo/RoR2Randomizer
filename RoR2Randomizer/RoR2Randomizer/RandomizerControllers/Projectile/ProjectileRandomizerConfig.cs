@@ -13,7 +13,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     {
 #if DEBUG
         public readonly EnumConfigValue<DebugMode> DebugMode;
-        public readonly StringConfigValue ForcedProjectileIndex;
+        public readonly IntStringConfigValue ForcedProjectileIndex;
 #endif
 
         public ProjectileRandomizerConfig(ConfigFile file) : base("Projectile", file)
@@ -21,7 +21,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 #if DEBUG
             DebugMode = new EnumConfigValue<DebugMode>(getEntry("Debug Mode", RandomizerControllers.DebugMode.None));
 
-            ForcedProjectileIndex = new StringConfigValue(getEntry("Forced Projectile Index", "0"));
+            ForcedProjectileIndex = new IntStringConfigValue(getEntry("Forced Projectile Index", "0"), -1);
 #endif
         }
     }

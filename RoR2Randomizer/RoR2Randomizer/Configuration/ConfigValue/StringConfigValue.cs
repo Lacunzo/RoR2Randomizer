@@ -2,7 +2,7 @@
 
 namespace RoR2Randomizer.Configuration.ConfigValue
 {
-    public sealed class StringConfigValue : GenericConfigValue<string>
+    public class StringConfigValue : GenericConfigValue<string>
     {
         public StringConfigValue(ConfigEntry<string> entry) : base(entry)
         {

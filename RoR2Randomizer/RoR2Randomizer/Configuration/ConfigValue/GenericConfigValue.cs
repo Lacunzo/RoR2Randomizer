@@ -28,6 +28,12 @@ namespace RoR2Randomizer.Configuration.ConfigValue
             OnChange?.Invoke();
         }
 
+        public string GetSettingPath()
+        {
+            ConfigDefinition definition = Entry.Definition;
+            return $"{definition.Section}->{definition.Key}";
+        }
+
         public abstract void CreateRiskOfOptionsEntry();
 
         public static implicit operator T(GenericConfigValue<T> config)
