@@ -14,15 +14,14 @@ namespace RoR2Randomizer
             _logSource = logSource;
         }
 
-        [Conditional("DEBUG")]
+#if DEBUG
         internal static void Debug(string data)
         {
-#if DEBUG
             _logSource.LogDebug(data);
 
             MiscUtils.TryNetworkLog(data, LogLevel.Debug);
-#endif
         }
+#endif
 
         internal static void Error(string data)
         {

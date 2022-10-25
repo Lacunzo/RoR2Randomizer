@@ -141,7 +141,9 @@ namespace RoR2Randomizer.CustomContent
 
             if (_alwaysExecuteEnter && _enterExecuteTime < 0f)
             {
+#if DEBUG
                 Log.Debug("Attempting to exit state without OnEnter, executing enter now");
+#endif
                 onEnter(excludeEnterTypes);
             }
 
