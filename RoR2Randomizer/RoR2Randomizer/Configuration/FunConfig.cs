@@ -21,7 +21,7 @@ namespace RoR2Randomizer.Configuration
         static void Init()
         {
             const string DLC1_NAME = "DLC1";
-            DLC1 = ExpansionCatalog.expansionDefs.FirstOrDefault(e => e.name == DLC1_NAME);
+            DLC1 = ExpansionCatalog.expansionDefs.FirstOrDefault(static e => e.name == DLC1_NAME);
 #if DEBUG
             if (!DLC1) Log.Warning($"Unable to find {nameof(ExpansionDef)} {DLC1_NAME}");
 #endif
