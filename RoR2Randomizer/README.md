@@ -34,6 +34,14 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.7 Changes:**
+
+* Stage Randomizer:
+  * Fixed Old Commencement softlocking with no way out of the arena after defeating Mithrix.
+
+* Gup Mode:
+  * Added Gup Mode.
+
 **0.5.6 Changes:**
 
 * Boss Randomizer:

@@ -6,8 +6,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>disable</ImplicitUsings>
     <SignAssembly>False</SignAssembly>
-    <AssemblyVersion>0.5.6</AssemblyVersion>
-    <FileVersion>0.5.6</FileVersion>
+    <AssemblyVersion>0.5.7</AssemblyVersion>
+    <FileVersion>0.5.7</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
