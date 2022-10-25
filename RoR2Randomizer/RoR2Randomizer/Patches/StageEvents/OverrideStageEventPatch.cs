@@ -52,8 +52,6 @@ namespace RoR2Randomizer.Patches.StageEvents
             {
                 foundCursors[1].EmitDelegate(getCardSelectionPrefab);
             }
-
-            Log.Debug(il.ToString());
         }
     }
 }
