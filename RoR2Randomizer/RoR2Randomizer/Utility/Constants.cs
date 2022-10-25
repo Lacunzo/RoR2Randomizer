@@ -35,5 +35,10 @@ namespace RoR2Randomizer.Utility
             public const string VOIDLING_PHASE_2_NAME = "MiniVoidRaidCrabBodyPhase2";
             public const string VOIDLING_PHASE_3_NAME = "MiniVoidRaidCrabBodyPhase3";
         }
+
+        public static class MasterNames
+        {
+            public const string GUP_NAME = "GupMaster";
+        }
     }
 }

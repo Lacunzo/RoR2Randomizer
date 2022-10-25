@@ -88,7 +88,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate((Chat.NpcChatMessage originalMessage, CharacterSpeechController instance) =>
                 {
-                    if (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled && BossRandomizerController.Mithrix.IsReplacedPartOfMithrixFight(instance.characterMaster.gameObject))
+                    if (BossRandomizerController.Mithrix.IsEnabled && BossRandomizerController.Mithrix.IsReplacedPartOfMithrixFight(instance.characterMaster.gameObject))
                     {
                         return new OverrideMithrixChatMessage(originalMessage, instance.characterMaster);
                     }

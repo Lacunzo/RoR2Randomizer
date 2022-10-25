@@ -38,6 +38,8 @@ namespace RoR2Randomizer.Configuration
 
         public static PerformanceConfig Performance;
 
+        public static FunConfig Fun;
+
         public static MiscConfig Misc;
 
 #if DEBUG
@@ -61,6 +63,8 @@ namespace RoR2Randomizer.Configuration
             _allCategories.Sort((a, b) => a.CategoryName.CompareTo(b.CategoryName));
 
             _allCategories.Add(Performance = new PerformanceConfig(file));
+
+            _allCategories.Add(Fun = new FunConfig(file));
 
             _allCategories.Add(Misc = new MiscConfig(file));
 #if DEBUG

@@ -10,13 +10,14 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
     [RandomizerController]
     public sealed class ExplicitSpawnRandomizerController : BaseRandomizerController
     {
-        public override bool IsRandomizerEnabled => ConfigManager.ExplicitSpawnRandomizer.Enabled;
+        public override bool IsRandomizerEnabled => IsActive;
+        public static bool IsActive => ConfigManager.ExplicitSpawnRandomizer.Enabled || ConfigManager.Fun.GupModeActive;
 
         protected override bool isNetworked => false;
 
         public static MasterCatalog.MasterIndex GetOriginalMasterIndex(GameObject replacementObject)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (IsActive)
             {
                 if (replacementObject && replacementObject.TryGetComponent<CharacterMaster>(out CharacterMaster master) && master.masterIndex.isValid)
                 {
@@ -29,7 +30,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static MasterCatalog.MasterIndex GetOriginalMasterIndex(MasterCatalog.MasterIndex replacement)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (IsActive)
             {
                 return CharacterReplacements.GetOriginalMasterIndex(replacement);
             }
@@ -47,7 +48,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static bool TryReplaceSummon(ref GameObject prefab)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (IsActive)
             {
                 return CharacterReplacements.TryReplaceMasterPrefab(ref prefab);
             }
@@ -78,7 +79,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static MasterCatalog.MasterIndex GetSummonReplacement(MasterCatalog.MasterIndex original)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (IsActive)
             {
                 return CharacterReplacements.GetReplacementForMasterIndex(original);
             }
@@ -90,7 +91,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static bool TryGetReplacementMaster(CharacterMaster originalPrefab, out CharacterMaster replacementPrefab)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (IsActive)
             {
                 GameObject replacementPrefabObject = CharacterReplacements.GetReplacementMasterPrefab(originalPrefab.name);
                 if (replacementPrefabObject && replacementPrefabObject.TryGetComponent<CharacterMaster>(out replacementPrefab))
@@ -139,7 +140,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static void RegisterSpawnedReplacement(GameObject masterObject, MasterCatalog.MasterIndex originalMasterIndex)
         {
-            if ((!NetworkServer.active || ConfigManager.ExplicitSpawnRandomizer.Enabled) && masterObject && originalMasterIndex.isValid)
+            if ((!NetworkServer.active || IsActive) && masterObject && originalMasterIndex.isValid)
             {
                 ExplicitSpawnReplacementInfo replacementInfo = masterObject.AddComponent<ExplicitSpawnReplacementInfo>();
                 replacementInfo.OriginalMasterIndex = originalMasterIndex;

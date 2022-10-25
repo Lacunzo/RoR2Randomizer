@@ -17,7 +17,7 @@ namespace RoR2Randomizer.Configuration
             {
                 if (t == type)
                 {
-                    return t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                    return t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                             .Where(f => Array.IndexOf(f.FieldType.GetInterfaces(), typeof(IConfigModCompatibility)) != -1);
                 }
                 else

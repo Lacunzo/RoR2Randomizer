@@ -27,6 +27,8 @@ namespace RoR2Randomizer.Networking
 
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 
+            NetworkingAPI.RegisterMessageType<SyncCharacterMasterReplacementMode>();
+
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
             NetworkingAPI.RegisterMessageType<SyncHoldoutZoneReplacements>();
 #endif

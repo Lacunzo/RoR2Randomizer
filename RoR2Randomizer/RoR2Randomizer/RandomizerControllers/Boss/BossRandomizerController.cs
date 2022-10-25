@@ -25,7 +25,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
             return masterObject && masterObject.GetComponent<BaseBossReplacement>();
         }
 
-        public override bool IsRandomizerEnabled => NetworkServer.active && ConfigManager.BossRandomizer.Enabled;
+        public override bool IsRandomizerEnabled => NetworkServer.active && (ConfigManager.BossRandomizer.Enabled || ConfigManager.Fun.GupModeActive);
 
         protected override bool isNetworked => false;
 

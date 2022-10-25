@@ -16,7 +16,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
     {
         public static class Aurelionite
         {
-            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.RandomizeAurelionite;
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.RandomizeAurelionite || ConfigManager.Fun.GupModeActive);
 
             const string MASTER_NAME = "TitanGoldMaster";
 

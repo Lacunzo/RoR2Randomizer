@@ -44,7 +44,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 {
                     ExplicitSpawnRandomizerController.ReplaceDirectorSpawnRequest(directorSpawnRequest);
 
-                    if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+                    if (ExplicitSpawnRandomizerController.IsActive)
                     {
                         if (BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned_ILHook == null)
                         {
@@ -84,7 +84,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 c.Remove();
                 c.EmitDelegate((Component component) =>
                 {
-                    if (component.TryGetComponent<Deployable>(out Deployable existingDeployable) || !ConfigManager.ExplicitSpawnRandomizer.Enabled)
+                    if (component.TryGetComponent<Deployable>(out Deployable existingDeployable) || !ExplicitSpawnRandomizerController.IsActive)
                         return existingDeployable;
 
                     Deployable newDeployable = component.gameObject.AddComponent<Deployable>();

@@ -64,6 +64,20 @@ namespace RoR2Randomizer.Utility
             return false;
         });
 
+        public static class Masters
+        {
+            public static MasterCatalog.MasterIndex Gup { get; private set; } = MasterCatalog.MasterIndex.none;
+
+            [SystemInitializer(typeof(MasterCatalog))]
+            static void Init()
+            {
+                Gup = MasterCatalog.FindMasterIndex(Constants.MasterNames.GUP_NAME);
+#if DEBUG
+                if (!Gup.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.GUP_NAME}'");
+#endif
+            }
+        }
+
         public static class Bodies
         {
             public static BodyIndex GrandparentBodyIndex { get; private set; } = BodyIndex.None;

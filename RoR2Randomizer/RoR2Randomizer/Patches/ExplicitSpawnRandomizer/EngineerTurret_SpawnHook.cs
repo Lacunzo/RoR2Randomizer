@@ -104,7 +104,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             {
                 c.EmitDelegate((PlaceTurret.PlacementInfo result) =>
                 {
-                    if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+                    if (ExplicitSpawnRandomizerController.IsActive)
                     {
                         // Rotate turret to face away from the engineer
                         result.rotation *= Quaternion.Euler(0f, 180f, 0f);

@@ -24,7 +24,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void ScriptedCombatEncounter_Spawn(On.RoR2.ScriptedCombatEncounter.orig_Spawn orig, ScriptedCombatEncounter self, ref ScriptedCombatEncounter.SpawnInfo spawnInfo)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (ExplicitSpawnRandomizerController.IsActive)
             {
                 if (self.TryGetComponent<GenericDisplayNameProvider>(out GenericDisplayNameProvider displayNameProvider) && displayNameProvider.displayToken == "VOID_CHEST_NAME")
                 {

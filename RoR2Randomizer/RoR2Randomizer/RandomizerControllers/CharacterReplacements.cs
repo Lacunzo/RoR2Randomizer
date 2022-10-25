@@ -131,6 +131,7 @@ namespace RoR2Randomizer.RandomizerControllers
             NetworkingManager.RegisterMessageProvider(_instance, MessageProviderFlags.Persistent);
 
             SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
+            SyncCharacterMasterReplacementMode.OnReceive += onMasterReplacementModeReceivedFromServer;
 
 #if DEBUG
             RoR2Application.onFixedUpdate += Update;
@@ -140,7 +141,7 @@ namespace RoR2Randomizer.RandomizerControllers
         static readonly RunSpecific<bool> _hasReceivedMasterIndexReplacementsFromServer = new RunSpecific<bool>(1);
         static readonly RunSpecific<IndexReplacementsCollection> _masterIndexReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
-            if (NetworkServer.active)
+            if (NetworkServer.active && _replacementMode.Value == CharacterReplacementMode.Random)
             {
                 result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize), MasterCatalog.masterPrefabs.Length);
 
@@ -153,17 +154,47 @@ namespace RoR2Randomizer.RandomizerControllers
             }
         }, 1);
 
-        public static bool IsEnabled => NetworkServer.active || (NetworkClient.active && _hasReceivedMasterIndexReplacementsFromServer);
+        static readonly RunSpecific<CharacterReplacementMode> _replacementMode = new RunSpecific<CharacterReplacementMode>((out CharacterReplacementMode result) =>
+        {
+            if (NetworkServer.active)
+            {
+                if (ConfigManager.Fun.GupModeActive)
+                {
+                    result = CharacterReplacementMode.Gup;
+                }
+                else
+                {
+                    result = CharacterReplacementMode.Random;
+                }
+
+                return true;
+            }
+
+            result = CharacterReplacementMode.None;
+            return false;
+        }, 2, CharacterReplacementMode.None);
+
+        public static bool IsEnabled => NetworkServer.active || (NetworkClient.active && (_hasReceivedMasterIndexReplacementsFromServer || _replacementMode.HasValue));
 
         public bool SendMessages => _masterIndexReplacements.HasValue;
 
         public IEnumerable<NetworkMessageBase> GetNetMessages()
         {
+            if (_replacementMode.HasValue)
+            {
 #if DEBUG
-            Log.Debug($"Sending {nameof(SyncCharacterMasterReplacements)} to clients");
+                Log.Debug($"Sending {nameof(SyncCharacterMasterReplacementMode)} to clients");
 #endif
+                yield return new SyncCharacterMasterReplacementMode(_replacementMode);
+            }
 
-            yield return new SyncCharacterMasterReplacements(_masterIndexReplacements);
+            if (!_replacementMode.HasValue || _replacementMode.Value == CharacterReplacementMode.Random)
+            {
+#if DEBUG
+                Log.Debug($"Sending {nameof(SyncCharacterMasterReplacements)} to clients");
+#endif
+                yield return new SyncCharacterMasterReplacements(_masterIndexReplacements);
+            }
         }
 
         static void onMasterReplacementsReceivedFromServer(IndexReplacementsCollection masterIndexReplacements)
@@ -176,12 +207,22 @@ namespace RoR2Randomizer.RandomizerControllers
             _hasReceivedMasterIndexReplacementsFromServer.Value = true;
         }
 
+        static void onMasterReplacementModeReceivedFromServer(CharacterReplacementMode mode)
+        {
+#if DEBUG
+            Log.Debug($"Received master replacement mode '{mode}' from server");
+#endif
+
+            _replacementMode.Value = mode;
+        }
+
         public static void Uninitialize()
         {
             _masterIndexReplacements.Dispose();
             _hasReceivedMasterIndexReplacementsFromServer.Dispose();
 
             SyncCharacterMasterReplacements.OnReceive -= onMasterReplacementsReceivedFromServer;
+            SyncCharacterMasterReplacementMode.OnReceive -= onMasterReplacementModeReceivedFromServer;
 
 #if DEBUG
             RoR2Application.onFixedUpdate -= Update;
@@ -255,6 +296,8 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static MasterCatalog.MasterIndex GetReplacementForMasterIndex(MasterCatalog.MasterIndex original)
         {
+            const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(GetReplacementForMasterIndex)} ";
+
             if (original.isValid && IsEnabled)
             {
 #if DEBUG
@@ -275,6 +318,21 @@ namespace RoR2Randomizer.RandomizerControllers
                     }
                 }
 #endif
+
+                if (_replacementMode.HasValue)
+                {
+                    switch (_replacementMode.Value)
+                    {
+                        case CharacterReplacementMode.Gup:
+                            if (!Caches.Masters.Gup.isValid)
+                            {
+                                Log.Error(LOG_PREFIX + $"{nameof(CharacterReplacementMode.Gup)} mode enabled, but master index is invalid!");
+                                return MasterCatalog.MasterIndex.none;
+                            }
+
+                            return Caches.Masters.Gup;
+                    }
+                }
 
                 if (_masterIndexReplacements.HasValue && _masterIndexReplacements.Value.TryGetReplacement((int)original, out int replacementIndex))
                 {

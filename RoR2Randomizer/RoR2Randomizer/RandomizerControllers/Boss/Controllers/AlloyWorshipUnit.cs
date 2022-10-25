@@ -14,7 +14,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
     {
         public static class AlloyWorshipUnit
         {
-            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && ConfigManager.BossRandomizer.RandomizeAlloyWorshipUnit;
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.RandomizeAlloyWorshipUnit || ConfigManager.Fun.GupModeActive);
 
             public static void Initialize()
             {

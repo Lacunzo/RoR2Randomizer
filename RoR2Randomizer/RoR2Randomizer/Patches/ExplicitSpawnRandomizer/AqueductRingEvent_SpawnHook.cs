@@ -25,7 +25,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void onSceneLoaded(SceneDef scene)
         {
-            if (ConfigManager.ExplicitSpawnRandomizer.Enabled)
+            if (ExplicitSpawnRandomizerController.IsActive)
             {
                 if (Caches.Scene.AbandonedAqueductSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.AbandonedAqueductSceneIndex)
                 {
