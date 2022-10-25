@@ -6,12 +6,17 @@ using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 {
     [PatchClass]
     public sealed class MithrixPhaseTracker : BossPhaseTracker<MithrixPhaseTracker>
     {
+        public delegate void OnFightVictoryDelegate(GameObject missionController);
+
+        public static event OnFightVictoryDelegate OnFightVictory;
+
         static void ApplyPatches()
         {
             new MithrixPhaseTracker().applyPatches();
@@ -45,6 +50,15 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
             orig(self);
 
             IsInFight.Value = false;
+
+            if (self != null)
+            {
+                EntityStateMachine outer = self.outer;
+                if (outer)
+                {
+                    OnFightVictory?.Invoke(outer.gameObject);
+                }
+            }
         }
 
         void PreEncounter_OnEnter(On.EntityStates.Missions.BrotherEncounter.PreEncounter.orig_OnEnter orig, EntityStates.Missions.BrotherEncounter.PreEncounter self)

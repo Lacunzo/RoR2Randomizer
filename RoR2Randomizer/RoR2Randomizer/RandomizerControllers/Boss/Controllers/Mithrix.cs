@@ -7,6 +7,8 @@ using RoR2Randomizer.Patches.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Mithrix;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityModdingUtility;
@@ -34,6 +36,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                 }
 
                 SyncBossReplacementCharacter.OnReceive += SyncBossReplacementCharacter_OnReceive;
+
+                MithrixPhaseTracker.OnFightVictory += MithrixPhaseTracker_OnFightVictory;
             }
 
             public static void Uninitialize()
@@ -44,6 +48,32 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                 }
 
                 SyncBossReplacementCharacter.OnReceive -= SyncBossReplacementCharacter_OnReceive;
+
+                MithrixPhaseTracker.OnFightVictory -= MithrixPhaseTracker_OnFightVictory;
+            }
+
+            static void MithrixPhaseTracker_OnFightVictory(GameObject missionController)
+            {
+                if (missionController &&
+                    Caches.Scene.OldCommencementSceneIndex != SceneIndex.Invalid &&
+                    SceneCatalog.mostRecentSceneDef && SceneCatalog.mostRecentSceneDef.sceneDefIndex == Caches.Scene.OldCommencementSceneIndex)
+                {
+                    static IEnumerator waitThenDisableArenaWalls(GameObject arenaWallsObj)
+                    {
+                        yield return new WaitForSeconds(10f);
+
+                        if (arenaWallsObj)
+                        {
+                            arenaWallsObj.SetActive(false);
+                        }
+                    }
+
+                    Transform arenaWalls = missionController.transform.Find("ArenaWalls");
+                    if (arenaWalls)
+                    {
+                        Main.Instance.StartCoroutine(waitThenDisableArenaWalls(arenaWalls.gameObject));
+                    }
+                }
             }
 
             static void IsInFight_OnChanged(bool isInFight)
