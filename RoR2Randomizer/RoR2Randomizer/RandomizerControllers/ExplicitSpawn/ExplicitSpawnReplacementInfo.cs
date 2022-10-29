@@ -47,17 +47,20 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         {
             base.initializeClient();
 
-            if (originalMasterPrefab.GetComponent<SetDontDestroyOnLoad>())
+            if (!GetComponent<PlayerCharacterMasterController>())
             {
-                gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
-            }
-            else if (TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
-            {
-                Destroy(setDontDestroyOnLoad);
-
-                if (RoR2.Util.IsDontDestroyOnLoad(gameObject))
+                if (originalMasterPrefab.GetComponent<SetDontDestroyOnLoad>())
                 {
-                    SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
+                    gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
+                }
+                else if (TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
+                {
+                    Destroy(setDontDestroyOnLoad);
+
+                    if (RoR2.Util.IsDontDestroyOnLoad(gameObject))
+                    {
+                        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
+                    }
                 }
             }
         }

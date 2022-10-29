@@ -68,6 +68,11 @@ namespace RoR2Randomizer.Utility
             return CreateFrom(collection, t => t, canReplaceFunc, weightSelector);
         }
 
+        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc)
+        {
+            return CreateFrom(collection, t => t, canReplaceFunc, null);
+        }
+
         readonly InitializeOnAccess<ReadOnlyDictionary<T, T>> _reverseDictionary;
 
         public ReplacementDictionary(IDictionary<T, T> dict) : base(dict)

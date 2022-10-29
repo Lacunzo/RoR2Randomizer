@@ -15,7 +15,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
     {
         public static class LunarScav
         {
-            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.RandomizeLunarScav || ConfigManager.Fun.GupModeActive);
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.RandomizeLunarScav || CharacterReplacements.IsAnyForcedCharacterModeEnabled);
 
             public static event Action<LunarScavReplacement> LunarScavReplacementReceivedClient;
 

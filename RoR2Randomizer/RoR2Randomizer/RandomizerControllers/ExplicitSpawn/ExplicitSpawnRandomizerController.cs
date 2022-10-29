@@ -11,7 +11,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
     public sealed class ExplicitSpawnRandomizerController : BaseRandomizerController
     {
         public override bool IsRandomizerEnabled => IsActive;
-        public static bool IsActive => ConfigManager.ExplicitSpawnRandomizer.Enabled || ConfigManager.Fun.GupModeActive;
+        public static bool IsActive => ConfigManager.ExplicitSpawnRandomizer.Enabled || CharacterReplacements.IsAnyForcedCharacterModeEnabled;
 
         protected override bool isNetworked => false;
 
@@ -124,6 +124,54 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                     }
                 });
             }
+        }
+
+        public static bool TryGetReplacementBodyName(string originalName, out string replacementName)
+        {
+            if (IsActive)
+            {
+                BodyIndex index = BodyCatalog.FindBodyIndex(originalName);
+                if (index != BodyIndex.None)
+                {
+                    BodyIndex replacementIndex = CharacterReplacements.GetReplacementBodyIndex(index);
+                    if (replacementIndex != BodyIndex.None)
+                    {
+                        GameObject replacementPrefab = BodyCatalog.GetBodyPrefab(replacementIndex);
+                        if (replacementPrefab)
+                        {
+                            replacementName = replacementPrefab.name;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            replacementName = null;
+            return false;
+        }
+
+        public static bool TryGetOriginalBodyName(string replacementName, out string originalName)
+        {
+            if (IsActive)
+            {
+                BodyIndex index = BodyCatalog.FindBodyIndex(replacementName);
+                if (index != BodyIndex.None)
+                {
+                    BodyIndex originalIndex = CharacterReplacements.GetOriginalBodyIndex(index);
+                    if (originalIndex != BodyIndex.None)
+                    {
+                        GameObject originalPrefab = BodyCatalog.GetBodyPrefab(originalIndex);
+                        if (originalPrefab)
+                        {
+                            originalName = originalPrefab.name;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            originalName = null;
+            return false;
         }
 
         protected override void Awake()

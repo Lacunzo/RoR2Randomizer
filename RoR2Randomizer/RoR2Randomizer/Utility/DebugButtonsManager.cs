@@ -16,6 +16,14 @@ namespace RoR2Randomizer.Utility
             {
                 SpawnDisabler.ToggleSpawnsDisabled();
             }
+            else if (Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                InfiniteLunarCoin.ToggleEnabled();
+            }
+            else if (Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                NoSkillCooldown.ToggleEnabled();
+            }
         }
     }
 }

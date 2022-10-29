@@ -21,7 +21,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
     {
         public static class Voidling
         {
-            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.RandomizeVoidling || ConfigManager.Fun.GupModeActive);
+            static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.RandomizeVoidling || CharacterReplacements.IsAnyForcedCharacterModeEnabled);
 
             public static readonly SerializableEntityStateType EscapeDeathState = new SerializableEntityStateType(typeof(EntityStates.VoidRaidCrab.EscapeDeath));
             public static readonly SerializableEntityStateType FinalDeathState = new SerializableEntityStateType(typeof(EntityStates.VoidRaidCrab.DeathState));

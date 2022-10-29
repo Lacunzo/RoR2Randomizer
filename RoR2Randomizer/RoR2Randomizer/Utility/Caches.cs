@@ -26,7 +26,7 @@ namespace RoR2Randomizer.Utility
                 }
                 else if (collider is CapsuleCollider capsuleCollider)
                 {
-                    radius = capsuleCollider.radius;
+                    radius = Mathf.Max(capsuleCollider.radius, capsuleCollider.height);
                     return true;
                 }
                 else
@@ -36,26 +36,37 @@ namespace RoR2Randomizer.Utility
                 }
             }
 
-            foreach (Collider collider in bodyPrefab.GetComponents<Collider>())
+            if (!bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body) || body.bodyIndex == BodyIndex.None ||
+                // The following characters have Colliders that don't match their actual collision size, so force them to be calculated from the model bounds
+                (body.bodyIndex != Bodies.BeetleQueenBodyIndex &&
+                 body.bodyIndex != Bodies.ClayBossBodyIndex &&
+                 body.bodyIndex != Bodies.LunarGolemBodyIndex))
             {
-                if (tryGetRadius(collider, out radius))
+                foreach (Collider collider in bodyPrefab.GetComponents<Collider>())
                 {
-                    return true;
+                    if (collider.enabled && tryGetRadius(collider, out radius))
+                    {
+                        return true;
+                    }
                 }
             }
 
-            if (bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body) && body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator))
+            if (body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator))
             {
                 Transform model = modelLocator.modelTransform;
                 if (model)
                 {
-                    if (Bodies.GrandparentBodyIndex != BodyIndex.None && body.bodyIndex == Bodies.GrandparentBodyIndex)
+                    if (model.TryGetComponent<CharacterModel>(out CharacterModel characterModel) && characterModel.TryGetModelBounds(out Bounds modelBounds))
                     {
-                        Transform centerColliderObj = model.Find("GrandparentArmature/ROOT/base/stomach/chest/Collision");
-                        if (centerColliderObj && centerColliderObj.TryGetComponent<Collider>(out Collider collider) && tryGetRadius(collider, out radius))
-                        {
-                            return true;
-                        }
+                        Vector3 position = ((MonoBehaviour)body).transform.position;
+                        Vector3 max = modelBounds.max;
+                        Vector3 min = modelBounds.min;
+
+                        radius = (Mathf.Abs(position.x - max.x) + Mathf.Abs(position.x - min.x) +
+                                  Mathf.Abs(position.y - max.y) + Mathf.Abs(position.y - min.y) +
+                                  Mathf.Abs(position.z - max.z) + Mathf.Abs(position.z - min.z)) / 6f;
+
+                        return true;
                     }
                 }
             }
@@ -68,6 +79,8 @@ namespace RoR2Randomizer.Utility
         {
             public static MasterCatalog.MasterIndex Gup { get; private set; } = MasterCatalog.MasterIndex.none;
 
+            public static MasterCatalog.MasterIndex Heretic { get; private set; } = MasterCatalog.MasterIndex.none;
+
             [SystemInitializer(typeof(MasterCatalog))]
             static void Init()
             {
@@ -75,40 +88,66 @@ namespace RoR2Randomizer.Utility
 #if DEBUG
                 if (!Gup.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.GUP_NAME}'");
 #endif
+
+                Heretic = MasterCatalog.FindMasterIndex(Constants.MasterNames.HERETIC_NAME);
+#if DEBUG
+                if (!Heretic.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.HERETIC_NAME}'");
+#endif
             }
         }
 
         public static class Bodies
         {
-            public static BodyIndex GrandparentBodyIndex { get; private set; } = BodyIndex.None;
+            public static BodyIndex VoidlingBaseBodyIndex { get; private set; } = BodyIndex.None;
 
-            public static BodyIndex VoidlingPhase1 { get; private set; } = BodyIndex.None;
+            public static BodyIndex VoidlingPhase1BodyIndex { get; private set; } = BodyIndex.None;
 
-            public static BodyIndex VoidlingPhase2 { get; private set; } = BodyIndex.None;
+            public static BodyIndex VoidlingPhase2BodyIndex { get; private set; } = BodyIndex.None;
 
-            public static BodyIndex VoidlingPhase3 { get; private set; } = BodyIndex.None;
+            public static BodyIndex VoidlingPhase3BodyIndex { get; private set; } = BodyIndex.None;
+
+            public static BodyIndex BeetleQueenBodyIndex { get; private set; } = BodyIndex.None;
+
+            public static BodyIndex ClayBossBodyIndex { get; private set; } = BodyIndex.None;
+
+            public static BodyIndex LunarGolemBodyIndex { get; private set; } = BodyIndex.None;
 
             [SystemInitializer(typeof(BodyCatalog))]
             static void Init()
             {
-                GrandparentBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.GRANDPARENT_NAME);
+                VoidlingBaseBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_BASE_NAME);
 #if DEBUG
-                if (GrandparentBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.GRANDPARENT_NAME}'");
+                if (VoidlingBaseBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_BASE_NAME}'");
 #endif
 
-                VoidlingPhase1 = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_1_NAME);
+                VoidlingPhase1BodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_1_NAME);
 #if DEBUG
-                if (VoidlingPhase1 == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_1_NAME}'");
+                if (VoidlingPhase1BodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_1_NAME}'");
 #endif
 
-                VoidlingPhase2 = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_2_NAME);
+                VoidlingPhase2BodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_2_NAME);
 #if DEBUG
-                if (VoidlingPhase2 == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_2_NAME}'");
+                if (VoidlingPhase2BodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_2_NAME}'");
 #endif
 
-                VoidlingPhase3 = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_3_NAME);
+                VoidlingPhase3BodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.VOIDLING_PHASE_3_NAME);
 #if DEBUG
-                if (VoidlingPhase3 == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_3_NAME}'");
+                if (VoidlingPhase3BodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.VOIDLING_PHASE_3_NAME}'");
+#endif
+
+                BeetleQueenBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.BEETLE_QUEEN_NAME);
+#if DEBUG
+                if (BeetleQueenBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.BEETLE_QUEEN_NAME}'");
+#endif
+
+                ClayBossBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.CLAY_BOSS_NAME);
+#if DEBUG
+                if (ClayBossBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.CLAY_BOSS_NAME}'");
+#endif
+
+                LunarGolemBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.LUNAR_GOLEM_NAME);
+#if DEBUG
+                if (LunarGolemBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.LUNAR_GOLEM_NAME}'");
 #endif
             }
         }

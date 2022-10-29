@@ -120,5 +120,16 @@ namespace RoR2Randomizer.Networking
                 message.SendTo(NetworkDestination.Clients);
             }
         }
+
+        public static void TrySendAll(this INetMessageProvider provider, NetworkDestination destination)
+        {
+            if (provider.SendMessages)
+            {
+                foreach (NetworkMessageBase message in provider.GetNetMessages())
+                {
+                    message.SendTo(destination);
+                }
+            }
+        }
     }
 }

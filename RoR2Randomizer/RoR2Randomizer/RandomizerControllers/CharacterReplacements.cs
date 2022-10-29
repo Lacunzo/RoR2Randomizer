@@ -33,6 +33,8 @@ namespace RoR2Randomizer.RandomizerControllers
 
     public class CharacterReplacements : INetMessageProvider
     {
+        public static event Action OnCharacterReplacementsInitialized;
+
         static CharacterReplacements _instance;
 
 #if DEBUG
@@ -42,6 +44,9 @@ namespace RoR2Randomizer.RandomizerControllers
         public static ReadOnlyArray<EquipmentIndex> AvailableDroneEquipments;
 
         static int[] _masterIndicesToRandomize;
+
+        static bool _hasInvokedReplacementsInitialized = false;
+        static ulong _invokeReplacementsInitializedRunCallbackHandle;
 
         [SystemInitializer(typeof(EquipmentCatalog), typeof(MasterCatalog))]
         static void Init()
@@ -133,6 +138,17 @@ namespace RoR2Randomizer.RandomizerControllers
             SyncCharacterMasterReplacements.OnReceive += onMasterReplacementsReceivedFromServer;
             SyncCharacterMasterReplacementMode.OnReceive += onMasterReplacementModeReceivedFromServer;
 
+            _invokeReplacementsInitializedRunCallbackHandle = RunSpecificCallbacksManager.AddEntry(static _ =>
+            {
+                if (IsEnabled)
+                {
+                    tryInvokeCharacterReplacementsInitialized();
+                }
+            }, static _ =>
+            {
+                _hasInvokedReplacementsInitialized = false;
+            }, 0);
+
 #if DEBUG
             RoR2Application.onFixedUpdate += Update;
 #endif
@@ -143,8 +159,27 @@ namespace RoR2Randomizer.RandomizerControllers
         {
             if (NetworkServer.active && _replacementMode.Value == CharacterReplacementMode.Random)
             {
-                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize), MasterCatalog.masterPrefabs.Length);
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize, (key, value) =>
+                {
+                    if (Caches.Masters.Heretic.isValid && key == Caches.Masters.Heretic.i)
+                    {
+                        GameObject valuePrefab = MasterCatalog.GetMasterPrefab((MasterCatalog.MasterIndex)value);
+                        if (valuePrefab.TryGetComponent<CharacterMaster>(out CharacterMaster master) && master.bodyPrefab && master.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
+                        {
+                            if (body.baseMoveSpeed <= 0f)
+                            {
+#if DEBUG
+                                Log.Debug($"Not allowing replacement {MasterCatalog.GetMasterPrefab(Caches.Masters.Heretic)?.name} -> {valuePrefab.name}: Heretic replacements must be mobile");
+#endif
 
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }), MasterCatalog.masterPrefabs.Length);
+                
                 return true;
             }
             else
@@ -176,7 +211,13 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static bool IsEnabled => NetworkServer.active || (NetworkClient.active && (_hasReceivedMasterIndexReplacementsFromServer || _replacementMode.HasValue));
 
-        public bool SendMessages => _masterIndexReplacements.HasValue;
+        public static bool IsAnyForcedCharacterModeEnabled => _replacementMode.HasValue && _replacementMode.Value switch
+        {
+            CharacterReplacementMode.Gup => true,
+            _ => false
+        };
+
+        public bool SendMessages => _masterIndexReplacements.HasValue || IsAnyForcedCharacterModeEnabled;
 
         public IEnumerable<NetworkMessageBase> GetNetMessages()
         {
@@ -205,6 +246,8 @@ namespace RoR2Randomizer.RandomizerControllers
 
             _masterIndexReplacements.Value = masterIndexReplacements;
             _hasReceivedMasterIndexReplacementsFromServer.Value = true;
+
+            tryInvokeCharacterReplacementsInitialized();
         }
 
         static void onMasterReplacementModeReceivedFromServer(CharacterReplacementMode mode)
@@ -214,15 +257,33 @@ namespace RoR2Randomizer.RandomizerControllers
 #endif
 
             _replacementMode.Value = mode;
+
+            if (IsAnyForcedCharacterModeEnabled)
+            {
+                tryInvokeCharacterReplacementsInitialized();
+            }
+        }
+
+        static void tryInvokeCharacterReplacementsInitialized()
+        {
+            if (!_hasInvokedReplacementsInitialized)
+            {
+                OnCharacterReplacementsInitialized?.Invoke();
+                _hasInvokedReplacementsInitialized = true;
+            }
         }
 
         public static void Uninitialize()
         {
+            _replacementMode.Dispose();
+
             _masterIndexReplacements.Dispose();
             _hasReceivedMasterIndexReplacementsFromServer.Dispose();
 
             SyncCharacterMasterReplacements.OnReceive -= onMasterReplacementsReceivedFromServer;
             SyncCharacterMasterReplacementMode.OnReceive -= onMasterReplacementModeReceivedFromServer;
+
+            RunSpecificCallbacksManager.RemoveEntry(_invokeReplacementsInitializedRunCallbackHandle);
 
 #if DEBUG
             RoR2Application.onFixedUpdate -= Update;
@@ -292,6 +353,60 @@ namespace RoR2Randomizer.RandomizerControllers
             {
                 return false;
             }
+        }
+
+        static MasterCatalog.MasterIndex getMasterIndexForBody(BodyIndex bodyIndex)
+        {
+            if (bodyIndex != BodyIndex.None)
+            {
+                CharacterMaster master = MasterCatalog.allMasters.FirstOrDefault(m => m && m.bodyPrefab && m.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body) && body.bodyIndex == bodyIndex);
+                if (master)
+                {
+                    return master.masterIndex;
+                }
+            }
+
+            return MasterCatalog.MasterIndex.none;
+        }
+
+        static BodyIndex getBodyIndexForMaster(MasterCatalog.MasterIndex index)
+        {
+            if (index.isValid)
+            {
+                GameObject prefab = MasterCatalog.GetMasterPrefab(index);
+                if (prefab)
+                {
+                    if (prefab.TryGetComponent<CharacterMaster>(out CharacterMaster master))
+                    {
+                        if (master.bodyPrefab && master.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
+                        {
+                            return body.bodyIndex;
+                        }
+                    }
+                }
+            }
+
+            return BodyIndex.None;
+        }
+
+        public static BodyIndex GetReplacementBodyIndex(BodyIndex original)
+        {
+            if (IsEnabled)
+            {
+                return getBodyIndexForMaster(GetReplacementForMasterIndex(getMasterIndexForBody(original)));
+            }
+
+            return BodyIndex.None;
+        }
+
+        public static BodyIndex GetOriginalBodyIndex(BodyIndex replacement)
+        {
+            if (IsEnabled)
+            {
+                return getBodyIndexForMaster(GetOriginalMasterIndex(getMasterIndexForBody(replacement)));
+            }
+
+            return BodyIndex.None;
         }
 
         public static MasterCatalog.MasterIndex GetReplacementForMasterIndex(MasterCatalog.MasterIndex original)

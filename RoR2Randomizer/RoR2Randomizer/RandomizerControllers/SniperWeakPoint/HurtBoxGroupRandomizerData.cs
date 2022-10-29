@@ -34,12 +34,9 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
             if (NetworkServer.active)
             {
-                if (SendMessages && !NetworkServer.dontListen)
+                if (!NetworkServer.dontListen)
                 {
-                    foreach (NetworkMessageBase message in GetNetMessages())
-                    {
-                        message.SendTo(NetworkDestination.Clients);
-                    }
+                    this.TrySendAll(NetworkDestination.Clients);
                 }
             }
             else if (NetworkClient.active)

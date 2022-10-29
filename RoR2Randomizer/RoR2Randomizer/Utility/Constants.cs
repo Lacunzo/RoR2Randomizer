@@ -30,15 +30,20 @@ namespace RoR2Randomizer.Utility
 
         public static class BodyNames
         {
-            public const string GRANDPARENT_NAME = "GrandParentBody";
+            public const string VOIDLING_BASE_NAME = "MiniVoidRaidCrabBodyBase";
             public const string VOIDLING_PHASE_1_NAME = "MiniVoidRaidCrabBodyPhase1";
             public const string VOIDLING_PHASE_2_NAME = "MiniVoidRaidCrabBodyPhase2";
             public const string VOIDLING_PHASE_3_NAME = "MiniVoidRaidCrabBodyPhase3";
+            public const string HERETIC_NAME = "HereticBody";
+            public const string BEETLE_QUEEN_NAME = "BeetleQueen2Body";
+            public const string CLAY_BOSS_NAME = "ClayBossBody";
+            public const string LUNAR_GOLEM_NAME = "LunarGolemBody";
         }
 
         public static class MasterNames
         {
             public const string GUP_NAME = "GupMaster";
+            public const string HERETIC_NAME = "HereticMonsterMaster";
         }
     }
 }

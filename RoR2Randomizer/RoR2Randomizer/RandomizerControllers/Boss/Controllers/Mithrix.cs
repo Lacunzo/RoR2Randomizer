@@ -19,7 +19,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
     {
         public static class Mithrix
         {
-            public static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled || ConfigManager.Fun.GupModeActive);
+            public static bool IsEnabled => _instance && _instance.IsRandomizerEnabled && (ConfigManager.BossRandomizer.AnyMithrixRandomizerEnabled || CharacterReplacements.IsAnyForcedCharacterModeEnabled);
 
             public static readonly SerializableEntityStateType MithrixHurtInitialState = new SerializableEntityStateType(typeof(SpellChannelEnterState));
 
@@ -86,9 +86,9 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                         {
                             resetCardFunc = null;
 
-                            if (((ConfigManager.BossRandomizer.RandomizeMithrix || ConfigManager.Fun.GupModeActive) &&
+                            if (((ConfigManager.BossRandomizer.RandomizeMithrix || CharacterReplacements.IsAnyForcedCharacterModeEnabled) &&
                                  (card == SpawnCardTracker.MithrixNormalSpawnCard || card == SpawnCardTracker.MithrixHurtSpawnCard)) ||
-                                ((ConfigManager.BossRandomizer.RandomizeMithrixPhase2 || ConfigManager.Fun.GupModeActive) && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
+                                ((ConfigManager.BossRandomizer.RandomizeMithrixPhase2 || CharacterReplacements.IsAnyForcedCharacterModeEnabled) && SpawnCardTracker.IsPartOfMithrixPhase2(card)))
                             {
                                 GameObject originalPrefab = card.prefab;
 
@@ -163,14 +163,14 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                     BaseMithrixReplacement baseMithrixReplacement = null;
                     if (MithrixPhaseTracker.Instance.Phase == 2)
                     {
-                        if ((ConfigManager.BossRandomizer.RandomizeMithrixPhase2 || ConfigManager.Fun.GupModeActive) && SpawnCardTracker.IsPartOfMithrixPhase2(spawnResult.spawnRequest.spawnCard))
+                        if ((ConfigManager.BossRandomizer.RandomizeMithrixPhase2 || CharacterReplacements.IsAnyForcedCharacterModeEnabled) && SpawnCardTracker.IsPartOfMithrixPhase2(spawnResult.spawnRequest.spawnCard))
                         {
                             baseMithrixReplacement = spawnResult.spawnedInstance.AddComponent<MithrixPhase2EnemiesReplacement>();
                         }
                     }
                     else
                     {
-                        if (ConfigManager.BossRandomizer.RandomizeMithrix || ConfigManager.Fun.GupModeActive)
+                        if (ConfigManager.BossRandomizer.RandomizeMithrix || CharacterReplacements.IsAnyForcedCharacterModeEnabled)
                         {
                             bool isHurtMithrixReplacement;
                             if ((isHurtMithrixReplacement = spawnResult.spawnRequest.spawnCard == SpawnCardTracker.MithrixHurtSpawnCard) ||
