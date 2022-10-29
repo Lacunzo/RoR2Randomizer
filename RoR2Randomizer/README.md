@@ -27,12 +27,18 @@ Current features:
   * Col. Droneman spawned from Spare Drone Parts
   * Shopkeeper Newt
   * Solus Probes spawned by Solus Control Unit and Alloy Worship Unit
+  * Heretic
 * Effect Randomizer: Randomizes visual effects.
 * Weak Point Randomizer: Randomizes which hitboxes are considered weak points by Railgunner's scoped shot. The number of weak points per character remain the same.
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.5.8 Changes:**
+
+* Summon Randomizer:
+  * Added Heretic to Summon randomizer (Getting all heresy items will turn you into a random character instead of Heretic)
 
 **0.5.7 Changes:**
 
