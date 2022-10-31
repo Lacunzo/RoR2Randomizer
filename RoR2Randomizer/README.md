@@ -35,6 +35,11 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.9 Changes:**
+
+* Stage Randomizer:
+  * Fixed out of bounds triggers on ai_test not killing teleporter bosses
+
 **0.5.8 Changes:**
 
 * Summon Randomizer:
