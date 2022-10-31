@@ -102,53 +102,55 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
 
         void sceneLoaded(SceneDef scene)
         {
-            if (shouldBeActive)
+            if (!shouldBeActive)
+                return;
+
+            StartCoroutine(waitThenCheckForStageLooping(scene));
+
+            if (Caches.Scene.AITestSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.AITestSceneIndex)
             {
-                StartCoroutine(waitThenCheckForStageLooping(scene));
+                const string ZONES_HOLDER_NAME = "HOLDER: Zones";
+                Transform zonesHolder = (GameObject.Find(ZONES_HOLDER_NAME) ?? new GameObject(ZONES_HOLDER_NAME)).transform;
 
-                if (Caches.Scene.AITestSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.AITestSceneIndex)
+                void addOOBTrigger(Vector3 position, Vector3 scale)
                 {
-                    const string ZONES_HOLDER_NAME = "HOLDER: Zones";
-                    Transform zonesHolder = (GameObject.Find(ZONES_HOLDER_NAME) ?? new GameObject(ZONES_HOLDER_NAME)).transform;
+                    const string NAME = "OOB_TRIGGER";
 
-                    void addOOBTrigger(Vector3 position, Vector3 scale)
-                    {
-                        const string NAME = "OOB_TRIGGER";
-
-                        GameObject oobObj;
+                    GameObject oobObj;
 #if DISPLAY_OOB_TRIGGERS
-                        oobObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        oobObj.name = NAME;
+                    oobObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    oobObj.name = NAME;
 #else
-                        oobObj = new GameObject(NAME);
+                    oobObj = new GameObject(NAME);
 #endif
 
-                        oobObj.transform.SetParent(zonesHolder, false);
+                    oobObj.layer = LayerIndex.collideWithCharacterHullOnly.intVal;
 
-                        oobObj.transform.position = position;
-                        oobObj.transform.localScale = scale;
+                    oobObj.transform.SetParent(zonesHolder, false);
 
-                        BoxCollider boxCollider;
+                    oobObj.transform.position = position;
+                    oobObj.transform.localScale = scale;
+
+                    BoxCollider boxCollider;
 #if DISPLAY_OOB_TRIGGERS
-                        boxCollider = oobObj.GetComponent<BoxCollider>();
+                    boxCollider = oobObj.GetComponent<BoxCollider>();
 #else
-                        boxCollider = oobObj.AddComponent<BoxCollider>();
+                    boxCollider = oobObj.AddComponent<BoxCollider>();
 #endif
 
-                        boxCollider.isTrigger = true;
+                    boxCollider.isTrigger = true;
 
-                        MapZone mapZone = oobObj.AddComponent<MapZone>();
-                        mapZone.triggerType = MapZone.TriggerType.TriggerEnter;
-                        mapZone.zoneType = MapZone.ZoneType.OutOfBounds;
-                    }
-
-                    addOOBTrigger(new Vector3(0f, -300f, 0f), new Vector3(1000f, 500f, 1000f));
-                    addOOBTrigger(new Vector3(600f, 200f, 0f), new Vector3(1000f, 500f, 1000f));
-                    addOOBTrigger(new Vector3(-800f, 200f, 0f), new Vector3(1000f, 500f, 1000f));
-                    addOOBTrigger(new Vector3(0f, 200f, 750f), new Vector3(1000f, 500f, 1000f));
-                    addOOBTrigger(new Vector3(0f, 200f, -750f), new Vector3(1000f, 500f, 1000f));
-                    addOOBTrigger(new Vector3(0f, 500f, 0f), new Vector3(1000f, 500f, 1000f));
+                    MapZone mapZone = oobObj.AddComponent<MapZone>();
+                    mapZone.triggerType = MapZone.TriggerType.TriggerEnter;
+                    mapZone.zoneType = MapZone.ZoneType.OutOfBounds;
                 }
+
+                addOOBTrigger(new Vector3(0f, -300f, 0f), new Vector3(1000f, 500f, 1000f));
+                addOOBTrigger(new Vector3(600f, 200f, 0f), new Vector3(1000f, 500f, 1000f));
+                addOOBTrigger(new Vector3(-800f, 200f, 0f), new Vector3(1000f, 500f, 1000f));
+                addOOBTrigger(new Vector3(0f, 200f, 750f), new Vector3(1000f, 500f, 1000f));
+                addOOBTrigger(new Vector3(0f, 200f, -750f), new Vector3(1000f, 500f, 1000f));
+                addOOBTrigger(new Vector3(0f, 500f, 0f), new Vector3(1000f, 500f, 1000f));
             }
         }
 
