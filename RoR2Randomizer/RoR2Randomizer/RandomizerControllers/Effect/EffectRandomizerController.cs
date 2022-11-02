@@ -58,8 +58,10 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             SyncEffectReplacements.OnCompleteMessageReceived += setEffectReplacementsFromServerEvent;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             _hasRecievedEffectReplacementsFromServer.Dispose();
             _effectReplacements.Dispose();
 

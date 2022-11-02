@@ -95,8 +95,10 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             SceneCatalog.onMostRecentSceneDefChanged += sceneLoaded;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             SceneCatalog.onMostRecentSceneDefChanged -= sceneLoaded;
         }
 

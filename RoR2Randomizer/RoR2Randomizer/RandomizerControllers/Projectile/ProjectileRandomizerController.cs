@@ -128,8 +128,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             SyncProjectileReplacements.OnReceive -= onProjectileReplacementsReceivedFromServer;
 
             _projectileIndicesReplacements.Dispose();

@@ -22,6 +22,14 @@ namespace RoR2Randomizer.RandomizerControllers
             }
         }
 
+        protected virtual void OnDestroy()
+        {
+            if (isNetworked)
+            {
+                NetworkingManager.UnregisterMessageProvider(this);
+            }
+        }
+
         IEnumerable<NetworkMessageBase> INetMessageProvider.GetNetMessages()
         {
             return getNetMessages();

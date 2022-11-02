@@ -67,8 +67,10 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         protected override bool isNetworked => false;
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             _overrideSpawnPodPrefabs.Dispose();
         }
 

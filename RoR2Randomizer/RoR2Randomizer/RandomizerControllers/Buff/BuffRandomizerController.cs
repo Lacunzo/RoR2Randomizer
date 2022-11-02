@@ -190,8 +190,10 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             SingletonHelper.Assign(ref _instance, this);
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             _buffReplacements.Dispose();
 
             SingletonHelper.Unassign(ref _instance, this);

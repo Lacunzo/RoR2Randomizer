@@ -112,6 +112,8 @@ namespace RoR2Randomizer.Utility
 
             public static BodyIndex LunarGolemBodyIndex { get; private set; } = BodyIndex.None;
 
+            public static BodyIndex HereticBodyIndex { get; private set; } = BodyIndex.None;
+
             [SystemInitializer(typeof(BodyCatalog))]
             static void Init()
             {
@@ -148,6 +150,11 @@ namespace RoR2Randomizer.Utility
                 LunarGolemBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.LUNAR_GOLEM_NAME);
 #if DEBUG
                 if (LunarGolemBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.LUNAR_GOLEM_NAME}'");
+#endif
+
+                HereticBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.HERETIC_NAME);
+#if DEBUG
+                if (HereticBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.HERETIC_NAME}'");
 #endif
             }
         }

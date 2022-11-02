@@ -1,7 +1,10 @@
 ﻿using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
+using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Utility;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,10 +13,17 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
     [RandomizerController]
     public sealed class ExplicitSpawnRandomizerController : BaseRandomizerController
     {
-        public override bool IsRandomizerEnabled => IsActive;
-        public static bool IsActive => ConfigManager.ExplicitSpawnRandomizer.Enabled || CharacterReplacements.IsAnyForcedCharacterModeEnabled;
+        static readonly RunSpecific<bool> _isEnabledServer = new RunSpecific<bool>();
 
-        protected override bool isNetworked => false;
+        public override bool IsRandomizerEnabled => IsActive;
+        public static bool IsActive => (NetworkServer.active && (ConfigManager.ExplicitSpawnRandomizer.Enabled || CharacterReplacements.IsAnyForcedCharacterModeEnabled)) || (NetworkClient.active && _isEnabledServer);
+
+        protected override bool isNetworked => true;
+
+        protected override IEnumerable<NetworkMessageBase> getNetMessages()
+        {
+            yield return new SyncExplicitSpawnRandomizerEnabled(IsActive);
+        }
 
         public static MasterCatalog.MasterIndex GetOriginalMasterIndex(GameObject replacementObject)
         {
@@ -131,23 +141,32 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             if (IsActive)
             {
                 BodyIndex index = BodyCatalog.FindBodyIndex(originalName);
-                if (index != BodyIndex.None)
+                if (index != BodyIndex.None && TryGetReplacementBodyIndex(index, out BodyIndex replacementIndex))
                 {
-                    BodyIndex replacementIndex = CharacterReplacements.GetReplacementBodyIndex(index);
-                    if (replacementIndex != BodyIndex.None)
+                    GameObject replacementPrefab = BodyCatalog.GetBodyPrefab(replacementIndex);
+                    if (replacementPrefab)
                     {
-                        GameObject replacementPrefab = BodyCatalog.GetBodyPrefab(replacementIndex);
-                        if (replacementPrefab)
-                        {
-                            replacementName = replacementPrefab.name;
-                            return true;
-                        }
+                        replacementName = replacementPrefab.name;
+                        return true;
                     }
                 }
             }
 
             replacementName = null;
             return false;
+        }
+
+        public static bool TryGetReplacementBodyIndex(BodyIndex original, out BodyIndex replacement)
+        {
+            if (IsActive)
+            {
+                return (replacement = CharacterReplacements.GetReplacementBodyIndex(original)) != BodyIndex.None;
+            }
+            else
+            {
+                replacement = BodyIndex.None;
+                return false;
+            }
         }
 
         public static bool TryGetOriginalBodyName(string replacementName, out string originalName)
@@ -179,11 +198,20 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             base.Awake();
 
             SyncExplicitSpawnReplacement.OnReceive += RegisterSpawnedReplacement;
+            SyncExplicitSpawnRandomizerEnabled.OnReceive += SyncExplicitSpawnRandomizerEnabled_OnReceive;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             SyncExplicitSpawnReplacement.OnReceive -= RegisterSpawnedReplacement;
+            SyncExplicitSpawnRandomizerEnabled.OnReceive -= SyncExplicitSpawnRandomizerEnabled_OnReceive;
+        }
+
+        static void SyncExplicitSpawnRandomizerEnabled_OnReceive(bool isEnabled)
+        {
+            _isEnabledServer.Value = isEnabled;
         }
 
         public static void RegisterSpawnedReplacement(GameObject masterObject, MasterCatalog.MasterIndex originalMasterIndex)

@@ -1,10 +1,13 @@
 ﻿using EntityStates;
 using EntityStates.BrotherMonster;
+using R2API;
 using RoR2;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Utility;
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityModdingUtility;
 
@@ -12,6 +15,38 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 {
     public sealed class MainMithrixReplacement : BaseMithrixReplacement
     {
+        class MithrixDialogueFormatOverlayHolder : IDisposable
+        {
+            bool _disposed;
+
+            public readonly MainMithrixReplacement Owner;
+            public readonly LanguageAPI.LanguageOverlay Overlay;
+
+            public MithrixDialogueFormatOverlayHolder(MainMithrixReplacement owner, string replacementToken)
+            {
+                Owner = owner;
+
+                const string BROTHER_DIALOGUE_FORMAT = "BROTHER_DIALOGUE_FORMAT";
+                Overlay = LanguageAPI.AddOverlay(BROTHER_DIALOGUE_FORMAT, Language.GetString(BROTHER_DIALOGUE_FORMAT).Replace(Language.GetString("BROTHER_BODY_NAME"), Language.GetString(replacementToken)));
+            }
+
+            public void Dispose()
+            {
+                if (_disposed)
+                    return;
+
+                Overlay?.Remove();
+
+                if (Owner)
+                    Owner._dialogueOverlayHolder = null;
+
+                _disposed = true;
+            }
+        }
+
+        static MithrixDialogueFormatOverlayHolder _mostRecentDialogueOverlayHolder;
+        MithrixDialogueFormatOverlayHolder _dialogueOverlayHolder;
+
         public bool IsHurt;
 
         protected override BossReplacementType replacementType => IsHurt ? BossReplacementType.MithrixHurt : BossReplacementType.MithrixNormal;
@@ -21,7 +56,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
             base.bodyResolved();
 
 #if DEBUG
-            Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(initializeClient)}: body.subtitleNameToken={_body.subtitleNameToken}");
+            Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(bodyResolved)}: body.subtitleNameToken={_body.subtitleNameToken}");
 #endif
 
             setBodySubtitleIfNull("BROTHER_BODY_SUBTITLE");
@@ -56,6 +91,15 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
                     }
                 }
             }
+
+            _mostRecentDialogueOverlayHolder?.Dispose();
+            _mostRecentDialogueOverlayHolder = _dialogueOverlayHolder = new MithrixDialogueFormatOverlayHolder(this, _body.baseNameToken);
+        }
+
+        void OnDestroy()
+        {
+            _dialogueOverlayHolder?.Dispose();
+            _dialogueOverlayHolder = null;
         }
 
         public static ReturnStolenItemsOnGettingHit AddReturnStolenItemsOnGettingHit(GameObject bodyObj, HealthComponent healthComponent)

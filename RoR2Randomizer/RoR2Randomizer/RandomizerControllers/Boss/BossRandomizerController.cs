@@ -44,8 +44,10 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
             AlloyWorshipUnit.Initialize();
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             Mithrix.Uninitialize();
             Voidling.Uninitialize();
             Aurelionite.Uninitialize();

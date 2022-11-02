@@ -19,7 +19,9 @@ namespace RoR2Randomizer.Networking
         public static void RegisterMessages()
         {
             NetworkingAPI.RegisterMessageType<SyncBossReplacementCharacter>();
+
             NetworkingAPI.RegisterMessageType<SyncExplicitSpawnReplacement>();
+            NetworkingAPI.RegisterMessageType<SyncExplicitSpawnRandomizerEnabled>();
 
             NetworkingAPI.RegisterMessageType<SyncProjectileReplacements>();
             NetworkingAPI.RegisterMessageType<SyncCharacterMasterReplacements>();
