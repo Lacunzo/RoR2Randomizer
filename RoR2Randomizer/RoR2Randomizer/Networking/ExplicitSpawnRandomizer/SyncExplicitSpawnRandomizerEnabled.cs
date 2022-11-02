@@ -1,7 +1,7 @@
 ﻿using RoR2Randomizer.Networking.Generic;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer
+namespace RoR2Randomizer.Networking.ExplicitSpawnRandomizer
 {
     public sealed class SyncExplicitSpawnRandomizerEnabled : NetworkMessageBase
     {
