@@ -168,15 +168,12 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
             void initializeHereticSkill(ref GenericSkill skill, GenericSkill hereticSkill, string fallbackName)
             {
-                bool createdSkill = false;
                 if (!skill)
                 {
 #if DEBUG
                     Log.Debug($"Adding skill {fallbackName} to {replacementPrefab.name}");
 #endif
 
-                    //GenericSkill_SuppressAwake.SuppressedCount++;
-                    // Awake will NullRef because skillFamily isn't assigned yet
                     skill = replacementPrefab.gameObject.AddComponent<GenericSkill>();
 
                     // ref vars can't be used in lambdas
@@ -185,12 +182,6 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                     {
                         GameObject.Destroy(createdSkillDummyVar);
                     });
-
-                    //GenericSkill_SuppressAwake.SuppressedCount--;
-
-                    //ArrayUtils.ArrayAppend(ref skillLocator.allSkills, skill);
-
-                    createdSkill = true;
                 }
 
                 ref string skillName = ref skill.skillName;
@@ -219,24 +210,21 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                     });
                 }
 
-                SkillFamily originalSkillFamily = skill.skillFamily;
-                if (MiscUtils.TryAssign(ref skill._skillFamily, hereticSkill.skillFamily))
+                if (!skill.skillFamily)
                 {
-                    // ref vars can't be used in lambdas
-                    GenericSkill skillDummyVar = skill;
-                    MiscUtils.AppendDelegate(ref undoCallback, _ =>
+                    SkillFamily originalSkillFamily = skill.skillFamily;
+                    if (MiscUtils.TryAssign(ref skill._skillFamily, hereticSkill.skillFamily))
                     {
-                        if (skillDummyVar)
+                        // ref vars can't be used in lambdas
+                        GenericSkill skillDummyVar = skill;
+                        MiscUtils.AppendDelegate(ref undoCallback, _ =>
                         {
-                            skillDummyVar._skillFamily = originalSkillFamily;
-                        }
-                    });
-                }
-
-                if (createdSkill)
-                {
-                    //skill.Awake();
-                    //skill.enabled = true;
+                            if (skillDummyVar)
+                            {
+                                skillDummyVar._skillFamily = originalSkillFamily;
+                            }
+                        });
+                    }
                 }
 
                 string stateMachineName = hereticSkill.skillFamily.defaultSkillDef.activationStateMachineName;
