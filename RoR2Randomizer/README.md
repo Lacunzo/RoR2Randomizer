@@ -35,6 +35,12 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.5.10 Changes:**
+
+* Summon Randomizer:
+  * Fixed randomized Heretic character getting all abilities replaced with "Nevermore" (ex. if Heretic is randomized into Lemurian, then all Lemurians during that run would get Nevermore in all of their skill slots)
+  * Replaced Heretic name in Mithrix dialogue. ![mithrixhereticname](https://cdn.discordapp.com/attachments/526159007442927648/1037385824511197294/unknown.png)
+
 **0.5.9 Changes:**
 
 * Stage Randomizer:
