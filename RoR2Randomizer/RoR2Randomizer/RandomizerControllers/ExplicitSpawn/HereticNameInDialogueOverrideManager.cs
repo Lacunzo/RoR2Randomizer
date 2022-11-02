@@ -1,5 +1,6 @@
 ﻿using R2API;
 using RoR2;
+using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
