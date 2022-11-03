@@ -13,6 +13,16 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
     [RandomizerController]
     public sealed class ExplicitSpawnRandomizerController : BaseRandomizerController
     {
+        [SystemInitializer(typeof(Caches.Bodies))]
+        static void Init()
+        {
+            if (Caches.Bodies.SquidTurretBodyIndex != BodyIndex.None)
+                ItemDescriptionNameReplacementManager.AddEntry("ITEM_SQUIDTURRET_PICKUP", Caches.Bodies.SquidTurretBodyIndex);
+
+            if (Caches.Bodies.MinorConstructOnKillBodyIndex != BodyIndex.None)
+                ItemDescriptionNameReplacementManager.AddEntry("ITEM_MINORCONSTRUCTONKILL_PICKUP", Caches.Bodies.MinorConstructOnKillBodyIndex);
+        }
+
         static readonly RunSpecific<bool> _isEnabledServer = new RunSpecific<bool>();
 
         public override bool IsRandomizerEnabled => IsActive;

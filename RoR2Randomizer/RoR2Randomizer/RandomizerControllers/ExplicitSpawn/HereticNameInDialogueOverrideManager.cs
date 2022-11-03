@@ -2,7 +2,6 @@
 using RoR2;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Utility;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,46 +12,24 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {
     static class HereticNameInDialogueOverrideManager
     {
-        static readonly RunSpecific<bool> _explicitSpawnRandomizerEnabledAvailable = new RunSpecific<bool>(static () => NetworkServer.active);
-        static readonly RunSpecific<bool> _characterReplacementsInitialized = new RunSpecific<bool>();
-
         static LanguageAPI.LanguageOverlay[] _hereticNameOverlays;
 
         [SystemInitializer]
         static void Init()
         {
-            SyncExplicitSpawnRandomizerEnabled.OnReceive += SyncExplicitSpawnRandomizerEnabled_OnReceive;
-            CharacterReplacements.OnCharacterReplacementsInitialized += characterReplacementsInitialized;
-
             Run.onRunDestroyGlobal += onRunEnd;
 
-            RoR2Application.onUpdate += update;
+            FullExplicitSpawnInitListener.OnFullInit += FullExplicitSpawnInitListener_OnFullInit;
         }
 
-        static void SyncExplicitSpawnRandomizerEnabled_OnReceive(bool isEnabled)
+        static void FullExplicitSpawnInitListener_OnFullInit()
         {
-            _explicitSpawnRandomizerEnabledAvailable.Value = true;
-        }
-
-        static void characterReplacementsInitialized()
-        {
-            _characterReplacementsInitialized.Value = true;
-        }
-
-        static void update()
-        {
-            if (Run.instance && _hereticNameOverlays == null)
+            if (ExplicitSpawnRandomizerController.TryGetReplacementBodyIndex(Caches.Bodies.HereticBodyIndex, out BodyIndex replacementIndex))
             {
-                if (_explicitSpawnRandomizerEnabledAvailable && _characterReplacementsInitialized)
+                GameObject replacementBodyPrefab = BodyCatalog.GetBodyPrefab(replacementIndex);
+                if (replacementBodyPrefab && replacementBodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
                 {
-                    if (ExplicitSpawnRandomizerController.TryGetReplacementBodyIndex(Caches.Bodies.HereticBodyIndex, out BodyIndex replacementIndex))
-                    {
-                        GameObject replacementBodyPrefab = BodyCatalog.GetBodyPrefab(replacementIndex);
-                        if (replacementBodyPrefab && replacementBodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
-                        {
-                            _hereticNameOverlays = replaceHereticNames(body.baseNameToken);
-                        }
-                    }
+                    _hereticNameOverlays = replaceHereticNames(body.baseNameToken);
                 }
             }
         }
