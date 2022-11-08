@@ -27,7 +27,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                 _hereticPrefabSkillLocator = hereticBodyPrefab.GetComponent<SkillLocator>();
             }
 
-            CharacterReplacements.OnCharacterReplacementsInitialized += static () =>
+            FullExplicitSpawnInitListener.OnFullInit += static () =>
             {
                 if (!Caches.Masters.Heretic.isValid)
                     return;
