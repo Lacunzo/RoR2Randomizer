@@ -126,13 +126,14 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static void ReplaceDirectorSpawnRequest(DirectorSpawnRequest spawnRequest)
         {
-            if (TryReplaceSummon(ref spawnRequest.spawnCard.prefab, out GameObject originalPrefab))
+            SpawnCard originalSpawnCard = spawnRequest.spawnCard;
+            if (TryReplaceSummon(ref originalSpawnCard.prefab, out GameObject originalPrefab))
             {
                 MiscUtils.AppendDelegate(ref spawnRequest.onSpawnedServer, (SpawnCard.SpawnResult result) =>
                 {
-                    if (result.spawnRequest != null && result.spawnRequest.spawnCard == spawnRequest.spawnCard)
+                    if (result.spawnRequest != null && result.spawnRequest.spawnCard == originalSpawnCard)
                     {
-                        result.spawnRequest.spawnCard.prefab = originalPrefab;
+                        originalSpawnCard.prefab = originalPrefab;
 
                         if (result.success && result.spawnedInstance)
                         {
