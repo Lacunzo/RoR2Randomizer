@@ -23,9 +23,13 @@ namespace RoR2Randomizer.Networking
             NetworkingAPI.RegisterMessageType<SyncExplicitSpawnReplacement>();
             NetworkingAPI.RegisterMessageType<SyncExplicitSpawnRandomizerEnabled>();
 
-            NetworkingAPI.RegisterMessageType<SyncProjectileReplacements>();
             NetworkingAPI.RegisterMessageType<SyncCharacterMasterReplacements>();
             NetworkingAPI.RegisterMessageType<SyncEffectReplacements>();
+
+            NetworkingAPI.RegisterMessageType<SyncProjectileReplacements>();
+
+            NetworkingAPI.RegisterMessageType<SyncBulletAttackCatalog>();
+            NetworkingAPI.RegisterMessageType<SyncBulletAttackIndexNeeded>();
 
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 

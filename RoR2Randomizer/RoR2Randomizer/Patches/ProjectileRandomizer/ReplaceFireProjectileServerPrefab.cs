@@ -17,56 +17,22 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
     {
         static void Apply()
         {
-            On.RoR2.Projectile.ProjectileManager.FireProjectileServer += ProjectileManager_FireProjectileServer;
-
-            IL.RoR2.Projectile.ProjectileManager.FireProjectileClient += ProjectileManager_FireProjectileClient;
+            On.RoR2.Projectile.ProjectileManager.FireProjectile_FireProjectileInfo += ProjectileManager_FireProjectile_FireProjectileInfo;
         }
 
         static void Cleanup()
         {
-            On.RoR2.Projectile.ProjectileManager.FireProjectileServer -= ProjectileManager_FireProjectileServer;
-
-            IL.RoR2.Projectile.ProjectileManager.FireProjectileClient -= ProjectileManager_FireProjectileClient;
+            On.RoR2.Projectile.ProjectileManager.FireProjectile_FireProjectileInfo -= ProjectileManager_FireProjectile_FireProjectileInfo;
         }
 
-        static void ProjectileManager_FireProjectileServer(On.RoR2.Projectile.ProjectileManager.orig_FireProjectileServer orig, ProjectileManager self, FireProjectileInfo fireProjectileInfo, NetworkConnection clientAuthorityOwner, ushort predictionId, double fastForwardTime)
+        static void ProjectileManager_FireProjectile_FireProjectileInfo(On.RoR2.Projectile.ProjectileManager.orig_FireProjectile_FireProjectileInfo orig, ProjectileManager self, FireProjectileInfo fireProjectileInfo)
         {
-            if (NetworkServer.active)
+            if (ProjectileRandomizerController.TryReplaceFire(fireProjectileInfo))
             {
-                ProjectileRandomizerController.TryOverrideProjectilePrefab(ref fireProjectileInfo.projectilePrefab);
+                return;
             }
 
-            orig(self, fireProjectileInfo, clientAuthorityOwner, predictionId, fastForwardTime);
-        }
-
-        static void ProjectileManager_FireProjectileClient(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-
-            // FireProjectileInfo fireProjectileInfo
-            c.Emit(OpCodes.Ldarga, 1);
-            c.EmitDelegate((ref FireProjectileInfo fireProjectileInfo) =>
-            {
-                if (!NetworkServer.active && NetworkClient.active)
-                {
-                    ProjectileRandomizerController.TryOverrideProjectilePrefab(ref fireProjectileInfo.projectilePrefab);
-                }
-            });
-
-            if (c.TryGotoNext(x => x.MatchStfld<ProjectileManager.PlayerFireProjectileMessage>(nameof(ProjectileManager.PlayerFireProjectileMessage.prefabIndexPlusOne))))
-            {
-                c.EmitDelegate((uint prefabIndexPlusOne) =>
-                {
-                    if (ProjectileRandomizerController.TryGetOriginalProjectileIndex(Util.UintToIntMinusOne(prefabIndexPlusOne), out int originalIndex))
-                    {
-                        return Util.IntToUintPlusOne(originalIndex);
-                    }
-                    else
-                    {
-                        return prefabIndexPlusOne;
-                    }
-                });
-            }
+            orig(self, fireProjectileInfo);
         }
     }
 }

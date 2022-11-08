@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2.Projectile;
+using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
 using RoR2Randomizer.RandomizerControllers.Projectile;
 using RoR2Randomizer.Utility;
 using System;
@@ -11,12 +12,10 @@ using System.Text;
 
 namespace RoR2Randomizer.Patches.ProjectileRandomizer
 {
-    // ArchWispCannon (2)
-
     [PatchClass]
     static class LightningStakeFix
     {
-        static int _lightningStakeProjectileIndex = -1;
+        static ProjectileTypeIdentifier _lightningStakeProjectileIdentifier;
 
         [SystemInitializer(typeof(ProjectileCatalog))]
         static void Init()
@@ -24,8 +23,8 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
             const string LOG_PREFIX = $"{nameof(LightningStakeFix)}.{nameof(Init)} ";
 
             const string LIGHTNING_STAKE_PROJECTILE_NAME = "LightningStake";
-            _lightningStakeProjectileIndex = ProjectileCatalog.FindProjectileIndex(LIGHTNING_STAKE_PROJECTILE_NAME);
-            if (_lightningStakeProjectileIndex == -1)
+            _lightningStakeProjectileIdentifier = new ProjectileTypeIdentifier(ProjectileType.OrdinaryProjectile, ProjectileCatalog.FindProjectileIndex(LIGHTNING_STAKE_PROJECTILE_NAME));
+            if (!_lightningStakeProjectileIdentifier.IsValid)
             {
                 Log.Warning(LOG_PREFIX + $"Unable to find projectile index for {LIGHTNING_STAKE_PROJECTILE_NAME}");
             }
@@ -56,18 +55,20 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                 hasBuffHook.Emit(OpCodes.Ldarg_1);
                 hasBuffHook.EmitDelegate(static (bool hasBuff, DamageInfo damageInfo) =>
                 {
-                    if (hasBuff && _lightningStakeProjectileIndex != -1 && ProjectileRandomizerController.IsActive)
+                    if (hasBuff && _lightningStakeProjectileIdentifier.IsValid && ProjectileRandomizerController.IsActive)
                     {
-                        if (ProjectileRandomizerController.TryGetOverrideProjectileIndex(_lightningStakeProjectileIndex, out int lightningStakeReplacementIndex))
+                        if (ProjectileRandomizerController.TryGetOverrideProjectileIdentifier(_lightningStakeProjectileIdentifier, out ProjectileTypeIdentifier lightningStakeReplacement))
                         {
                             if (damageInfo.inflictor && damageInfo.inflictor.TryGetComponent<ProjectileController>(out ProjectileController projectileController))
                             {
                                 if (projectileController.TryGetComponent<ProjectileParentChainTracker>(out ProjectileParentChainTracker parentChainTracker))
                                 {
-                                    if (parentChainTracker.IsChildOf(lightningStakeReplacementIndex))
+                                    if (parentChainTracker.IsChildOf(lightningStakeReplacement) || 
+                                        (ProjectileManager_InitializeProjectile_SetOwnerPatch.BulletOwnerNodeOfNextProjectile != null &&
+                                         ProjectileManager_InitializeProjectile_SetOwnerPatch.BulletOwnerNodeOfNextProjectile.IsChildOf(lightningStakeReplacement)))
                                     {
 #if DEBUG
-                                        Log.Debug($"Prevented infinite projectile loop ({projectileController.name} is child of {ProjectileCatalog.GetProjectilePrefab(lightningStakeReplacementIndex)?.name})");
+                                        Log.Debug($"Prevented infinite projectile loop ({projectileController.name} is child of {lightningStakeReplacement})");
 #endif
 
                                         return false;

@@ -9,35 +9,43 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
     {
         internal static GameObject OwnerOfNextProjectile;
 
+        internal static ProjectileParentChainNode BulletOwnerNodeOfNextProjectile;
+
+        internal static ProjectileParentChainNode ResolveChainNodeForCurrentOwner()
+        {
+            if (BulletOwnerNodeOfNextProjectile != null)
+                return BulletOwnerNodeOfNextProjectile;
+
+            if (OwnerOfNextProjectile && OwnerOfNextProjectile.TryGetComponent<ProjectileParentChainTracker>(out ProjectileParentChainTracker parentChainTracker))
+                return parentChainTracker.ChainNode;
+
+            return null;
+        }
+
         static void Apply()
         {
-            On.RoR2.Projectile.ProjectileManager.FireProjectile_FireProjectileInfo += ProjectileManager_FireProjectile_FireProjectileInfo;
-
-            On.RoR2.Projectile.ProjectileManager.InitializeProjectile += ProjectileManager_InitializeProjectile;
+            On.RoR2.Projectile.ProjectileController.Awake += ProjectileController_Awake;
         }
 
         static void Cleanup()
         {
-            On.RoR2.Projectile.ProjectileManager.FireProjectile_FireProjectileInfo -= ProjectileManager_FireProjectile_FireProjectileInfo;
-
-            On.RoR2.Projectile.ProjectileManager.InitializeProjectile -= ProjectileManager_InitializeProjectile;
+            On.RoR2.Projectile.ProjectileController.Awake -= ProjectileController_Awake;
         }
 
-        static void ProjectileManager_FireProjectile_FireProjectileInfo(On.RoR2.Projectile.ProjectileManager.orig_FireProjectile_FireProjectileInfo orig, ProjectileManager self, FireProjectileInfo fireProjectileInfo)
+        static void ProjectileController_Awake(On.RoR2.Projectile.ProjectileController.orig_Awake orig, ProjectileController self)
         {
-            orig(self, fireProjectileInfo);
-            OwnerOfNextProjectile = null;
-        }
-
-        static void ProjectileManager_InitializeProjectile(On.RoR2.Projectile.ProjectileManager.orig_InitializeProjectile orig, ProjectileController projectileController, FireProjectileInfo fireProjectileInfo)
-        {
-            if (OwnerOfNextProjectile && projectileController.TryGetComponent<ProjectileParentChainTracker>(out ProjectileParentChainTracker parentChainTracker))
+            ProjectileParentChainTracker parentChainTracker = self.gameObject.AddComponent<ProjectileParentChainTracker>();
+            if (OwnerOfNextProjectile)
             {
                 parentChainTracker.TrySetParent(OwnerOfNextProjectile);
                 OwnerOfNextProjectile = null;
             }
+            else if (BulletOwnerNodeOfNextProjectile != null)
+            {
+                parentChainTracker.SetParent(BulletOwnerNodeOfNextProjectile);
+            }
 
-            orig(projectileController, fireProjectileInfo);
+            orig(self);
         }
     }
 }

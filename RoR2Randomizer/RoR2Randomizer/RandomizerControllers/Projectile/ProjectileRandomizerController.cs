@@ -1,11 +1,14 @@
-﻿using R2API.Networking;
+﻿using HG;
+using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.Projectile;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -28,17 +31,17 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                  {
                                      if (!projectile)
                                          return false;
-                                     
+
                                      if (projectile.TryGetComponent<ProjectileFireChildren>(out ProjectileFireChildren projectileFireChildren)
                                       && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
                                      {
 #if DEBUG                            
                                          Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
-#endif                               
-                                     
+#endif
+
                                          return false;
                                      }
-                                     
+
                                      switch (projectile.name)
                                      {
                                          case "AACannon": // Does nothing
@@ -63,11 +66,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                          case "ToolbotDroneHeal": // Does nothing
                                          case "ToolbotDroneStun": // Does nothing
                                          case "TreebotPounderProjectile": // Does nothing
-                                     
+
                                          // Excluded because I think it's more fun that way
                                          case "MageIcewallWalkerProjectile":
                                          case "MageFirewallWalkerProjectile":
-                                     
+
                                          // Excluded because it seems like a huge pain getting it to work, might look into it in the future.
                                          case "LunarSunProjectile":
 #if DEBUG                            
@@ -75,7 +78,19 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 #endif                               
                                              return false;
                                      }
-                                     
+
+#if DEBUG
+                                     if (projectile.TryGetComponent<ProjectileSpawnMaster>(out ProjectileSpawnMaster projectileSpawnMaster))
+                                     {
+                                         Log.Debug($"{projectile.name} spawns {projectileSpawnMaster.spawnCard} ({projectileSpawnMaster.spawnCard?.prefab})");
+                                     }
+
+                                     if (projectileFireChildren)
+                                     {
+                                         Log.Debug($"Projectile Randomizer: {projectile.name} is {nameof(ProjectileFireChildren)}");
+                                     }
+#endif
+
                                      return true;
                                  })
                                  .Select(p => p.catalogIndex)
@@ -84,14 +99,23 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         static readonly RunSpecific<bool> _hasReceivedProjectileReplacementsFromServer = new RunSpecific<bool>();
 
-        static readonly RunSpecific<IndexReplacementsCollection> _projectileIndicesReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
+        static IEnumerable<ProjectileTypeIdentifier> getAllProjectileIdentifiers()
+        {
+            IEnumerable<ProjectileTypeIdentifier> identifiers = _projectileIndicesToRandomize.Select(static i => new ProjectileTypeIdentifier(ProjectileType.OrdinaryProjectile, i));
+
+            if (ConfigManager.ProjectileRandomizer.RandomizeHitscanAttacks)
+            {
+                identifiers = identifiers.Concat(BulletAttackCatalog.GetAllBulletAttacks().Select(static b => new ProjectileTypeIdentifier(ProjectileType.Bullet, b.Index)));
+            }
+
+            return identifiers;
+        }
+
+        static readonly RunSpecific<ReplacementDictionary<ProjectileTypeIdentifier>> _projectileIndicesReplacements = new RunSpecific<ReplacementDictionary<ProjectileTypeIdentifier>>((out ReplacementDictionary<ProjectileTypeIdentifier> result) =>
         {
             if (shouldBeActive)
             {
-                ReplacementDictionary<int> dict = ReplacementDictionary<int>.CreateFrom(_projectileIndicesToRandomize);
-
-                result = new IndexReplacementsCollection(dict, ProjectileCatalog.projectilePrefabCount);
-
+                result = ReplacementDictionary<ProjectileTypeIdentifier>.CreateFrom(getAllProjectileIdentifiers());
                 return true;
             }
 
@@ -99,12 +123,32 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return false;
         });
 
+        static readonly RunSpecific<Dictionary<ProjectileTypeIdentifier, ProjectileTypeIdentifier>> _appendedProjectileReplacements = new RunSpecific<Dictionary<ProjectileTypeIdentifier, ProjectileTypeIdentifier>>();
+
+        static readonly RunSpecific<bool> _shouldRandomizeHitscanServer = new RunSpecific<bool>((out bool result) =>
+        {
+            if (NetworkServer.active)
+            {
+                result = ConfigManager.ProjectileRandomizer.RandomizeHitscanAttacks;
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        });
+
         static bool shouldBeActive => NetworkServer.active && ConfigManager.ProjectileRandomizer.Enabled;
         public static bool IsActive => (shouldBeActive || (NetworkClient.active && _hasReceivedProjectileReplacementsFromServer)) && _projectileIndicesReplacements.HasValue;
+
+        public static bool ShouldRandomizeBulletAttacks => IsActive && _shouldRandomizeHitscanServer;
 
         public override bool IsRandomizerEnabled => IsActive;
 
         protected override bool isNetworked => true;
+
+        static bool _replacingTempDisabled = false;
 
         protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
@@ -112,13 +156,52 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             Log.Debug($"Sending {nameof(SyncProjectileReplacements)} to clients");
 #endif
 
-            yield return new SyncProjectileReplacements(_projectileIndicesReplacements);
+            if (_projectileIndicesReplacements.HasValue)
+            {
+                yield return new SyncProjectileReplacements(_projectileIndicesReplacements, false);
+            }
+
+            if (_appendedProjectileReplacements.HasValue)
+            {
+                yield return new SyncProjectileReplacements(new ReplacementDictionary<ProjectileTypeIdentifier>(_appendedProjectileReplacements.Value), true);
+            }
         }
 
-        static void onProjectileReplacementsReceivedFromServer(IndexReplacementsCollection replacements)
+        static void onProjectileReplacementsReceivedFromServer(ReplacementDictionary<ProjectileTypeIdentifier> replacements, bool isAppendedReplacements)
         {
-            _projectileIndicesReplacements.Value = replacements;
-            _hasReceivedProjectileReplacementsFromServer.Value = true;
+            if (isAppendedReplacements)
+            {
+                _appendedProjectileReplacements.Value = new Dictionary<ProjectileTypeIdentifier, ProjectileTypeIdentifier>(replacements);
+            }
+            else
+            {
+                _projectileIndicesReplacements.Value = replacements;
+                _hasReceivedProjectileReplacementsFromServer.Value = true;
+            }
+
+            if (!_shouldRandomizeHitscanServer)
+            {
+                _shouldRandomizeHitscanServer.Value |= replacements.Keys.Any(static i => i.Type == ProjectileType.Bullet);
+            }
+        }
+
+        static void BulletAttackCatalog_BulletAttackAppended(BulletAttackIdentifier identifier)
+        {
+            if (Run.instance && NetworkServer.active)
+            {
+                if (!_appendedProjectileReplacements.HasValue)
+                    _appendedProjectileReplacements.Value = new Dictionary<ProjectileTypeIdentifier, ProjectileTypeIdentifier>();
+
+                if (!_appendedProjectileReplacements.Value.ContainsKey(identifier))
+                {
+                    _appendedProjectileReplacements.Value.Add(identifier, getAllProjectileIdentifiers().GetRandomOrDefault());
+
+                    if (!NetworkServer.dontListen)
+                    {
+                        new SyncProjectileReplacements(new ReplacementDictionary<ProjectileTypeIdentifier>(_appendedProjectileReplacements.Value), true).SendTo(NetworkDestination.Clients);
+                    }
+                }
+            }
         }
 
         protected override void Awake()
@@ -126,6 +209,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             base.Awake();
 
             SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
+            BulletAttackCatalog.BulletAttackAppended += BulletAttackCatalog_BulletAttackAppended;
         }
 
         protected override void OnDestroy()
@@ -133,121 +217,136 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             base.OnDestroy();
 
             SyncProjectileReplacements.OnReceive -= onProjectileReplacementsReceivedFromServer;
+            BulletAttackCatalog.BulletAttackAppended -= BulletAttackCatalog_BulletAttackAppended;
 
             _projectileIndicesReplacements.Dispose();
             _hasReceivedProjectileReplacementsFromServer.Dispose();
         }
 
-#if DEBUG
-        static bool getDebugProjectileReplacement(int original, out int replacement)
+        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType)
         {
-            if (_projectileIndicesReplacements.Value.HasReplacement(original))
+            const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceProjectileInstantiateFire)} ";
+
+            originalPrefab = projectilePrefab;
+
+            if (TryGetOverrideProjectileIdentifier(ProjectileTypeIdentifier.FromProjectilePrefab(projectilePrefab), out ProjectileTypeIdentifier replacement))
             {
-                switch (ConfigManager.ProjectileRandomizer.DebugMode.Entry.Value)
+                switch (replacement.Type)
                 {
-                    case DebugMode.Manual:
-                        replacement = _projectileIndicesToRandomize[_forcedProjectileIndex];
+                    case ProjectileType.OrdinaryProjectile:
+                        projectilePrefab = ProjectileCatalog.GetProjectilePrefab(replacement.Index);
                         return true;
-                    case DebugMode.Forced:
-                        return (replacement = ConfigManager.ProjectileRandomizer.ForcedProjectileIndex.Parsed) >= 0;
+                    case ProjectileType.Bullet:
+                        replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType);
+                        return false;
+                    default:
+                        Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {replacement.Type}");
+                        break;
                 }
             }
 
-            replacement = -1;
-            return false;
+            return true;
         }
-#endif
 
-        public static void TryOverrideProjectilePrefab(ref GameObject prefab)
+        public static bool TryReplaceFire(FireProjectileInfo info)
         {
-            if (IsActive)
-            {
-                int originalIndex = ProjectileCatalog.GetProjectileIndex(prefab);
-                if (originalIndex != -1 && TryGetOverrideProjectileIndex(originalIndex, out int replacementIndex))
-                {
-                    GameObject replacementPrefab = ProjectileCatalog.GetProjectilePrefab(replacementIndex);
-                    if (replacementPrefab)
-                    {
-#if DEBUG
-                        Log.Debug($"Projectile randomizer: Replaced projectile: {prefab.name} ({originalIndex}) -> {replacementPrefab.name} ({replacementIndex})");
-#endif
+            return TryReplaceFire(ProjectileType.OrdinaryProjectile, ProjectileCatalog.GetProjectileIndex(info.projectilePrefab), info.position, info.rotation, info.owner, info.damage, info.force, info.crit, info.damageTypeOverride);
+        }
 
-                        prefab = replacementPrefab;
+        public static bool TryReplaceFire(ProjectileType type, int index, Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType)
+        {
+            if (!IsActive || _replacingTempDisabled)
+                return false;
+
+            if (type == ProjectileType.Invalid)
+                return false;
+
+            if (type == ProjectileType.Bullet && !ShouldRandomizeBulletAttacks)
+                return false;
+
+            if (TryGetOverrideProjectileIdentifier(new ProjectileTypeIdentifier(type, index), out ProjectileTypeIdentifier replacement) && replacement.IsValid)
+            {
+                _replacingTempDisabled = true;
+                replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType);
+
+                if (type == ProjectileType.OrdinaryProjectile && replacement.Type != ProjectileType.OrdinaryProjectile)
+                {
+                    GameObject originalProjectilePrefab = ProjectileCatalog.GetProjectilePrefab(index);
+
+                    if (originalProjectilePrefab.GetComponent<ProjectileGrappleController>())
+                    {
+                        const string STATE_MACHINE_NAME = "Hook";
+
+                        EntityStateMachine hookStateMachine = EntityStateMachine.FindByCustomName(owner, STATE_MACHINE_NAME);
+                        if (hookStateMachine)
+                        {
+                            if (hookStateMachine.state is EntityStates.Loader.FireHook fireHook)
+                            {
+                                // Force Hook to retract next update
+                                fireHook.hadHookInstance = true;
+                            }
+                        }
+                        else
+                        {
+                            Log.Warning($"Tried to initialize grapple {replacement.Type}, but owner has no '{STATE_MACHINE_NAME}' state machine");
+                        }
                     }
                 }
-            }
-        }
 
-        public static bool TryGetOverrideProjectileIndex(int originalIndex, out int replacementIndex)
-        {
-            if (IsActive)
-            {
-                if (
-#if DEBUG
-                    getDebugProjectileReplacement(originalIndex, out replacementIndex) ||
-#endif
-                    _projectileIndicesReplacements.Value.TryGetReplacement(originalIndex, out replacementIndex))
-                {
-                    return true;
-                }
-            }
-
-            replacementIndex = -1;
-            return false;
-        }
-
-        public static bool TryGetOriginalProjectileIndex(int replacementIndex, out int originalIndex)
-        {
-            if (IsActive && _projectileIndicesReplacements.Value.TryGetOriginal(replacementIndex, out originalIndex))
-            {
+                _replacingTempDisabled = false;
                 return true;
             }
 
-            originalIndex = -1;
             return false;
         }
 
         public static bool TryGetOriginalProjectilePrefab(GameObject replacementPrefab, out GameObject originalPrefab)
         {
-            if (TryGetOriginalProjectileIndex(ProjectileCatalog.GetProjectileIndex(replacementPrefab), out int originalIndex))
+            if (IsActive)
             {
-                originalPrefab = ProjectileCatalog.GetProjectilePrefab(originalIndex);
-                return (bool)originalPrefab;
+                int projectileIndex = ProjectileCatalog.GetProjectileIndex(replacementPrefab);
+                if (TryGetOriginalProjectileIdentifier(new ProjectileTypeIdentifier(ProjectileType.OrdinaryProjectile, projectileIndex), out ProjectileTypeIdentifier original))
+                {
+                    if (original.Type == ProjectileType.OrdinaryProjectile)
+                    {
+                        originalPrefab = ProjectileCatalog.GetProjectilePrefab(original.Index);
+                        return (bool)originalPrefab;
+                    }
+                }
             }
 
-            originalPrefab = null;
+            originalPrefab = default;
             return false;
         }
 
-#if DEBUG
-        static int _forcedProjectileIndex = 0;
-
-        void Update()
+        public static bool TryGetOriginalProjectileIdentifier(ProjectileTypeIdentifier replacement, out ProjectileTypeIdentifier original)
         {
-            if (ConfigManager.ProjectileRandomizer.Enabled && ConfigManager.ProjectileRandomizer.DebugMode == DebugMode.Manual)
+            if (IsActive)
             {
-                bool changedProjectileIndex = false;
-                if (Input.GetKeyDown(KeyCode.KeypadPlus))
-                {
-                    if (++_forcedProjectileIndex >= _projectileIndicesToRandomize.Length)
-                            _forcedProjectileIndex = 0;
+                return _projectileIndicesReplacements.Value.TryGetOriginal(replacement, out original);
+            }
 
-                    changedProjectileIndex = true;
-                }
-                else if (Input.GetKeyDown(KeyCode.KeypadMinus))
-                {
-                        if (--_forcedProjectileIndex < 0)
-                        _forcedProjectileIndex = _projectileIndicesToRandomize.Length - 1;
+            original = default;
+            return false;
+        }
 
-                    changedProjectileIndex = true;
-                }
-
-                if (changedProjectileIndex)
+        public static bool TryGetOverrideProjectileIdentifier(ProjectileTypeIdentifier original, out ProjectileTypeIdentifier replacement)
+        {
+            if (IsActive)
+            {
+                if (_projectileIndicesReplacements.Value.TryGetReplacement(original, out replacement) ||
+                    (_appendedProjectileReplacements.HasValue && _appendedProjectileReplacements.Value.TryGetValue(original, out replacement)))
                 {
-                    Log.Debug($"Current projectile override: {ProjectileCatalog.GetProjectilePrefab(_projectileIndicesToRandomize[_forcedProjectileIndex]).name} ({_projectileIndicesToRandomize[_forcedProjectileIndex]})");
+#if DEBUG
+                    Log.Debug($"Projectile Randomizer: Replaced projectile {original} -> {replacement}");
+#endif
+
+                    return true;
                 }
             }
+
+            replacement = default;
+            return false;
         }
-#endif
     }
 }

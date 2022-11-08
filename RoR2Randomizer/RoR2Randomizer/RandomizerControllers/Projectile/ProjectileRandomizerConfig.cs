@@ -11,18 +11,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 {
     public sealed class ProjectileRandomizerConfig : BaseRandomizerConfig
     {
-#if DEBUG
-        public readonly EnumConfigValue<DebugMode> DebugMode;
-        public readonly IntStringConfigValue ForcedProjectileIndex;
-#endif
+        public readonly BoolConfigValue RandomizeHitscanAttacks;
 
         public ProjectileRandomizerConfig(ConfigFile file) : base("Projectile", file)
         {
-#if DEBUG
-            DebugMode = new EnumConfigValue<DebugMode>(getEntry("Debug Mode", RandomizerControllers.DebugMode.None));
-
-            ForcedProjectileIndex = new IntStringConfigValue(getEntry("Forced Projectile Index", "0"), -1);
-#endif
+            RandomizeHitscanAttacks = new BoolConfigValue(getEntry("Randomize Hitscan Attacks", "If Hitscan attacks can be randomized into projectiles, and vice verse.", true));
         }
     }
 }

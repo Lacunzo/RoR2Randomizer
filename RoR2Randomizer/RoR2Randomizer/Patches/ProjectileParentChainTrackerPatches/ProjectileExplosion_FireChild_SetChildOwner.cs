@@ -15,35 +15,19 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
     {
         static void Apply()
         {
-            IL.RoR2.Projectile.ProjectileExplosion.FireChild += ProjectileExplosion_FireChild;
+            On.RoR2.Projectile.ProjectileExplosion.FireChild += ProjectileExplosion_FireChild;
         }
 
         static void Cleanup()
         {
-            IL.RoR2.Projectile.ProjectileExplosion.FireChild -= ProjectileExplosion_FireChild;
+            On.RoR2.Projectile.ProjectileExplosion.FireChild -= ProjectileExplosion_FireChild;
         }
 
-        static void ProjectileExplosion_FireChild(ILContext il)
+        static void ProjectileExplosion_FireChild(On.RoR2.Projectile.ProjectileExplosion.orig_FireChild orig, ProjectileExplosion self)
         {
-            ILCursor c = new ILCursor(il);
-
-            ILCursor[] foundCursors;
-            if (c.TryFindNext(out foundCursors,
-                              x => x.MatchLdfld<ProjectileExplosion>(nameof(ProjectileExplosion.childrenProjectilePrefab)),
-                              x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo(() => GameObject.Instantiate<GameObject>(default(GameObject), default(Vector3), default(Quaternion))))))
-            {
-                ILCursor ilCursor = foundCursors[1];
-                ilCursor.Index++;
-                ilCursor.Emit(OpCodes.Dup);
-                ilCursor.Emit(OpCodes.Ldarg_0);
-                ilCursor.EmitDelegate(static (GameObject childProjectile, ProjectileExplosion instance) =>
-                {
-                    if (childProjectile.TryGetComponent<ProjectileParentChainTracker>(out ProjectileParentChainTracker parentChainTracker))
-                    {
-                        parentChainTracker.TrySetParent(instance.gameObject);
-                    }
-                });
-            }
+            ProjectileManager_InitializeProjectile_SetOwnerPatch.OwnerOfNextProjectile = self.gameObject;
+            orig(self);
+            ProjectileManager_InitializeProjectile_SetOwnerPatch.OwnerOfNextProjectile = null;
         }
     }
 }
