@@ -114,6 +114,10 @@ namespace RoR2Randomizer.Utility
 
             public static BodyIndex HereticBodyIndex { get; private set; } = BodyIndex.None;
 
+            public static BodyIndex SquidTurretBodyIndex { get; private set; } = BodyIndex.None;
+
+            public static BodyIndex MinorConstructOnKillBodyIndex { get; private set; } = BodyIndex.None;
+
             [SystemInitializer(typeof(BodyCatalog))]
             static void Init()
             {
@@ -155,6 +159,16 @@ namespace RoR2Randomizer.Utility
                 HereticBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.HERETIC_NAME);
 #if DEBUG
                 if (HereticBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.HERETIC_NAME}'");
+#endif
+
+                SquidTurretBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.SQUID_TURRET_NAME);
+#if DEBUG
+                if (SquidTurretBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.SQUID_TURRET_NAME}'");
+#endif
+
+                MinorConstructOnKillBodyIndex = BodyCatalog.FindBodyIndex(Constants.BodyNames.MINOR_CONSTRUCT_ON_KILL_NAME);
+#if DEBUG
+                if (MinorConstructOnKillBodyIndex == BodyIndex.None) Log.Warning($"Unable to find body index '{Constants.BodyNames.MINOR_CONSTRUCT_ON_KILL_NAME}'");
 #endif
             }
         }

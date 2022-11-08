@@ -38,6 +38,8 @@ namespace RoR2Randomizer.Utility
             public const string BEETLE_QUEEN_NAME = "BeetleQueen2Body";
             public const string CLAY_BOSS_NAME = "ClayBossBody";
             public const string LUNAR_GOLEM_NAME = "LunarGolemBody";
+            public const string SQUID_TURRET_NAME = "SquidTurretBody";
+            public const string MINOR_CONSTRUCT_ON_KILL_NAME = "MinorConstructOnKillBody";
         }
 
         public static class MasterNames
