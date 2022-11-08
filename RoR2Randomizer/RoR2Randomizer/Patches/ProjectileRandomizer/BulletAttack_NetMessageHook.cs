@@ -92,7 +92,10 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
                 if (c.TryGotoNext(x => x.MatchRet()))
                 {
-                    ProjectileManager_InitializeProjectile_SetOwnerPatch.BulletOwnerNodeOfNextProjectile = null;
+                    c.EmitDelegate(static () =>
+                    {
+                        ProjectileManager_InitializeProjectile_SetOwnerPatch.BulletOwnerNodeOfNextProjectile = null;
+                    });
                 }
                 else
                 {
