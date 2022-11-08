@@ -12,7 +12,7 @@ Current features:
 * Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers and Alloy Worship Unit are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
-* Projectile Randomizer: Randomizes projectiles. Hitscan attacks are not affected by this. Certain attacks are also not technically projectiles (even if they have travel time), most notably almost all of Huntress' attacks, meaning they are also not affected by this randomizer.
+* Projectile Randomizer: Randomizes projectiles. Please note that certain attacks are also not technically projectiles (even if they have travel time), most notably almost all of Huntress' attacks, meaning they are not affected by this randomizer.
 * Summon Randomizer: Randomizes summoned characters.
   * Buying drones
   * Squid Polyp
@@ -28,12 +28,24 @@ Current features:
   * Shopkeeper Newt
   * Solus Probes spawned by Solus Control Unit and Alloy Worship Unit
   * Heretic
+  * Alpha Construct spawned by Defense Nucleus
 * Effect Randomizer: Randomizes visual effects.
 * Weak Point Randomizer: Randomizes which hitboxes are considered weak points by Railgunner's scoped shot. The number of weak points per character remain the same.
 
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.6.0 Changes:**
+
+* Projectile Randomizer:
+  * Added option to randomize hitscan attacks (enabled by default), meaning any hitscan attack (primarily bullets) can become a projectile or another type of bullet, regular projectiles can also become bullets.
+    * You thought there were survivors "safe" from the randomizer? Think again! (Unless you're thinking of Huntress, then you are still correct)
+
+* Summon Randomizer:
+  * Added Alpha Construct spawned by Defense Nucleus to summon randomizer.
+  * The names in the descriptions of the Squid Polyp and Defense Nucleus items are now replaced with the name of that character's replacement.
+  * (Possibly) fixed summon replacements sometimes changing mid-run
 
 **0.5.10 Changes:**
 
