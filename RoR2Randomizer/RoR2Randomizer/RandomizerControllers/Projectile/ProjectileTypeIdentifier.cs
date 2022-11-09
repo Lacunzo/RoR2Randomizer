@@ -1,6 +1,7 @@
 ﻿using RoR2;
 using RoR2.Projectile;
 using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
+using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using System;
 using System.Text;
 using UnityEngine;

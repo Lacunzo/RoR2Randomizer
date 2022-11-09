@@ -1,4 +1,5 @@
 ﻿using RoR2Randomizer.RandomizerControllers.Projectile;
+using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RoR2Randomizer.RandomizerControllers.Projectile
+namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 {
     [Flags]
     public enum BulletAttackFlags : uint

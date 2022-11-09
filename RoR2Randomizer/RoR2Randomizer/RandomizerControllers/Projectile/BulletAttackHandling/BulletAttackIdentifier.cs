@@ -1,7 +1,7 @@
 ﻿using RoR2;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.RandomizerControllers.Projectile
+namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 {
     public struct BulletAttackIdentifier
     {
