@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.Patches.ProjectileRandomizer
+namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
 {
     [PatchClass]
     static class BulletAttack_NetMessageHook

@@ -9,7 +9,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace RoR2Randomizer.Patches.ProjectileRandomizer
+namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
 {
     [PatchClass]
     static class BulletAttack_FireHook
