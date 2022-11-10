@@ -221,6 +221,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             BulletAttackCatalog.BulletAttackAppended -= BulletAttackCatalog_BulletAttackAppended;
 
             _projectileIndicesReplacements.Dispose();
+            _appendedProjectileReplacements.Dispose();
+            _shouldRandomizeHitscanServer.Dispose();
             _hasReceivedProjectileReplacementsFromServer.Dispose();
         }
 
