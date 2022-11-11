@@ -26,13 +26,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
                 static void initIdentifier(GenericDamageOrb damageOrb)
                 {
                     DamageOrbIdentifier identifier = new DamageOrbIdentifier(damageOrb);
-
-#if DEBUG
-                    const bool IS_DEBUG = true;
-#else
-                    const bool IS_DEBUG = false;
-#endif
-                    appendIdentifier(ref identifier, IS_DEBUG);
+                    appendIdentifier(ref identifier, true);
                 }
 
                 initIdentifier(new T());
