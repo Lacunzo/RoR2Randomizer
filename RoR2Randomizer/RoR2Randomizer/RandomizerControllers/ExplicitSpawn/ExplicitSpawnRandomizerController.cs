@@ -2,6 +2,7 @@
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Networking.Generic;
+using RoR2Randomizer.Patches.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
 using System.Reflection;
@@ -126,24 +127,44 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static void ReplaceDirectorSpawnRequest(DirectorSpawnRequest spawnRequest)
         {
+            const string LOG_PREFIX = $"{nameof(ExplicitSpawnRandomizerController)}.{nameof(ReplaceDirectorSpawnRequest)} ";
+
+            if (spawnRequest == null)
+                return;
+
             SpawnCard originalSpawnCard = spawnRequest.spawnCard;
+            if (!originalSpawnCard)
+                return;
+
             if (TryReplaceSummon(ref originalSpawnCard.prefab, out GameObject originalPrefab))
             {
-                MiscUtils.AppendDelegate(ref spawnRequest.onSpawnedServer, (SpawnCard.SpawnResult result) =>
+#if DEBUG
+                Log.Debug($"Override spawn request ({originalSpawnCard}) prefab {originalPrefab?.name ?? "null"} -> {originalSpawnCard?.prefab?.name ?? "null"}");
+#endif
+
+                void trySpawnObjectPostfix(ref GameObject result, DirectorSpawnRequest spawnRequest)
                 {
-                    if (result.spawnRequest != null && result.spawnRequest.spawnCard == originalSpawnCard)
+                    if (spawnRequest.spawnCard == originalSpawnCard)
                     {
+#if DEBUG
+                        Log.Debug($"Reset spawn request ({originalSpawnCard}) prefab {originalSpawnCard?.prefab?.name ?? "null"} -> {originalPrefab?.name ?? "null"} (success: {(bool)result})");
+#endif
+
                         originalSpawnCard.prefab = originalPrefab;
 
-                        if (result.success && result.spawnedInstance)
+                        if (result)
                         {
                             if (originalPrefab && originalPrefab.TryGetComponent<CharacterMaster>(out CharacterMaster originalMasterPrefab))
                             {
-                                RegisterSpawnedReplacement(result.spawnedInstance, originalMasterPrefab.masterIndex);
+                                RegisterSpawnedReplacement(result, originalMasterPrefab.masterIndex);
                             }
                         }
+
+                        DirectorCore_TrySpawnObject.Postfix -= trySpawnObjectPostfix;
                     }
-                });
+                }
+
+                DirectorCore_TrySpawnObject.Postfix += trySpawnObjectPostfix;
             }
         }
 
