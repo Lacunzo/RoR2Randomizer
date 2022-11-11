@@ -60,7 +60,12 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
                             ProjectileManager_InitializeProjectile_SetOwnerPatch.OwnerOfNextProjectile = instance.gameObject;
 
-                            if (ProjectileRandomizerController.TryReplaceProjectileInstantiateFire(ref prefab, out _originalPrefab, position, rotation, controller.owner, damage.damage, damage.force, damage.crit, damage.damageType))
+                            if (ProjectileRandomizerController.TryReplaceProjectileInstantiateFire(ref prefab, out _originalPrefab, position, rotation, damage.damage, damage.force, damage.crit, new GenericFireProjectileArgs
+                            {
+                                Owner = controller.owner,
+                                Weapon = instance.gameObject,
+                                DamageType = damage.damageType
+                            }))
                             {
                                 _prefab = prefab;
                                 _position = position;

@@ -248,7 +248,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             _hasReceivedProjectileReplacementsFromServer.Dispose();
         }
 
-        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType)
+        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
             const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceProjectileInstantiateFire)} ";
 
@@ -263,7 +263,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         return true;
                     case ProjectileType.Bullet:
                     case ProjectileType.DamageOrb:
-                        replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType, null);
+                        _replacingTempDisabled = true;
+                        replacement.Fire(origin, rotation, damage, force, isCrit, genericArgs);
+                        _replacingTempDisabled = false;
                         return false;
                     default:
                         Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {replacement.Type}");
@@ -301,7 +303,12 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 }
 
                 DamageOrbIdentifier identifier = DamageOrbCatalog.GetIdentifier(damageOrb);
-                return identifier.IsValid && TryReplaceFire(identifier, orb.origin, rotation, damageOrb.attacker, damageOrb.damageValue, force, damageOrb.isCrit, damageOrb.damageType, damageOrb.target);
+                return identifier.IsValid && TryReplaceFire(identifier, orb.origin, rotation, damageOrb.damageValue, force, damageOrb.isCrit, new GenericFireProjectileArgs
+                {
+                    Owner = damageOrb.attacker,
+                    DamageType = damageOrb.damageType,
+                    Target = damageOrb.target
+                });
             }
             else
             {
@@ -315,10 +322,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         public static bool TryReplaceFire(BulletAttack bulletAttack, Vector3 fireDirection)
         {
             BulletAttackIdentifier identifier = BulletAttackCatalog.GetBulletAttackIdentifier(bulletAttack);
-            return identifier.IsValid && TryReplaceFire(identifier, bulletAttack.origin, Util.QuaternionSafeLookRotation(fireDirection), bulletAttack.owner, bulletAttack.damage, bulletAttack.force, bulletAttack.isCrit, bulletAttack.damageType, null);
+            return identifier.IsValid && TryReplaceFire(identifier, bulletAttack.origin, Util.QuaternionSafeLookRotation(fireDirection), bulletAttack.damage, bulletAttack.force, bulletAttack.isCrit, new GenericFireProjectileArgs(bulletAttack));
         }
 
-        public static bool TryReplaceFire(FireProjectileInfo info)
+        public static bool TryReplaceFire(FireProjectileInfo info, GameObject weapon)
         {
             HurtBox targetHurtBox = null;
             if (info.target)
@@ -348,10 +355,16 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 }
             }
 
-            return TryReplaceFire(ProjectileTypeIdentifier.FromProjectilePrefab(info.projectilePrefab), info.position, info.rotation, info.owner, info.damage, info.force, info.crit, info.damageTypeOverride, targetHurtBox);
+            return TryReplaceFire(ProjectileTypeIdentifier.FromProjectilePrefab(info.projectilePrefab), info.position, info.rotation, info.damage, info.force, info.crit, new GenericFireProjectileArgs
+            {
+                Owner = info.owner,
+                Weapon = weapon,
+                DamageType = info.damageTypeOverride,
+                Target = targetHurtBox
+            });
         }
 
-        public static bool TryReplaceFire(ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType, HurtBox target)
+        public static bool TryReplaceFire(ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
             if (!IsActive || _replacingTempDisabled)
                 return false;
@@ -365,10 +378,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             if (TryGetOverrideProjectileIdentifier(identifier, out ProjectileTypeIdentifier replacement) && replacement.IsValid)
             {
                 _replacingTempDisabled = true;
-                replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType, target);
+                replacement.Fire(origin, rotation, damage, force, isCrit, genericArgs);
                 _replacingTempDisabled = false;
 
-                if (identifier.Type == ProjectileType.OrdinaryProjectile && replacement.Type != ProjectileType.OrdinaryProjectile)
+                if (genericArgs.Owner && identifier.Type == ProjectileType.OrdinaryProjectile && replacement.Type != ProjectileType.OrdinaryProjectile)
                 {
                     GameObject originalProjectilePrefab = ProjectileCatalog.GetProjectilePrefab(identifier.Index);
 
@@ -376,7 +389,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     {
                         const string STATE_MACHINE_NAME = "Hook";
 
-                        EntityStateMachine hookStateMachine = EntityStateMachine.FindByCustomName(owner, STATE_MACHINE_NAME);
+                        EntityStateMachine hookStateMachine = EntityStateMachine.FindByCustomName(genericArgs.Owner, STATE_MACHINE_NAME);
                         if (hookStateMachine)
                         {
                             if (hookStateMachine.state is EntityStates.Loader.FireHook fireHook)

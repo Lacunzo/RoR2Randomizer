@@ -21,6 +21,32 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
             _instance = new DamageOrbCatalog();
             NetworkingManager.RegisterMessageProvider(_instance, MessageProviderFlags.Persistent);
 
+            static void initIdentifiersForType<T>() where T : GenericDamageOrb, new()
+            {
+                static void initIdentifier(GenericDamageOrb damageOrb)
+                {
+                    DamageOrbIdentifier identifier = new DamageOrbIdentifier(damageOrb);
+
+#if DEBUG
+                    const bool IS_DEBUG = true;
+#else
+                    const bool IS_DEBUG = false;
+#endif
+                    appendIdentifier(ref identifier, IS_DEBUG);
+                }
+
+                initIdentifier(new T());
+                initIdentifier(new T { isCrit = true });
+            }
+
+            initIdentifiersForType<HuntressArrowOrb>();
+            initIdentifiersForType<HuntressFlurryArrowOrb>();
+            initIdentifiersForType<LightningStrikeOrb>();
+            initIdentifiersForType<MicroMissileOrb>();
+            initIdentifiersForType<MissileVoidOrb>();
+            initIdentifiersForType<SimpleLightningStrikeOrb>();
+            initIdentifiersForType<SquidOrb>();
+
             SyncDamageOrbCatalog.OnReceive += SyncDamageOrbCatalog_OnReceive;
             SyncDamageOrbIndexNeeded.OnReceive += SyncDamageOrbIndexNeeded_OnReceive;
         }
@@ -33,6 +59,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
         static void appendIdentifier(ref DamageOrbIdentifier identifier, bool checkExisting)
         {
             const string LOG_PREFIX = $"{nameof(DamageOrbCatalog)}.{nameof(appendIdentifier)} ";
+
+            if (!identifier.ValuesValid)
+                return;
 
             if (checkExisting)
             {

@@ -16,7 +16,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
         public readonly EffectIndex OrbEffectIndex;
         public readonly SerializableSystemType OrbType;
 
-        public readonly bool IsValid => Index != -1 && OrbEffectIndex != EffectIndex.Invalid && (Type)OrbType != null;
+        public readonly bool IsValid => IndexValid && ValuesValid;
+
+        public readonly bool IndexValid => Index != -1;
+        public readonly bool ValuesValid => OrbEffectIndex != EffectIndex.Invalid && (Type)OrbType != null;
 
         public DamageOrbIdentifier(EffectIndex orbEffectIndex, SerializableSystemType orbType)
         {

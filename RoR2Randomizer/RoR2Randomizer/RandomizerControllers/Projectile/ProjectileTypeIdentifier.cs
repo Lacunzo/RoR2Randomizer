@@ -55,9 +55,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             writer.WritePackedIndex32(Index);
         }
 
-        public readonly void Fire(Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType, HurtBox target)
+        public readonly void Fire(Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
             const string LOG_PREFIX = $"{nameof(ProjectileTypeIdentifier)}.{nameof(Fire)} ";
+
+            genericArgs.ModifyArgs(ref origin);
 
 #if DEBUG
             Log.Debug($"Firing {Type} in direction {rotation.eulerAngles}");
@@ -68,18 +70,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             Vector3 direction = (rotation * Vector3.forward).normalized;
 
-            CharacterBody ownerBody = null;
-            if (owner)
-            {
-                if (owner.TryGetComponent<CharacterMaster>(out CharacterMaster master))
-                {
-                    ownerBody = master.GetBody();
-                }
-                else if (owner.TryGetComponent<CharacterBody>(out CharacterBody body))
-                {
-                    ownerBody = body;
-                }
-            }
+            CharacterBody ownerBody = genericArgs.OwnerBody;
 
             switch (Type)
             {
@@ -90,10 +81,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         crit = isCrit,
                         damage = damage,
                         force = force,
-                        owner = owner,
+                        owner = genericArgs.Owner,
                         position = origin,
                         rotation = rotation,
-                        target = target?.gameObject,
+                        target = genericArgs.TargetGO,
                         //damageTypeOverride = damageType
                     });
                     break;
@@ -113,7 +104,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     bulletAttack.hitEffectPrefab = EffectCatalog.GetEffectDef(bulletIdentifier.HitEffectIndex)?.prefab;
                     bulletAttack.isCrit = isCrit;
                     bulletAttack.origin = origin;
-                    bulletAttack.owner = owner;
+                    bulletAttack.owner = genericArgs.Owner;
+                    bulletAttack.weapon = genericArgs.Weapon;
+                    bulletAttack.muzzleName = genericArgs.MuzzleName;
                     bulletAttack.tracerEffectPrefab = EffectCatalog.GetEffectDef(bulletIdentifier.TracerEffectIndex)?.prefab;
                     
                     //if (damageType.HasValue)
@@ -133,7 +126,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
                     damageOrb.origin = origin;
                     damageOrb.damageValue = damage;
-                    damageOrb.attacker = owner;
+                    damageOrb.attacker = genericArgs.Owner;
                     damageOrb.isCrit = isCrit;
 
                     //if (damageType.HasValue)
@@ -144,9 +137,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         squidOrb.forceScalar = force;
                     }
 
-                    if (target)
+                    if (genericArgs.Target)
                     {
-                        damageOrb.target = target;
+                        damageOrb.target = genericArgs.Target;
                     }
                     else
                     {
@@ -189,6 +182,15 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                             }
 
                             DamageOrbHurtBoxReferenceObjectOverridePatch.overrideOrbTargetPosition[damageOrb] = targetPosition;
+
+                            if (damageOrb is LightningStrikeOrb lightningStrikeOrb)
+                            {
+                                lightningStrikeOrb.lastKnownTargetPosition = targetPosition;
+                            }
+                            else if (damageOrb is SimpleLightningStrikeOrb simpleLightningStrikeOrb)
+                            {
+                                simpleLightningStrikeOrb.lastKnownTargetPosition = targetPosition;
+                            }
                         }
                     }
 
