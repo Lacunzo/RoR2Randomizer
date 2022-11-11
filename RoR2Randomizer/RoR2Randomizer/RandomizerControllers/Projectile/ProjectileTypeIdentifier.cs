@@ -1,8 +1,12 @@
 ﻿using RoR2;
+using RoR2.Orbs;
 using RoR2.Projectile;
+using RoR2Randomizer.Patches.OrbEffectOverrideTarget;
 using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
 using System;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -12,6 +16,16 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     public readonly struct ProjectileTypeIdentifier : IEquatable<ProjectileTypeIdentifier>
     {
         public static readonly ProjectileTypeIdentifier Invalid = new ProjectileTypeIdentifier(ProjectileType.Invalid, -1);
+
+        static readonly BullseyeSearch _orbTargetSearch = new BullseyeSearch
+        {
+            minAngleFilter = 0f,
+            maxAngleFilter = 7.5f,
+            filterByLoS = true,
+            minDistanceFilter = 0f,
+            maxDistanceFilter = float.PositiveInfinity,
+            sortMode = BullseyeSearch.SortMode.Distance
+        };
 
         public readonly ProjectileType Type;
         public readonly int Index;
@@ -41,7 +55,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             writer.WritePackedIndex32(Index);
         }
 
-        public readonly void Fire(Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType)
+        public readonly void Fire(Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType, HurtBox target)
         {
             const string LOG_PREFIX = $"{nameof(ProjectileTypeIdentifier)}.{nameof(Fire)} ";
 
@@ -51,6 +65,21 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             //if (damageType.HasValue && damageType.Value == DamageType.Generic)
             //    damageType = null;
+
+            Vector3 direction = (rotation * Vector3.forward).normalized;
+
+            CharacterBody ownerBody = null;
+            if (owner)
+            {
+                if (owner.TryGetComponent<CharacterMaster>(out CharacterMaster master))
+                {
+                    ownerBody = master.GetBody();
+                }
+                else if (owner.TryGetComponent<CharacterBody>(out CharacterBody body))
+                {
+                    ownerBody = body;
+                }
+            }
 
             switch (Type)
             {
@@ -64,32 +93,106 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         owner = owner,
                         position = origin,
                         rotation = rotation,
+                        target = target?.gameObject,
                         //damageTypeOverride = damageType
                     });
                     break;
                 case ProjectileType.Bullet:
-                    BulletAttackIdentifier identifier = BulletAttackCatalog.GetBulletAttack(Index);
-                    if (!identifier.IsValid)
+                    BulletAttackIdentifier bulletIdentifier = BulletAttackCatalog.GetBulletAttack(Index);
+                    if (!bulletIdentifier.IsValid)
                     {
                         Log.Warning(LOG_PREFIX + $"invalid bullet attack at index {Index}");
                         break;
                     }
 
-                    BulletAttack bulletAttack = identifier.CreateInstance();
-                    bulletAttack.aimVector = rotation * Vector3.forward;
+                    BulletAttack bulletAttack = bulletIdentifier.CreateInstance();
+                    bulletAttack.aimVector = direction;
                     bulletAttack.bulletCount = 1;
                     bulletAttack.damage = damage;
                     bulletAttack.force = force;
-                    bulletAttack.hitEffectPrefab = EffectCatalog.GetEffectDef(identifier.HitEffectIndex)?.prefab;
+                    bulletAttack.hitEffectPrefab = EffectCatalog.GetEffectDef(bulletIdentifier.HitEffectIndex)?.prefab;
                     bulletAttack.isCrit = isCrit;
                     bulletAttack.origin = origin;
                     bulletAttack.owner = owner;
-                    bulletAttack.tracerEffectPrefab = EffectCatalog.GetEffectDef(identifier.TracerEffectIndex)?.prefab;
-
+                    bulletAttack.tracerEffectPrefab = EffectCatalog.GetEffectDef(bulletIdentifier.TracerEffectIndex)?.prefab;
+                    
                     //if (damageType.HasValue)
                     //    bulletAttack.damageType |= damageType.Value;
                     
                     bulletAttack.Fire();
+                    break;
+                case ProjectileType.DamageOrb:
+                    DamageOrbIdentifier orbIdentifier = DamageOrbCatalog.GetIdentifier(Index);
+                    if (!orbIdentifier.IsValid)
+                    {
+                        Log.Warning(LOG_PREFIX + $"invalid damage orb at index {Index}");
+                        break;
+                    }
+
+                    GenericDamageOrb damageOrb = orbIdentifier.CreateInstance();
+
+                    damageOrb.origin = origin;
+                    damageOrb.damageValue = damage;
+                    damageOrb.attacker = owner;
+                    damageOrb.isCrit = isCrit;
+
+                    //if (damageType.HasValue)
+                    //    damageOrb.damageType = damageType.Value;
+
+                    if (damageOrb is SquidOrb squidOrb)
+                    {
+                        squidOrb.forceScalar = force;
+                    }
+
+                    if (target)
+                    {
+                        damageOrb.target = target;
+                    }
+                    else
+                    {
+                        _orbTargetSearch.searchOrigin = origin;
+                        _orbTargetSearch.searchDirection = direction;
+
+                        if (ownerBody)
+                        {
+                            _orbTargetSearch.viewer = ownerBody;
+                            _orbTargetSearch.teamMaskFilter = TeamMask.allButNeutral;
+                            _orbTargetSearch.teamMaskFilter.RemoveTeam(TeamComponent.GetObjectTeam(ownerBody.gameObject));
+                        }
+                        else
+                        {
+                            _orbTargetSearch.viewer = null;
+                            _orbTargetSearch.teamMaskFilter = TeamMask.all;
+                        }
+
+                        _orbTargetSearch.RefreshCandidates();
+
+                        HurtBox hurtBox = _orbTargetSearch.GetResults().FirstOrDefault();
+                        if (hurtBox)
+                        {
+                            damageOrb.target = hurtBox;
+                        }
+                        else
+                        {
+                            const float MAX_DISTANCE = 100f;
+
+                            Ray ray = new Ray(origin, direction);
+
+                            Vector3 targetPosition;
+                            if (Physics.Raycast(ray, out RaycastHit hit, MAX_DISTANCE, LayerIndex.world.mask))
+                            {
+                                targetPosition = hit.point;
+                            }
+                            else
+                            {
+                                targetPosition = ray.GetPoint(MAX_DISTANCE);
+                            }
+
+                            DamageOrbHurtBoxReferenceObjectOverridePatch.overrideOrbTargetPosition[damageOrb] = targetPosition;
+                        }
+                    }
+
+                    OrbManager.instance.AddOrb(damageOrb);
                     break;
                 default:
                     Log.Warning(LOG_PREFIX + $"unhandled type {Type}");

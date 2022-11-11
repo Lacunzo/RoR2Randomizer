@@ -1,6 +1,7 @@
 ﻿using R2API.Networking;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Networking.CharacterReplacements;
+using RoR2Randomizer.Networking.DamageOrbTargetDummy;
 using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
@@ -30,6 +31,12 @@ namespace RoR2Randomizer.Networking
 
             NetworkingAPI.RegisterMessageType<SyncBulletAttackCatalog>();
             NetworkingAPI.RegisterMessageType<SyncBulletAttackIndexNeeded>();
+
+            NetworkingAPI.RegisterMessageType<SyncDamageOrbCatalog>();
+            NetworkingAPI.RegisterMessageType<SyncDamageOrbIndexNeeded>();
+
+            NetworkingAPI.RegisterMessageType<ClientRequestDamageOrbTargetMarkerObjects>();
+            NetworkingAPI.RegisterMessageType<ClientRequestDamageOrbTargetMarkerObjects.Reply>();
 
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 

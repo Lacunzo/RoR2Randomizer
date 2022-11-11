@@ -8,6 +8,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     {
         Invalid = -1,
         OrdinaryProjectile,
-        Bullet
+        Bullet,
+        DamageOrb
     }
 }

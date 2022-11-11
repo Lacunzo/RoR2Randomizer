@@ -2,12 +2,14 @@
 using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2;
+using RoR2.Orbs;
 using RoR2.Projectile;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -106,8 +108,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             if (ConfigManager.ProjectileRandomizer.RandomizeHitscanAttacks)
             {
-                identifiers = identifiers.Concat(BulletAttackCatalog.GetAllBulletAttacks().Select(static b => new ProjectileTypeIdentifier(ProjectileType.Bullet, b.Index)));
+                identifiers = identifiers.Concat(BulletAttackCatalog.GetAllBulletAttackProjectileIdentifiers());
             }
+
+            identifiers = identifiers.Concat(DamageOrbCatalog.GetAllDamageOrbProjectileIdentifiers());
 
             return identifiers;
         }
@@ -186,22 +190,38 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
+        static void appendProjectileReplacement(ProjectileTypeIdentifier identifier)
+        {
+            if (!NetworkServer.active)
+                return;
+
+            if (!_appendedProjectileReplacements.HasValue)
+                _appendedProjectileReplacements.Value = new Dictionary<ProjectileTypeIdentifier, ProjectileTypeIdentifier>();
+
+            if (!_appendedProjectileReplacements.Value.ContainsKey(identifier))
+            {
+                _appendedProjectileReplacements.Value.Add(identifier, getAllProjectileIdentifiers().GetRandomOrDefault());
+
+                if (!NetworkServer.dontListen)
+                {
+                    new SyncProjectileReplacements(new ReplacementDictionary<ProjectileTypeIdentifier>(_appendedProjectileReplacements.Value), true).SendTo(NetworkDestination.Clients);
+                }
+            }
+        }
+
         static void BulletAttackCatalog_BulletAttackAppended(BulletAttackIdentifier identifier)
         {
             if (Run.instance && NetworkServer.active)
             {
-                if (!_appendedProjectileReplacements.HasValue)
-                    _appendedProjectileReplacements.Value = new Dictionary<ProjectileTypeIdentifier, ProjectileTypeIdentifier>();
+                appendProjectileReplacement(identifier);
+            }
+        }
 
-                if (!_appendedProjectileReplacements.Value.ContainsKey(identifier))
-                {
-                    _appendedProjectileReplacements.Value.Add(identifier, getAllProjectileIdentifiers().GetRandomOrDefault());
-
-                    if (!NetworkServer.dontListen)
-                    {
-                        new SyncProjectileReplacements(new ReplacementDictionary<ProjectileTypeIdentifier>(_appendedProjectileReplacements.Value), true).SendTo(NetworkDestination.Clients);
-                    }
-                }
+        static void DamageOrbCatalog_DamageOrbAppendedServer(DamageOrbIdentifier identifier)
+        {
+            if (Run.instance)
+            {
+                appendProjectileReplacement(identifier);
             }
         }
 
@@ -211,6 +231,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
             BulletAttackCatalog.BulletAttackAppended += BulletAttackCatalog_BulletAttackAppended;
+            DamageOrbCatalog.DamageOrbAppendedServer += DamageOrbCatalog_DamageOrbAppendedServer;
         }
 
         protected override void OnDestroy()
@@ -219,6 +240,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             SyncProjectileReplacements.OnReceive -= onProjectileReplacementsReceivedFromServer;
             BulletAttackCatalog.BulletAttackAppended -= BulletAttackCatalog_BulletAttackAppended;
+            DamageOrbCatalog.DamageOrbAppendedServer -= DamageOrbCatalog_DamageOrbAppendedServer;
 
             _projectileIndicesReplacements.Dispose();
             _appendedProjectileReplacements.Dispose();
@@ -240,7 +262,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         projectilePrefab = ProjectileCatalog.GetProjectilePrefab(replacement.Index);
                         return true;
                     case ProjectileType.Bullet:
-                        replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType);
+                    case ProjectileType.DamageOrb:
+                        replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType, null);
                         return false;
                     default:
                         Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {replacement.Type}");
@@ -251,30 +274,103 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return true;
         }
 
-        public static bool TryReplaceFire(FireProjectileInfo info)
+        public static bool TryReplaceFire(Orb orb)
         {
-            return TryReplaceFire(ProjectileType.OrdinaryProjectile, ProjectileCatalog.GetProjectileIndex(info.projectilePrefab), info.position, info.rotation, info.owner, info.damage, info.force, info.crit, info.damageTypeOverride);
+            const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceFire)}({nameof(Orb)}) ";
+
+            if (orb is GenericDamageOrb damageOrb)
+            {
+                float force;
+                if (damageOrb is SquidOrb squidOrb)
+                {
+                    force = squidOrb.forceScalar;
+                }
+                else
+                {
+                    force = 0f;
+                }
+
+                Quaternion rotation;
+                if (orb.target)
+                {
+                    rotation = Util.QuaternionSafeLookRotation((orb.target.transform.position - orb.origin).normalized);
+                }
+                else
+                {
+                    rotation = Quaternion.identity;
+                }
+
+                DamageOrbIdentifier identifier = DamageOrbCatalog.GetIdentifier(damageOrb);
+                return identifier.IsValid && TryReplaceFire(identifier, orb.origin, rotation, damageOrb.attacker, damageOrb.damageValue, force, damageOrb.isCrit, damageOrb.damageType, damageOrb.target);
+            }
+            else
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"unhandled Orb type {orb?.GetType()?.FullName ?? "null"}");
+#endif
+                return false;
+            }
         }
 
-        public static bool TryReplaceFire(ProjectileType type, int index, Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType)
+        public static bool TryReplaceFire(BulletAttack bulletAttack, Vector3 fireDirection)
+        {
+            BulletAttackIdentifier identifier = BulletAttackCatalog.GetBulletAttackIdentifier(bulletAttack);
+            return identifier.IsValid && TryReplaceFire(identifier, bulletAttack.origin, Util.QuaternionSafeLookRotation(fireDirection), bulletAttack.owner, bulletAttack.damage, bulletAttack.force, bulletAttack.isCrit, bulletAttack.damageType, null);
+        }
+
+        public static bool TryReplaceFire(FireProjectileInfo info)
+        {
+            HurtBox targetHurtBox = null;
+            if (info.target)
+            {
+                if (info.target.TryGetComponent<HurtBox>(out HurtBox hurtBox))
+                {
+                    targetHurtBox = hurtBox;
+                }
+                else if (info.target.TryGetComponent<HurtBoxGroup>(out HurtBoxGroup hurtBoxGroup))
+                {
+                    targetHurtBox = hurtBoxGroup.hurtBoxes.GetRandomOrDefault();
+                }
+                else
+                {
+                    if (!info.target.TryGetComponent<CharacterBody>(out CharacterBody body))
+                    {
+                        if (info.target.TryGetComponent<CharacterMaster>(out CharacterMaster master))
+                        {
+                            body = master.GetBody();
+                        }
+                    }
+
+                    if (body)
+                    {
+                        targetHurtBox = body.mainHurtBox;
+                    }
+                }
+            }
+
+            return TryReplaceFire(ProjectileTypeIdentifier.FromProjectilePrefab(info.projectilePrefab), info.position, info.rotation, info.owner, info.damage, info.force, info.crit, info.damageTypeOverride, targetHurtBox);
+        }
+
+        public static bool TryReplaceFire(ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, GameObject owner, float damage, float force, bool isCrit, DamageType? damageType, HurtBox target)
         {
             if (!IsActive || _replacingTempDisabled)
                 return false;
 
-            if (type == ProjectileType.Invalid)
+            if (identifier.Type == ProjectileType.Invalid)
                 return false;
 
-            if (type == ProjectileType.Bullet && !ShouldRandomizeBulletAttacks)
+            if (identifier.Type == ProjectileType.Bullet && !ShouldRandomizeBulletAttacks)
                 return false;
 
-            if (TryGetOverrideProjectileIdentifier(new ProjectileTypeIdentifier(type, index), out ProjectileTypeIdentifier replacement) && replacement.IsValid)
+            if (TryGetOverrideProjectileIdentifier(identifier, out ProjectileTypeIdentifier replacement) && replacement.IsValid)
             {
                 _replacingTempDisabled = true;
-                replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType);
+                replacement.Fire(origin, rotation, owner, damage, force, isCrit, damageType, target);
+                _replacingTempDisabled = false;
 
-                if (type == ProjectileType.OrdinaryProjectile && replacement.Type != ProjectileType.OrdinaryProjectile)
+                if (identifier.Type == ProjectileType.OrdinaryProjectile && replacement.Type != ProjectileType.OrdinaryProjectile)
                 {
-                    GameObject originalProjectilePrefab = ProjectileCatalog.GetProjectilePrefab(index);
+                    GameObject originalProjectilePrefab = ProjectileCatalog.GetProjectilePrefab(identifier.Index);
 
                     if (originalProjectilePrefab.GetComponent<ProjectileGrappleController>())
                     {
@@ -296,7 +392,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     }
                 }
 
-                _replacingTempDisabled = false;
                 return true;
             }
 

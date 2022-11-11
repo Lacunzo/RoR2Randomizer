@@ -114,28 +114,42 @@ namespace RoR2Randomizer.Networking.Generic
             _objectId = reader.ReadNetworkId();
         }
 
-        IEnumerator waitForObjectResolved()
+        public static IEnumerator WaitForObjectResolved(NetworkInstanceId objectId, float? timeout, CoroutineOut<GameObject> resolvedObject)
         {
-            IEnumerator baseTask()
+            static IEnumerator baseTask(NetworkInstanceId objectId, CoroutineOut<GameObject> resolvedObject)
             {
 #if DEBUG
                 float timeStarted = Time.unscaledTime;
 #endif
 
-                GameObject obj;
-                while (!(obj = ClientScene.FindLocalObject(_objectId)))
+                while (!(resolvedObject.Result = (NetworkServer.active ? NetworkServer.FindLocalObject(objectId)
+                                                                       : ClientScene.FindLocalObject(objectId))))
                 {
                     yield return 0;
                 }
-
 #if DEBUG
-                Log.Debug($"{nameof(SyncGameObjectReference)} waited {Time.unscaledTime - timeStarted:F2} seconds for object ({obj})");
+                Log.Debug($"{nameof(SyncGameObjectReference)} waited {Time.unscaledTime - timeStarted:F2} seconds for object ({resolvedObject.Result})");
 #endif
-
-                onReceivedObjectResolved(obj);
             }
 
-            return baseTask().AddTimeout(OBJECT_WAIT_TIMEOUT);
+            IEnumerator task = baseTask(objectId, resolvedObject);
+            if (timeout.HasValue)
+            {
+                task = task.AddTimeout(timeout.Value);
+            }
+
+            return task;
+        }
+
+        IEnumerator waitForObjectResolved()
+        {
+            CoroutineOut<GameObject> resolvedObject = new CoroutineOut<GameObject>();
+            yield return WaitForObjectResolved(_objectId, OBJECT_WAIT_TIMEOUT, resolvedObject);
+
+            if (resolvedObject.Result)
+            {
+                onReceivedObjectResolved(resolvedObject.Result);
+            }
         }
 
         public override void OnReceived()

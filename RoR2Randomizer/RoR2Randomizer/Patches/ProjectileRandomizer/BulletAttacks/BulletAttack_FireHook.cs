@@ -29,17 +29,13 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
         {
             const string LOG_PREFIX = $"{nameof(BulletAttack_FireHook)}.{nameof(BulletAttack_FireSingle)} ";
 
-            BulletAttackIdentifier identifier = BulletAttackCatalog.GetBulletAttackIdentifier(self);
-            if (identifier.IsValid)
+            if (ProjectileRandomizerController.TryReplaceFire(self, normal))
             {
 #if DEBUG
                 Log.Debug(LOG_PREFIX + $"direction: {normal}");
 #endif
 
-                if (ProjectileRandomizerController.TryReplaceFire(ProjectileType.Bullet, identifier.Index, self.origin, Quaternion.LookRotation(normal, Vector3.up), self.owner, self.damage, self.force, self.isCrit, self.damageType))
-                {
-                    return;
-                }
+                return;
             }
 
             orig(self, normal, muzzleIndex);

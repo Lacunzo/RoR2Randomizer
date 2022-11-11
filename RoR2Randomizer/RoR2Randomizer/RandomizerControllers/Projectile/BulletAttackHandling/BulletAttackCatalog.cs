@@ -1,19 +1,14 @@
 ﻿using HG;
 using R2API.Networking;
-using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
-using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.RandomizerControllers.Projectile
+namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 {
     // Not identified by this method:
     // EntityStates.TitanMonster.FireMegaLaser
@@ -288,7 +283,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        public static IEnumerable<BulletAttackIdentifier> GetAllBulletAttacks()
+        public static IEnumerable<ProjectileTypeIdentifier> GetAllBulletAttackProjectileIdentifiers()
         {
             for (int i = 0; i < _attackIdentifierCount; i++)
             {

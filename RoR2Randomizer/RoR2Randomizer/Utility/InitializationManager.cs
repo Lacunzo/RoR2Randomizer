@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RoR2Randomizer.Patches;
 using RoR2Randomizer.RandomizerControllers;
+using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -33,6 +34,8 @@ namespace RoR2Randomizer.Utility
 #endif
                 }
             }
+
+            DamageOrbTargetDummyObjectMarker.InitNetworkPrefab();
         }
 
         public static void Cleanup()
