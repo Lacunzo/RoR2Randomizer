@@ -8,7 +8,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {
     static class FullExplicitSpawnInitListener
     {
-        static readonly RunSpecific<bool> _explicitSpawnRandomizerEnabledAvailable = new RunSpecific<bool>(static () => NetworkServer.active);
+        static readonly RunSpecific<bool> _explicitSpawnRandomizerEnabledAvailable = new RunSpecific<bool>(static () => NetworkServer.active && ExplicitSpawnRandomizerController.IsActive);
         static readonly RunSpecific<bool> _characterReplacementsInitialized = new RunSpecific<bool>();
 
         static readonly RunSpecific<bool> _hasDispatchedInitForCurrentRun = new RunSpecific<bool>();
