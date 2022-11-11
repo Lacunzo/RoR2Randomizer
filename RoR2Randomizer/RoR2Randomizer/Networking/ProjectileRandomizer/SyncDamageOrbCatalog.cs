@@ -1,5 +1,5 @@
 ﻿using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.ProjectileRandomizer

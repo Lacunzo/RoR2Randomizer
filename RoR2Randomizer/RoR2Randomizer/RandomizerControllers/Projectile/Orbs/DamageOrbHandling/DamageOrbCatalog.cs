@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
+namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
 {
     public class DamageOrbCatalog : INetMessageProvider
     {

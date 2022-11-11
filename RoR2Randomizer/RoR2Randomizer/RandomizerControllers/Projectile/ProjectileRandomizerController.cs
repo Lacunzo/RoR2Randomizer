@@ -9,7 +9,7 @@ using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
-using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;

@@ -5,7 +5,7 @@ using MonoMod.RuntimeDetour;
 using RoR2;
 using RoR2.Orbs;
 using RoR2Randomizer.RandomizerControllers.Projectile;
-using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -73,7 +73,7 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
                         {
                             if (!_target && ProjectileRandomizerController.IsActive && overrideOrbTargetPosition.TryGetValue(instance, out Vector3 overrideTargetPosition))
                             {
-                                DamageOrbTargetDummyObjectMarker marker = DamageOrbTargetDummyObjectMarker.GetMarker(overrideTargetPosition, instance.duration * 2f);
+                                OrbTargetDummyObjectMarker marker = OrbTargetDummyObjectMarker.GetMarker(overrideTargetPosition, instance.duration * 2f);
                                 if (marker)
                                 {
                                     effectData.SetHurtBoxReference(marker.gameObject);

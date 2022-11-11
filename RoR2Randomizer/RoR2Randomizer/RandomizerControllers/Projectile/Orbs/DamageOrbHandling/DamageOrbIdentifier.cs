@@ -5,7 +5,7 @@ using RoR2Randomizer.Extensions;
 using System;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
+namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
 {
     public struct DamageOrbIdentifier : IEquatable<DamageOrbIdentifier>
     {

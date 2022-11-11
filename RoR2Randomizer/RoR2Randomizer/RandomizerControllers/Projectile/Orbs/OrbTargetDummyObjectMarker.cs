@@ -14,20 +14,20 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UIElements;
 
-namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
+namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 {
-    public class DamageOrbTargetDummyObjectMarker : NetworkBehaviour
+    public class OrbTargetDummyObjectMarker : NetworkBehaviour
     {
         // The threshold for when new objects should be requested
         const int LOCAL_OBJECTS_THRESHOLD = 20;
 
-        static readonly List<DamageOrbTargetDummyObjectMarker> _availableLocalInstances = new List<DamageOrbTargetDummyObjectMarker>();
+        static readonly List<OrbTargetDummyObjectMarker> _availableLocalInstances = new List<OrbTargetDummyObjectMarker>();
 
         public static GameObject Prefab { get; private set; }
 
         internal static void InitNetworkPrefab()
         {
-            const string PREFAB_NAME = "DamageOrbTargetDummy";
+            const string PREFAB_NAME = "OrbTargetDummy";
 
             GameObject tmpPrefab = new GameObject(PREFAB_NAME + "_tmp");
             NetworkIdentity networkIdentity = tmpPrefab.AddComponent<NetworkIdentity>();
@@ -42,7 +42,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
 
             Prefab = tmpPrefab.InstantiateClone(PREFAB_NAME);
             GameObject.Destroy(tmpPrefab);
-            DamageOrbTargetDummyObjectMarker marker = Prefab.AddComponent<DamageOrbTargetDummyObjectMarker>();
+            OrbTargetDummyObjectMarker marker = Prefab.AddComponent<OrbTargetDummyObjectMarker>();
             marker.enabled = false;
         }
 
@@ -51,7 +51,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
         {
             Run.onRunStartGlobal += onRunStart;
 
-            ClientRequestDamageOrbTargetMarkerObjects.Reply.OnReceive += ClientRequestDamageOrbTargetMarkerObjects_Reply_OnReceived;
+            ClientRequestOrbTargetMarkerObjects.Reply.OnReceive += ClientRequestDamageOrbTargetMarkerObjects_Reply_OnReceived;
         }
 
         static void onRunStart(Run _)
@@ -59,7 +59,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
             refillLocalInstances(LOCAL_OBJECTS_THRESHOLD - _availableLocalInstances.Count);
         }
 
-        public static DamageOrbTargetDummyObjectMarker GetMarker(Vector3 position, float? duration)
+        public static OrbTargetDummyObjectMarker GetMarker(Vector3 position, float? duration)
         {
             if (_availableLocalInstances.Count < LOCAL_OBJECTS_THRESHOLD)
             {
@@ -68,7 +68,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
 
             if (_availableLocalInstances.Count > 0)
             {
-                DamageOrbTargetDummyObjectMarker marker = _availableLocalInstances.GetAndRemoveAt(0);
+                OrbTargetDummyObjectMarker marker = _availableLocalInstances.GetAndRemoveAt(0);
                 marker.transform.position = position;
                 marker.setInUse(duration);
                 return marker;
@@ -79,7 +79,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
 
         static void refillLocalInstances(int amount)
         {
-            const string LOG_PREFIX = $"{nameof(DamageOrbTargetDummyObjectMarker)}.{nameof(refillLocalInstances)} ";
+            const string LOG_PREFIX = $"{nameof(OrbTargetDummyObjectMarker)}.{nameof(refillLocalInstances)} ";
 
 #if DEBUG
             Log.Debug(LOG_PREFIX + $"{nameof(amount)}={amount}");
@@ -92,7 +92,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
             {
                 for (int i = 0; i < amount; i++)
                 {
-                    DamageOrbTargetDummyObjectMarker marker = InstantiateNew();
+                    OrbTargetDummyObjectMarker marker = InstantiateNew();
                     marker.IsAvailableToLocalPlayer = true;
                     NetworkServer.Spawn(marker.gameObject);
                     _availableLocalInstances.Add(marker);
@@ -131,7 +131,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
                             Log.Debug(LOG_PREFIX + $"asking server ({nameof(networkUser)} + sending event) id: {networkUser.id.HasValidValue()} (waited {Time.time - timeStarted:F2} seconds)");
 #endif
 
-                            new ClientRequestDamageOrbTargetMarkerObjects(amount, networkUser.id).SendTo(NetworkDestination.Server);
+                            new ClientRequestOrbTargetMarkerObjects(amount, networkUser.id).SendTo(NetworkDestination.Server);
                         }
 
                         Main.Instance.StartCoroutine(waitForUserInitAndSendRequest((uint)amount, networkUser));
@@ -140,9 +140,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
             }
         }
 
-        static void ClientRequestDamageOrbTargetMarkerObjects_Reply_OnReceived(DamageOrbTargetDummyObjectMarker[] newTargetObjects)
+        static void ClientRequestDamageOrbTargetMarkerObjects_Reply_OnReceived(OrbTargetDummyObjectMarker[] newTargetObjects)
         {
-            IEnumerable<DamageOrbTargetDummyObjectMarker> validObjects = newTargetObjects.Where(static o => o);
+            IEnumerable<OrbTargetDummyObjectMarker> validObjects = newTargetObjects.Where(static o => o);
 
 #if DEBUG
             Log.Debug($"Received orb markers: [{string.Join(", ", validObjects.Select(static o => o.GetComponent<NetworkIdentity>().netId))}]");
@@ -151,10 +151,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling
             _availableLocalInstances.AddRange(validObjects);
         }
 
-        public static DamageOrbTargetDummyObjectMarker InstantiateNew()
+        public static OrbTargetDummyObjectMarker InstantiateNew()
         {
             GameObject orbTarget = GameObject.Instantiate(Prefab);
-            return orbTarget.GetComponent<DamageOrbTargetDummyObjectMarker>();
+            return orbTarget.GetComponent<OrbTargetDummyObjectMarker>();
         }
 
         public bool IsAvailableToLocalPlayer { get; internal set; }

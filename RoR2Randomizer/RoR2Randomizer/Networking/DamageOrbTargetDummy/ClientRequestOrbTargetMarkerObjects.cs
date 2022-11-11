@@ -1,7 +1,7 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.RandomizerControllers.Projectile.DamageOrbHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,16 +14,16 @@ using UnityModdingUtility;
 
 namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
 {
-    public sealed class ClientRequestDamageOrbTargetMarkerObjects : NetworkMessageBase
+    public sealed class ClientRequestOrbTargetMarkerObjects : NetworkMessageBase
     {
         uint _newObjectCount;
         NetworkUserId _requesterID;
 
-        public ClientRequestDamageOrbTargetMarkerObjects()
+        public ClientRequestOrbTargetMarkerObjects()
         {
         }
 
-        public ClientRequestDamageOrbTargetMarkerObjects(uint amount, NetworkUserId requesterID)
+        public ClientRequestOrbTargetMarkerObjects(uint amount, NetworkUserId requesterID)
         {
             _newObjectCount = amount;
             _requesterID = requesterID;
@@ -43,7 +43,7 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
 
         public override void OnReceived()
         {
-            const string LOG_PREFIX = $"{nameof(ClientRequestDamageOrbTargetMarkerObjects)}.{nameof(OnReceived)} ";
+            const string LOG_PREFIX = $"{nameof(ClientRequestOrbTargetMarkerObjects)}.{nameof(OnReceived)} ";
 
             if (!NetworkServer.active)
             {
@@ -101,7 +101,7 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
                 GameObject[] objects = new GameObject[_newObjectCount];
                 for (int i = 0; i < _newObjectCount; i++)
                 {
-                    DamageOrbTargetDummyObjectMarker instantiated = DamageOrbTargetDummyObjectMarker.InstantiateNew();
+                    OrbTargetDummyObjectMarker instantiated = OrbTargetDummyObjectMarker.InstantiateNew();
 
                     objects[i] = instantiated.gameObject;
 
@@ -116,7 +116,7 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
 
         public sealed class Reply : NetworkMessageBase
         {
-            public delegate void OnReceiveDelegate(DamageOrbTargetDummyObjectMarker[] newTargetObjects);
+            public delegate void OnReceiveDelegate(OrbTargetDummyObjectMarker[] newTargetObjects);
             public static event OnReceiveDelegate OnReceive;
 
             NetworkInstanceId[] _objectIDs;
@@ -154,7 +154,7 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
             {
                 CoroutineOut<GameObject> resolvedObject = new CoroutineOut<GameObject>();
 
-                DamageOrbTargetDummyObjectMarker[] resolvedTargetObjects = new DamageOrbTargetDummyObjectMarker[objectIDs.Length];
+                OrbTargetDummyObjectMarker[] resolvedTargetObjects = new OrbTargetDummyObjectMarker[objectIDs.Length];
                 for (int i = 0; i < resolvedTargetObjects.Length; i++)
                 {
                     yield return SyncGameObjectReference.WaitForObjectResolved(objectIDs[i], null, resolvedObject);
@@ -162,7 +162,7 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
                     if (resolvedObject.Result)
                     {
                         GameObject.DontDestroyOnLoad(resolvedObject.Result);
-                        DamageOrbTargetDummyObjectMarker marker = resolvedObject.Result.GetComponent<DamageOrbTargetDummyObjectMarker>();
+                        OrbTargetDummyObjectMarker marker = resolvedObject.Result.GetComponent<OrbTargetDummyObjectMarker>();
                         marker.IsAvailableToLocalPlayer = true;
                         resolvedTargetObjects[i] = marker;
                     }
@@ -173,7 +173,7 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
 
             public override void OnReceived()
             {
-                const string LOG_PREFIX = $"{nameof(ClientRequestDamageOrbTargetMarkerObjects)}+{nameof(Reply)}.{nameof(OnReceived)} ";
+                const string LOG_PREFIX = $"{nameof(ClientRequestOrbTargetMarkerObjects)}+{nameof(Reply)}.{nameof(OnReceived)} ";
 
 #if DEBUG
                 Log.Debug(LOG_PREFIX);

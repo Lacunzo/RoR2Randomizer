@@ -35,8 +35,8 @@ namespace RoR2Randomizer.Networking
             NetworkingAPI.RegisterMessageType<SyncDamageOrbCatalog>();
             NetworkingAPI.RegisterMessageType<SyncDamageOrbIndexNeeded>();
 
-            NetworkingAPI.RegisterMessageType<ClientRequestDamageOrbTargetMarkerObjects>();
-            NetworkingAPI.RegisterMessageType<ClientRequestDamageOrbTargetMarkerObjects.Reply>();
+            NetworkingAPI.RegisterMessageType<ClientRequestOrbTargetMarkerObjects>();
+            NetworkingAPI.RegisterMessageType<ClientRequestOrbTargetMarkerObjects.Reply>();
 
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 
