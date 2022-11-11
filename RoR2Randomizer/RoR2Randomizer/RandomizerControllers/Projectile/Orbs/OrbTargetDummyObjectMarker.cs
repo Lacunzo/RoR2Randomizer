@@ -159,6 +159,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
         public bool IsAvailableToLocalPlayer { get; internal set; }
 
+        bool isAuthority => hasAuthority || (isServer && IsAvailableToLocalPlayer);
+
         bool _isInUse;
         float _timeToDestroy;
 
@@ -170,7 +172,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
         void onRunEnd(Run _)
         {
-            if (hasAuthority)
+            if (isAuthority)
             {
                 _isInUse = false;
                 enabled = false;
@@ -207,7 +209,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
         void Update()
         {
-            if (!hasAuthority && (!isServer || !IsAvailableToLocalPlayer))
+            if (!isAuthority)
                 return;
             
             if (_isInUse)
