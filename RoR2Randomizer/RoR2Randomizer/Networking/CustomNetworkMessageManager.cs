@@ -8,6 +8,7 @@ using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Networking.HoldoutZoneRandomizer;
 #endif
 using RoR2Randomizer.Networking.ProjectileRandomizer;
+using RoR2Randomizer.Networking.ProjectileRandomizer.Bullet;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.GenericDamage;
 using RoR2Randomizer.Networking.SniperWeakPointRandomizer;
 using System;

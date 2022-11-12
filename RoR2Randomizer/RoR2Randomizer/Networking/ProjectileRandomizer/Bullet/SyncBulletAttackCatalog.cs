@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.Networking.ProjectileRandomizer
+namespace RoR2Randomizer.Networking.ProjectileRandomizer.Bullet
 {
     public sealed class SyncBulletAttackCatalog : NetworkMessageBase
     {

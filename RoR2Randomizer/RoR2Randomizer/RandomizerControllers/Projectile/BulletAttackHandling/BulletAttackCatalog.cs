@@ -3,7 +3,7 @@ using R2API.Networking;
 using RoR2;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.Networking.ProjectileRandomizer;
+using RoR2Randomizer.Networking.ProjectileRandomizer.Bullet;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Networking;
