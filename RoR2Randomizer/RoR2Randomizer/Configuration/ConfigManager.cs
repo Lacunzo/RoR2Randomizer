@@ -1,5 +1,4 @@
-﻿using BepInEx.Bootstrap;
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using RoR2Randomizer.RandomizerControllers.Boss;
 using RoR2Randomizer.RandomizerControllers.Buff;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
@@ -11,10 +10,7 @@ using RoR2Randomizer.RandomizerControllers.Projectile;
 using RoR2Randomizer.RandomizerController.Skill;
 #endif
 using RoR2Randomizer.RandomizerControllers.Stage;
-using RoR2Randomizer.Utility;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Configuration
 {

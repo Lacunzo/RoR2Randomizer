@@ -4,7 +4,6 @@ using RoR2Randomizer.Patches.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Voidling;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
-using UnityEngine.Networking;
 using UnityEngine;
 using RoR2;
 using EntityStates;

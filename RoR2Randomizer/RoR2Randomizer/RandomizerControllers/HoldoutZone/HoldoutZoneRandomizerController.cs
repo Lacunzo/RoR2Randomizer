@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
-using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.HoldoutZone
 {

@@ -1,6 +1,4 @@
-﻿using HG;
-using R2API.Networking;
-using R2API.Networking.Interfaces;
+﻿using R2API.Networking;
 using RoR2;
 using RoR2.Orbs;
 using RoR2.Projectile;
@@ -12,12 +10,10 @@ using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
 using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandling;
 using RoR2Randomizer.Utility;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile
 {

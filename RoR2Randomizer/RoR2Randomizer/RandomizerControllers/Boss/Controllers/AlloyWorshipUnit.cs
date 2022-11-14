@@ -6,7 +6,6 @@ using RoR2Randomizer.Patches.BossRandomizer.AlloyWorshipUnit;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {

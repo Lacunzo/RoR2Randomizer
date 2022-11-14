@@ -1,9 +1,4 @@
 ﻿#if !DISABLE_SKILL_RANDOMIZER
-using RoR2Randomizer.ChildTransformAdditions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Bandit2.Weapon
 {
     [PatchClass]

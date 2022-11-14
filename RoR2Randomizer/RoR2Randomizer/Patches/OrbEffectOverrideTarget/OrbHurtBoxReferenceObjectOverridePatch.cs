@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
 {

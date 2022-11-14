@@ -5,9 +5,6 @@ using HarmonyLib;
 using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.Patches.Fixes;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.HoldoutZoneRandomizer.MoonBattery

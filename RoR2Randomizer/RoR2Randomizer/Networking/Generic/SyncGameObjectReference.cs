@@ -1,10 +1,7 @@
 ﻿using R2API.Networking;
-using R2API.Networking.Interfaces;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityModdingUtility;

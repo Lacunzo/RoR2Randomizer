@@ -1,14 +1,6 @@
 ﻿using RoR2;
-using RoR2.Projectile;
-using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
 using RoR2Randomizer.RandomizerControllers.Projectile;
-using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
-using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
 {

@@ -1,5 +1,4 @@
 ﻿using EntityStates;
-using HarmonyLib;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -8,10 +7,7 @@ using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
 using RoR2Randomizer.Utility.Patching;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes

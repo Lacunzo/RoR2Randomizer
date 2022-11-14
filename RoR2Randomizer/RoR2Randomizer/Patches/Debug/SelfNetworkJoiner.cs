@@ -3,9 +3,6 @@ using RoR2;
 using RoR2.EntitlementManagement;
 using RoR2.Networking;
 using RoR2Randomizer.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.Debug

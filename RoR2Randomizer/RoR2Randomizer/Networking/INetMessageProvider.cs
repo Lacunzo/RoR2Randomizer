@@ -1,5 +1,4 @@
-﻿using R2API.Networking.Interfaces;
-using RoR2Randomizer.Networking.Generic;
+﻿using RoR2Randomizer.Networking.Generic;
 using System.Collections.Generic;
 
 namespace RoR2Randomizer.Networking

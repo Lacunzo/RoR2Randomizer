@@ -5,11 +5,8 @@ using RoR2;
 using RoR2Randomizer.RandomizerControllers.Buff;
 using RoR2Randomizer.Utility;
 using RoR2Randomizer.Utility.Patching;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.BuffRandomizer
 {

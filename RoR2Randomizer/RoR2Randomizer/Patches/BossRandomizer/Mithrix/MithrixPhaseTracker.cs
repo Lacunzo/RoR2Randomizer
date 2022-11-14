@@ -1,11 +1,6 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using R2API.Utils;
 using RoR2;
-using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix

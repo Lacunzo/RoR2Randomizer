@@ -1,9 +1,6 @@
 ﻿using RoR2.UI;
 using RoR2.UI.MainMenu;
 using RoR2Randomizer.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.ModInfoMessage
 {

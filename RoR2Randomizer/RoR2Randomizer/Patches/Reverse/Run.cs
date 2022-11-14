@@ -1,10 +1,8 @@
 ﻿using HarmonyLib;
 using RoR2;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.Reverse
 {

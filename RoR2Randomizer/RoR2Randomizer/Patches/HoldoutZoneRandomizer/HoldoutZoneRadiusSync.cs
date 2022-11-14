@@ -3,9 +3,6 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.HoldoutZone;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.HoldoutZoneRandomizer
 {

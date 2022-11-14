@@ -4,9 +4,6 @@ using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerControllers.Boss;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster

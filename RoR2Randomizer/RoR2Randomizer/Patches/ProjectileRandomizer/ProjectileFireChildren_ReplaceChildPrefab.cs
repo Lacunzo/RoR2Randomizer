@@ -4,7 +4,6 @@ using MonoMod.Cil;
 using RoR2.Projectile;
 using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
 using RoR2Randomizer.RandomizerControllers.Projectile;
-using System;
 using System.Reflection;
 using UnityEngine;
 

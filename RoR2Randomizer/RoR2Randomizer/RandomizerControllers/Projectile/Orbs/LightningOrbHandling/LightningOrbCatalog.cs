@@ -5,10 +5,8 @@ using RoR2.Orbs;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.Lightning;
-using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandling

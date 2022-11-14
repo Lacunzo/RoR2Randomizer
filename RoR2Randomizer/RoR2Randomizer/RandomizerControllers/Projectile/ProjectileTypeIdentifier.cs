@@ -1,13 +1,8 @@
 ﻿using RoR2;
-using RoR2.Orbs;
 using RoR2.Projectile;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs;
-using RoR2Randomizer.Patches.OrbEffectOverrideTarget;
-using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
-using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
 using System;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;

@@ -1,12 +1,5 @@
-﻿using R2API.Networking.Interfaces;
-using RoR2;
-using RoR2Randomizer.Networking.BossRandomizer;
-using RoR2Randomizer.Networking.Generic;
+﻿using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.CharacterReplacements

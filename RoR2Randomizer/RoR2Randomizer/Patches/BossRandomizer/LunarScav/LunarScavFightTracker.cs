@@ -2,12 +2,7 @@
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.Boss;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
-using RoR2Randomizer.RandomizerControllers.Stage;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.LunarScav
 {

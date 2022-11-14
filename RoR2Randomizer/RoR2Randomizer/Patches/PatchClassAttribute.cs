@@ -1,9 +1,7 @@
-﻿using RoR2;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.Patches

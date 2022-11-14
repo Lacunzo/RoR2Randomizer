@@ -1,7 +1,6 @@
 ﻿using RoR2;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Utility;
-using System;
 using UnityEngine;
 using UnityEngine.Networking;
 

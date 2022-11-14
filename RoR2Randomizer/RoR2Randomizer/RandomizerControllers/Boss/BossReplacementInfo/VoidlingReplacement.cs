@@ -6,12 +6,7 @@ using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Voidling;
 using RoR2Randomizer.Utility;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 {

@@ -1,16 +1,12 @@
 ﻿#if !DISABLE_SKILL_RANDOMIZER
 using EntityStates;
 using HarmonyLib;
-using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2.CharacterAI;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.Assassin2

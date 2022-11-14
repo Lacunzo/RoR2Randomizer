@@ -1,7 +1,5 @@
 ﻿using BepInEx.Logging;
 using RoR2Randomizer.Utility;
-using System.Diagnostics;
-using UnityEngine;
 
 namespace RoR2Randomizer
 {

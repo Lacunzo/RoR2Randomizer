@@ -1,14 +1,9 @@
 ﻿#if DEBUG
 using BepInEx.Logging;
-using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Networking.Generic;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Unity;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.Debug

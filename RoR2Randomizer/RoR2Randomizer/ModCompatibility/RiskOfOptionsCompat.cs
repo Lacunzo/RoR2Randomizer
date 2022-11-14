@@ -1,9 +1,5 @@
 ﻿using BepInEx.Bootstrap;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using UnityEngine;
 using UnityModdingUtility;
 

@@ -2,14 +2,10 @@
 using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using On.EntityStates.BrotherMonster;
 using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.Boss;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster

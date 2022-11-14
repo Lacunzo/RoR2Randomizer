@@ -1,8 +1,4 @@
-﻿using RoR2;
-using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using RoR2Randomizer.Utility;
 
 namespace RoR2Randomizer.Patches.BossRandomizer
 {

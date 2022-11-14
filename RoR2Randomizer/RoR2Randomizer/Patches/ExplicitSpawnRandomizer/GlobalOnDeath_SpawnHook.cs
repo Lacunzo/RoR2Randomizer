@@ -4,8 +4,6 @@ using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;

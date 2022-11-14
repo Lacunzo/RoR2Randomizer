@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 {

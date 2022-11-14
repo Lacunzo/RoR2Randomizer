@@ -3,8 +3,6 @@ using HarmonyLib;
 using MonoMod.RuntimeDetour;
 using RoR2;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.Debug
 {

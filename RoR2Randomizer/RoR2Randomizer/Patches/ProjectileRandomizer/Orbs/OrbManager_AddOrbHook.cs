@@ -1,8 +1,5 @@
 ﻿using RoR2.Orbs;
 using RoR2Randomizer.RandomizerControllers.Projectile;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.ProjectileRandomizer.Orbs
 {

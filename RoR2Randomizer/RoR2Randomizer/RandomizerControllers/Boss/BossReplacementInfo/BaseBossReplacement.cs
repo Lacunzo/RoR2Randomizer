@@ -1,16 +1,9 @@
-﻿using R2API.Networking;
-using R2API.Networking.Interfaces;
-using RoR2;
+﻿using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Networking.Generic;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
-using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 {

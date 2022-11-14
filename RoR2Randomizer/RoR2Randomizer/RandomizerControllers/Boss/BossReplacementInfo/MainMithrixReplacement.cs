@@ -1,15 +1,11 @@
-﻿using EntityStates;
-using EntityStates.BrotherMonster;
+﻿using EntityStates.BrotherMonster;
 using R2API;
 using RoR2;
 using RoR2Randomizer.Networking.BossRandomizer;
 using RoR2Randomizer.Utility;
 using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Networking;
-using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 {

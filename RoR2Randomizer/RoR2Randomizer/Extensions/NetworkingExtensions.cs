@@ -1,7 +1,4 @@
 ﻿using HG;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Extensions

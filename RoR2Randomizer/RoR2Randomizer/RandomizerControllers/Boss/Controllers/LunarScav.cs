@@ -7,7 +7,6 @@ using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
 using System;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss
 {

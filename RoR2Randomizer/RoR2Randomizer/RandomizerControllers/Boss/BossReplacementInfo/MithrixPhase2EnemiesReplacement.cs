@@ -1,8 +1,4 @@
-﻿using RoR2;
-using RoR2Randomizer.Networking.BossRandomizer;
-using RoR2Randomizer.Utility;
-using System.Collections;
-using UnityModdingUtility;
+﻿using RoR2Randomizer.Networking.BossRandomizer;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 {

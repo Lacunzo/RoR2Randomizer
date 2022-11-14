@@ -1,8 +1,5 @@
 ﻿#if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
 using RoR2Randomizer.RandomizerControllers.HoldoutZone;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.HoldoutZoneRandomizer
 {

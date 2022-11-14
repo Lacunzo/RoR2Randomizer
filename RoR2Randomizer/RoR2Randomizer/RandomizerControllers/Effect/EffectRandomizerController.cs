@@ -1,15 +1,11 @@
-﻿using R2API.Networking;
-using R2API.Networking.Interfaces;
-using RoR2;
+﻿using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Effect

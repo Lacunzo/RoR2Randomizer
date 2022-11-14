@@ -1,10 +1,6 @@
 ﻿#if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
 using BepInEx.Configuration;
 using RoR2Randomizer.Configuration;
-using RoR2Randomizer.Configuration.ConfigValue;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.RandomizerControllers.HoldoutZone
 {

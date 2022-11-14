@@ -1,6 +1,5 @@
 ﻿#if DEBUG
 using RoR2;
-using RoR2Randomizer.Utility;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.Debug

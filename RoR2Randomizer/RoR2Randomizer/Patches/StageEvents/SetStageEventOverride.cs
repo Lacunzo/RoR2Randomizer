@@ -1,6 +1,5 @@
 ﻿using RoR2;
 using RoR2Randomizer.Configuration;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;

@@ -1,9 +1,7 @@
 ﻿#if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
 using EntityStates;
 using RoR2;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Utility
 {

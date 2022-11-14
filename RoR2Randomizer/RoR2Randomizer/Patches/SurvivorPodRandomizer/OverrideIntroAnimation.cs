@@ -1,9 +1,5 @@
 ﻿using RoR2;
-using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerControllers.SurvivorPod;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.SurvivorPodRandomizer

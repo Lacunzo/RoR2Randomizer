@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace RoR2Randomizer.Utility
+﻿namespace RoR2Randomizer.Utility
 {
     public static class Constants
     {

@@ -1,14 +1,8 @@
 ﻿using EntityStates;
-using HG;
 using RoR2;
 using RoR2.Skills;
-using RoR2Randomizer.Patches.Fixes;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {

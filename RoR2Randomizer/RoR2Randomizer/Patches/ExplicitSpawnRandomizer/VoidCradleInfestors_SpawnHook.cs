@@ -1,10 +1,6 @@
 ﻿using RoR2;
-using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Patches.BossRandomizer;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer

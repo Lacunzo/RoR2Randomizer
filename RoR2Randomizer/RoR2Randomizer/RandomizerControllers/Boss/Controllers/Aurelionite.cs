@@ -3,7 +3,6 @@ using RoR2Randomizer.Patches.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Aurelionite;
 using RoR2Randomizer.Utility;
 using System;
-using UnityEngine.Networking;
 using UnityEngine;
 using RoR2;
 using RoR2Randomizer.Configuration;

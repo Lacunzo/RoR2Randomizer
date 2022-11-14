@@ -1,11 +1,6 @@
-﻿using HarmonyLib;
-using MonoMod.Cil;
-using RoR2;
+﻿using RoR2;
 using RoR2.Projectile;
 using RoR2Randomizer.ChildTransformAdditions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.ProjectileRandomizer

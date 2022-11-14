@@ -1,11 +1,6 @@
 ﻿using BepInEx.Configuration;
-using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Configuration.ConfigValue;
-using RoR2Randomizer.RandomizerControllers.Boss;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile
 {

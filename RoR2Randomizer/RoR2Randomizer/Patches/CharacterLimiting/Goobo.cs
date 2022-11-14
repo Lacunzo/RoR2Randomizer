@@ -4,9 +4,6 @@ using RoR2;
 using RoR2.Projectile;
 using RoR2Randomizer.CharacterLimiter;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.CharacterLimiting

@@ -1,11 +1,6 @@
 ﻿#if !DISABLE_SKILL_RANDOMIZER
 using RoR2;
-using RoR2.Skills;
-using RoR2Randomizer.Extensions;
 using RoR2Randomizer.RandomizerController.Skill;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches
 {

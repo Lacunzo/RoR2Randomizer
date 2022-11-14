@@ -1,10 +1,5 @@
-﻿using R2API.Networking;
-using RoR2;
+﻿using RoR2;
 using RoR2Randomizer.Configuration;
-using RoR2Randomizer.Networking.SniperWeakPointRandomizer;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint

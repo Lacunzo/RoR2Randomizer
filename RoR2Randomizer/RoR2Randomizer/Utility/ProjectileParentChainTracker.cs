@@ -1,7 +1,5 @@
 ﻿using RoR2.Projectile;
 using RoR2Randomizer.RandomizerControllers.Projectile;
-using System;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Utility

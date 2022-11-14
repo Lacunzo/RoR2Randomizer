@@ -1,9 +1,6 @@
 ﻿using HarmonyLib;
 using RoR2Randomizer.RandomizerControllers.Buff;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.BuffRandomizer
 {

@@ -1,12 +1,7 @@
 ﻿using HarmonyLib;
-using Mono.Cecil.Rocks;
 using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using RoR2;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.Reverse
 {

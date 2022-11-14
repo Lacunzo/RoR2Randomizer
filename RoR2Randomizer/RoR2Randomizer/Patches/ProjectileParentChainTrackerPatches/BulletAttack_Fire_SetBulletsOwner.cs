@@ -1,10 +1,5 @@
-﻿using RoR2Randomizer.RandomizerControllers.Projectile;
-using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
+﻿using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using RoR2Randomizer.Utility;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 {

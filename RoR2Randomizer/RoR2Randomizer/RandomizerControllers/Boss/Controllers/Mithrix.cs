@@ -7,10 +7,8 @@ using RoR2Randomizer.Patches.BossRandomizer;
 using RoR2Randomizer.Patches.BossRandomizer.Mithrix;
 using RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo;
 using RoR2Randomizer.Utility;
-using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityModdingUtility;
 
 namespace RoR2Randomizer.RandomizerControllers.Boss

@@ -3,9 +3,7 @@ using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.RandomizerControllers.HoldoutZone;
 using RoR2Randomizer.Utility;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.HoldoutZoneRandomizer

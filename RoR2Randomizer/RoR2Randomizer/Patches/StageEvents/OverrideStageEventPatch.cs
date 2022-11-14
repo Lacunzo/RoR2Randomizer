@@ -2,12 +2,9 @@
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RoR2;
-using RoR2Randomizer.Utility;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Patches.StageEvents

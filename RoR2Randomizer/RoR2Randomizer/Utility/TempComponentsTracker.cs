@@ -1,7 +1,6 @@
 ﻿using RoR2Randomizer.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace RoR2Randomizer.Utility

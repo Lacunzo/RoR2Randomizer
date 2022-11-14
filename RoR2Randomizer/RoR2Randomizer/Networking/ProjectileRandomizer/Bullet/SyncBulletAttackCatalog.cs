@@ -1,8 +1,5 @@
 ﻿using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.ProjectileRandomizer.Bullet

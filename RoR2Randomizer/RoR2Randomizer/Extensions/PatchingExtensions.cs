@@ -3,8 +3,6 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2Randomizer.Utility;
 using System;
-using System.Linq;
-using System.Reflection;
 
 namespace RoR2Randomizer.Extensions
 {

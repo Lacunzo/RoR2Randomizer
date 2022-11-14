@@ -1,14 +1,9 @@
 ﻿#if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
-using EntityStates;
 using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
-using RoR2Randomizer.Patches.Fixes;
 using RoR2Randomizer.RandomizerControllers.HoldoutZone;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.HoldoutZoneRandomizer.NullWard
 {

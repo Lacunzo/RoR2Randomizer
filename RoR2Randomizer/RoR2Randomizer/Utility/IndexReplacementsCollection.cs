@@ -1,12 +1,10 @@
 ﻿using HG;
-using R2API.Networking.Interfaces;
 using RoR2;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Utility

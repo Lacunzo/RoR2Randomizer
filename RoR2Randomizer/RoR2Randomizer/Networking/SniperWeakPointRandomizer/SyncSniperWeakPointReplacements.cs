@@ -1,15 +1,10 @@
 ﻿using HG;
 using R2API.Networking;
-using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.RandomizerControllers.SniperWeakPoint;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Unity;
 using UnityEngine;
 using UnityEngine.Networking;
 

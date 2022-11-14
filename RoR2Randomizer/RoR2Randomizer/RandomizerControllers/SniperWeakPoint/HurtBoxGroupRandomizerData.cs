@@ -4,10 +4,8 @@ using RoR2;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.SniperWeakPointRandomizer;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 

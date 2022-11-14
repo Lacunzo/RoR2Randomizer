@@ -1,14 +1,10 @@
 ﻿using BepInEx.Logging;
 using R2API.Networking;
-using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2Randomizer.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Utility
