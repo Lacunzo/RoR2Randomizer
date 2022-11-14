@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RoR2Randomizer.Patches.ProjectileRandomizer.DamageOrbs
+namespace RoR2Randomizer.Patches.ProjectileRandomizer.Orbs
 {
     [PatchClass]
     static class OrbManager_AddOrbHook
     {
+        internal static int PatchDisabledCount = 0;
+
         static void Apply()
         {
             On.RoR2.Orbs.OrbManager.AddOrb += OrbManager_AddOrb;
@@ -21,7 +23,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.DamageOrbs
 
         static void OrbManager_AddOrb(On.RoR2.Orbs.OrbManager.orig_AddOrb orig, OrbManager self, Orb orb)
         {
-            if (ProjectileRandomizerController.TryReplaceFire(orb))
+            if (PatchDisabledCount <= 0 && ProjectileRandomizerController.TryReplaceFire(orb))
             {
                 return;
             }

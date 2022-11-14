@@ -15,14 +15,14 @@ using UnityEngine.Networking;
 namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
 {
     [PatchClass]
-    static class DamageOrbHurtBoxReferenceObjectOverridePatch
+    static class OrbHurtBoxReferenceObjectOverridePatch
     {
-        internal static readonly Dictionary<GenericDamageOrb, Vector3> overrideOrbTargetPosition = new Dictionary<GenericDamageOrb, Vector3>();
+        internal static readonly Dictionary<Orb, Vector3> overrideOrbTargetPosition = new Dictionary<Orb, Vector3>();
 
         static readonly Hook Orb_get_distanceToTarget = new Hook(AccessTools.DeclaredPropertyGetter(typeof(Orb), nameof(Orb.distanceToTarget)), static (Func<Orb, float> orig, Orb self) =>
         {
             float result = orig(self);
-            if (!self.target && self is GenericDamageOrb genericDamageOrb && overrideOrbTargetPosition.TryGetValue(genericDamageOrb, out Vector3 overrideTargetPosition))
+            if (!self.target && overrideOrbTargetPosition.TryGetValue(self, out Vector3 overrideTargetPosition))
             {
                 result = Vector3.Distance(self.origin, overrideTargetPosition);
             }
@@ -32,26 +32,28 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
 
         static void Apply()
         {
-            IL.RoR2.Orbs.GenericDamageOrb.Begin += IL_GenericDamageOrb_Begin;
+            IL.RoR2.Orbs.GenericDamageOrb.Begin += IL_GenericOrb_Begin;
+            IL.RoR2.Orbs.LightningOrb.Begin += IL_GenericOrb_Begin;
 
             Orb_get_distanceToTarget.Apply();
         }
 
         static void Cleanup()
         {
-            IL.RoR2.Orbs.GenericDamageOrb.Begin -= IL_GenericDamageOrb_Begin;
+            IL.RoR2.Orbs.GenericDamageOrb.Begin -= IL_GenericOrb_Begin;
+            IL.RoR2.Orbs.LightningOrb.Begin -= IL_GenericOrb_Begin;
 
             Orb_get_distanceToTarget.Undo();
         }
 
-        static readonly FieldInfo _target_FI = AccessTools.DeclaredField(typeof(DamageOrbHurtBoxReferenceObjectOverridePatch), nameof(_target));
+        static readonly FieldInfo _target_FI = AccessTools.DeclaredField(typeof(OrbHurtBoxReferenceObjectOverridePatch), nameof(_target));
 #pragma warning disable CS0649 // Compiler complains that it is never assigned since it's only set through patched IL
         static HurtBox _target;
 #pragma warning restore CS0649
 
-        static void IL_GenericDamageOrb_Begin(ILContext il)
+        static void IL_GenericOrb_Begin(ILContext il)
         {
-            const string LOG_PREFIX = $"Patch {nameof(DamageOrbHurtBoxReferenceObjectOverridePatch)}.{nameof(IL_GenericDamageOrb_Begin)} ";
+            const string LOG_PREFIX = $"Patch {nameof(OrbHurtBoxReferenceObjectOverridePatch)}.{nameof(IL_GenericOrb_Begin)} ";
 
             ILCursor c = new ILCursor(il);
 
@@ -69,7 +71,7 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
                         c.Index++;
                         c.Emit(OpCodes.Ldloc, effectDataLocalIndex);
                         c.Emit(OpCodes.Ldarg_0);
-                        c.EmitDelegate(static (EffectData effectData, GenericDamageOrb instance) =>
+                        c.EmitDelegate(static (EffectData effectData, Orb instance) =>
                         {
                             if (!_target && ProjectileRandomizerController.IsActive && overrideOrbTargetPosition.TryGetValue(instance, out Vector3 overrideTargetPosition))
                             {
@@ -95,7 +97,7 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
             if (c.TryGotoNext(x => x.MatchRet()))
             {
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate(static (GenericDamageOrb instance) =>
+                c.EmitDelegate(static (Orb instance) =>
                 {
                     overrideOrbTargetPosition.Remove(instance);
                 });

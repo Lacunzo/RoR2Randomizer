@@ -1,6 +1,7 @@
 ﻿using RoR2;
 using RoR2.Orbs;
 using RoR2.Projectile;
+using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs;
 using RoR2Randomizer.Patches.OrbEffectOverrideTarget;
 using RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
@@ -16,16 +17,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     public readonly struct ProjectileTypeIdentifier : IEquatable<ProjectileTypeIdentifier>
     {
         public static readonly ProjectileTypeIdentifier Invalid = new ProjectileTypeIdentifier(ProjectileType.Invalid, -1);
-
-        static readonly BullseyeSearch _orbTargetSearch = new BullseyeSearch
-        {
-            minAngleFilter = 0f,
-            maxAngleFilter = 7.5f,
-            filterByLoS = true,
-            minDistanceFilter = 0f,
-            maxDistanceFilter = float.PositiveInfinity,
-            sortMode = BullseyeSearch.SortMode.Distance
-        };
 
         public readonly ProjectileType Type;
         public readonly int Index;
@@ -70,8 +61,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             Vector3 direction = (rotation * Vector3.forward).normalized;
 
-            CharacterBody ownerBody = genericArgs.OwnerBody;
-
             switch (Type)
             {
                 case ProjectileType.OrdinaryProjectile:
@@ -115,86 +104,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     bulletAttack.Fire();
                     break;
                 case ProjectileType.DamageOrb:
-                    DamageOrbIdentifier orbIdentifier = DamageOrbCatalog.GetIdentifier(Index);
-                    if (!orbIdentifier.IsValid)
-                    {
-                        Log.Warning(LOG_PREFIX + $"invalid damage orb at index {Index}");
-                        break;
-                    }
-
-                    GenericDamageOrb damageOrb = orbIdentifier.CreateInstance();
-
-                    damageOrb.origin = origin;
-                    damageOrb.damageValue = damage;
-                    damageOrb.attacker = genericArgs.Owner;
-                    damageOrb.isCrit = isCrit;
-
-                    //if (damageType.HasValue)
-                    //    damageOrb.damageType = damageType.Value;
-
-                    if (damageOrb is SquidOrb squidOrb)
-                    {
-                        squidOrb.forceScalar = force;
-                    }
-
-                    if (genericArgs.Target)
-                    {
-                        damageOrb.target = genericArgs.Target;
-                    }
-                    else
-                    {
-                        _orbTargetSearch.searchOrigin = origin;
-                        _orbTargetSearch.searchDirection = direction;
-
-                        if (ownerBody)
-                        {
-                            _orbTargetSearch.viewer = ownerBody;
-                            _orbTargetSearch.teamMaskFilter = TeamMask.allButNeutral;
-                            _orbTargetSearch.teamMaskFilter.RemoveTeam(TeamComponent.GetObjectTeam(ownerBody.gameObject));
-                        }
-                        else
-                        {
-                            _orbTargetSearch.viewer = null;
-                            _orbTargetSearch.teamMaskFilter = TeamMask.all;
-                        }
-
-                        _orbTargetSearch.RefreshCandidates();
-
-                        HurtBox hurtBox = _orbTargetSearch.GetResults().FirstOrDefault();
-                        if (hurtBox)
-                        {
-                            damageOrb.target = hurtBox;
-                        }
-                        else
-                        {
-                            const float MAX_DISTANCE = 100f;
-
-                            Ray ray = new Ray(origin, direction);
-
-                            Vector3 targetPosition;
-                            if (Physics.Raycast(ray, out RaycastHit hit, MAX_DISTANCE, LayerIndex.world.mask))
-                            {
-                                targetPosition = hit.point;
-                            }
-                            else
-                            {
-                                targetPosition = ray.GetPoint(MAX_DISTANCE);
-                            }
-
-                            DamageOrbHurtBoxReferenceObjectOverridePatch.overrideOrbTargetPosition[damageOrb] = targetPosition;
-
-                            if (damageOrb is LightningStrikeOrb lightningStrikeOrb)
-                            {
-                                lightningStrikeOrb.lastKnownTargetPosition = targetPosition;
-                            }
-                            else if (damageOrb is SimpleLightningStrikeOrb simpleLightningStrikeOrb)
-                            {
-                                simpleLightningStrikeOrb.lastKnownTargetPosition = targetPosition;
-                            }
-                        }
-                    }
-
-                    OrbManager.instance.AddOrb(damageOrb);
+                case ProjectileType.LightningOrb:
+                    new SpawnRandomizedOrbMessage(this, origin, rotation, damage, force, isCrit, genericArgs).SpawnOrSendMessage();
                     break;
                 default:
                     Log.Warning(LOG_PREFIX + $"unhandled type {Type}");

@@ -9,11 +9,10 @@ using RoR2Randomizer.Networking.HoldoutZoneRandomizer;
 #endif
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Bullet;
+using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.GenericDamage;
+using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.Lightning;
 using RoR2Randomizer.Networking.SniperWeakPointRandomizer;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RoR2Randomizer.Networking
 {
@@ -37,8 +36,13 @@ namespace RoR2Randomizer.Networking
             NetworkingAPI.RegisterMessageType<SyncDamageOrbCatalog>();
             NetworkingAPI.RegisterMessageType<SyncDamageOrbIndexNeeded>();
 
+            NetworkingAPI.RegisterMessageType<SyncLightningOrbCatalog>();
+            NetworkingAPI.RegisterMessageType<SyncLightningOrbIndexNeeded>();
+
             NetworkingAPI.RegisterMessageType<ClientRequestOrbTargetMarkerObjects>();
             NetworkingAPI.RegisterMessageType<ClientRequestOrbTargetMarkerObjects.Reply>();
+
+            NetworkingAPI.RegisterMessageType<SpawnRandomizedOrbMessage>();
 
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 

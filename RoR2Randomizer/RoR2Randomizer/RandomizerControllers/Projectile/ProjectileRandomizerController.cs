@@ -10,6 +10,7 @@ using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandling;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -112,6 +113,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
 
             identifiers = identifiers.Concat(DamageOrbCatalog.GetAllDamageOrbProjectileIdentifiers());
+            identifiers = identifiers.Concat(LightningOrbCatalog.GetAllLightningOrbProjectileIdentifiers());
 
             return identifiers;
         }
@@ -225,6 +227,14 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
+        static void LightningOrbCatalog_LightningOrbIdentifierAppendedServer(LightningOrbIdentifier identifier)
+        {
+            if (Run.instance)
+            {
+                appendProjectileReplacement(identifier);
+            }
+        }
+
         protected override void Awake()
         {
             base.Awake();
@@ -232,6 +242,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
             BulletAttackCatalog.BulletAttackAppended += BulletAttackCatalog_BulletAttackAppended;
             DamageOrbCatalog.DamageOrbAppendedServer += DamageOrbCatalog_DamageOrbAppendedServer;
+            LightningOrbCatalog.LightningOrbIdentifierAppendedServer += LightningOrbCatalog_LightningOrbIdentifierAppendedServer;
         }
 
         protected override void OnDestroy()
@@ -241,6 +252,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             SyncProjectileReplacements.OnReceive -= onProjectileReplacementsReceivedFromServer;
             BulletAttackCatalog.BulletAttackAppended -= BulletAttackCatalog_BulletAttackAppended;
             DamageOrbCatalog.DamageOrbAppendedServer -= DamageOrbCatalog_DamageOrbAppendedServer;
+            LightningOrbCatalog.LightningOrbIdentifierAppendedServer -= LightningOrbCatalog_LightningOrbIdentifierAppendedServer;
 
             _projectileIndicesReplacements.Dispose();
             _appendedProjectileReplacements.Dispose();
@@ -263,6 +275,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         return true;
                     case ProjectileType.Bullet:
                     case ProjectileType.DamageOrb:
+                    case ProjectileType.LightningOrb:
                         _replacingTempDisabled = true;
                         replacement.Fire(origin, rotation, damage, force, isCrit, genericArgs);
                         _replacingTempDisabled = false;
@@ -278,19 +291,25 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryReplaceFire(Orb orb)
         {
+            if (!IsActive)
+                return false;
+
             const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceFire)}({nameof(Orb)}) ";
 
-            if (orb is GenericDamageOrb damageOrb)
+            ProjectileTypeIdentifier identifier = ProjectileTypeIdentifier.Invalid;
+
+            float damage = 0f;
+            float force = 0f;
+            bool isCrit = false;
+
+            GenericFireProjectileArgs genericArgs = new GenericFireProjectileArgs
             {
-                float force;
-                if (damageOrb is SquidOrb squidOrb)
+                Target = orb.target
+            };
+
+            bool tryReplaceOrb()
                 {
-                    force = squidOrb.forceScalar;
-                }
-                else
-                {
-                    force = 0f;
-                }
+                Vector3 origin = orb.origin;
 
                 Quaternion rotation;
                 if (orb.target)
@@ -302,22 +321,48 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     rotation = Quaternion.identity;
                 }
 
-                DamageOrbIdentifier identifier = DamageOrbCatalog.GetIdentifier(damageOrb);
-                return identifier.IsValid && TryReplaceFire(identifier, orb.origin, rotation, damageOrb.damageValue, force, damageOrb.isCrit, new GenericFireProjectileArgs
-                {
-                    Owner = damageOrb.attacker,
-                    DamageType = damageOrb.damageType,
-                    Target = damageOrb.target
-                });
+                return identifier.IsValid && TryReplaceFire(identifier, orb.origin, rotation, damage, force, isCrit, genericArgs);
             }
-            else
+
+            if (orb is GenericDamageOrb damageOrb)
+                {
+                damage = damageOrb.damageValue;
+                force = damageOrb is SquidOrb squidOrb ? squidOrb.forceScalar : 0f;
+                isCrit = damageOrb.isCrit;
+
+                DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.GetIdentifier(damageOrb);
+                if (damageOrbIdentifier.IsValid)
+                {
+                    genericArgs.Owner = damageOrb.attacker;
+                    genericArgs.DamageType = damageOrb.damageType;
+
+                    identifier = damageOrbIdentifier;
+                    return tryReplaceOrb();
+            }
+            }
+            else if (orb is LightningOrb lightningOrb)
             {
+                damage = lightningOrb.damageValue;
+                force = 0f;
+                isCrit = lightningOrb.isCrit;
+
+                LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.GetIdentifier(lightningOrb);
+                if (lightningOrbIdentifier.IsValid)
+                {
+                    genericArgs.Owner = lightningOrb.attacker;
+                    genericArgs.DamageType = lightningOrb.damageType;
+                    genericArgs.Weapon = lightningOrb.inflictor;
+
+                    identifier = lightningOrbIdentifier;
+                    return tryReplaceOrb();
+                }
+            }
+
 #if DEBUG
                 Log.Debug(LOG_PREFIX + $"unhandled Orb type {orb?.GetType()?.FullName ?? "null"}");
 #endif
                 return false;
             }
-        }
 
         public static bool TryReplaceFire(BulletAttack bulletAttack, Vector3 fireDirection)
         {
@@ -327,6 +372,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryReplaceFire(FireProjectileInfo info, GameObject weapon)
         {
+            if (!IsActive)
+                return false;
+
             HurtBox targetHurtBox = null;
             if (info.target)
             {

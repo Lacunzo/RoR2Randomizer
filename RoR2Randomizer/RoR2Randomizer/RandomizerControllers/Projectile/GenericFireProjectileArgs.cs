@@ -1,9 +1,11 @@
-﻿using RoR2;
+﻿using R2API.Networking.Interfaces;
+using RoR2;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile
 {
-    public struct GenericFireProjectileArgs
+    public struct GenericFireProjectileArgs : ISerializableObject
     {
         public GameObject Owner;
         public CharacterBody OwnerBody
@@ -40,6 +42,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
+        public TeamIndex OwnerTeam => TeamComponent.GetObjectTeam(Owner);
+
         public GameObject Weapon;
 
         public string MuzzleName;
@@ -74,6 +78,37 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     }
                 }
             }
+        }
+
+        void ISerializableObject.Serialize(NetworkWriter writer)
+        {
+            writer.Write(Owner);
+
+            writer.Write(DamageType.HasValue);
+            if (DamageType.HasValue)
+                writer.Write(DamageType.Value);
+
+            HurtBoxReference.FromHurtBox(Target).Write(writer);
+
+            writer.Write(Weapon);
+
+            writer.Write(MuzzleName);
+        }
+
+        void ISerializableObject.Deserialize(NetworkReader reader)
+        {
+            Owner = reader.ReadGameObject();
+
+            if (reader.ReadBoolean())
+                DamageType = reader.ReadDamageType();
+
+            HurtBoxReference hurtBoxReference = new HurtBoxReference();
+            hurtBoxReference.Read(reader);
+            Target = hurtBoxReference.ResolveHurtBox();
+
+            Weapon = reader.ReadGameObject();
+
+            MuzzleName = reader.ReadString();
         }
     }
 }
