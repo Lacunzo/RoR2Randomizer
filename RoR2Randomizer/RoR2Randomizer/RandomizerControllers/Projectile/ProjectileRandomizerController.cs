@@ -70,6 +70,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                          case "ToolbotDroneHeal": // Does nothing
                                          case "ToolbotDroneStun": // Does nothing
                                          case "TreebotPounderProjectile": // Does nothing
+                                         case "TreebotFlower1": // Does nothing
 
                                          // Excluded because I think it's more fun that way
                                          case "MageIcewallWalkerProjectile":
@@ -308,7 +309,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             };
 
             bool tryReplaceOrb()
-                {
+            {
                 Vector3 origin = orb.origin;
 
                 Quaternion rotation;
@@ -325,7 +326,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
 
             if (orb is GenericDamageOrb damageOrb)
-                {
+            {
                 damage = damageOrb.damageValue;
                 force = damageOrb is SquidOrb squidOrb ? squidOrb.forceScalar : 0f;
                 isCrit = damageOrb.isCrit;
@@ -338,7 +339,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
                     identifier = damageOrbIdentifier;
                     return tryReplaceOrb();
-            }
+                }
             }
             else if (orb is LightningOrb lightningOrb)
             {
@@ -359,10 +360,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"unhandled Orb type {orb?.GetType()?.FullName ?? "null"}");
+            Log.Debug(LOG_PREFIX + $"unhandled Orb type {orb?.GetType()?.FullName ?? "null"}");
 #endif
-                return false;
-            }
+            return false;
+        }
 
         public static bool TryReplaceFire(BulletAttack bulletAttack, Vector3 fireDirection)
         {
