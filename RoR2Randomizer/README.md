@@ -1,4 +1,4 @@
-﻿# Risk of Rain 2 Randomizer
+# Risk of Rain 2 Randomizer
 
 A randomizer mod for Risk of Rain 2!
 
@@ -53,7 +53,7 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
   * Excluded a projectile that does nothing.
 
 * Status Effect Randomizer:
-  * Fixed Void Fiend 「?Tr?espass】 (Utility Skill) cleansing the corrupted status effect if it is randomized into a DOT, resulting in permanent corruption mode.
+  * Fixed Void Fiend Trespass (Utility Skill) cleansing the corrupted status effect if it is randomized into a DOT, resulting in permanent corruption mode.
 
 * Summon Randomizer:
   * Fixed randomized summons sometimes changing mid-run.
