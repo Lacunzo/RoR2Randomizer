@@ -46,5 +46,10 @@ namespace RoR2Randomizer.Utility
             public const string GUP_NAME = "GupMaster";
             public const string HERETIC_NAME = "HereticMonsterMaster";
         }
+
+        public static class BuffNames
+        {
+            public const string VOIDSURVIVOR_CORRUPT_MODE_NAME = "bdVoidSurvivorCorruptMode";
+        }
     }
 }
