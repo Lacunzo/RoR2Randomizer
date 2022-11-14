@@ -1,4 +1,4 @@
-# Risk of Rain 2 Randomizer
+﻿# Risk of Rain 2 Randomizer
 
 A randomizer mod for Risk of Rain 2!
 
@@ -12,7 +12,7 @@ Current features:
 * Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers and Alloy Worship Unit are implemented.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
-* Projectile Randomizer: Randomizes projectiles. Please note that certain attacks are also not technically projectiles (even if they have travel time), most notably almost all of Huntress' attacks, meaning they are not affected by this randomizer.
+* Projectile Randomizer: Randomizes projectiles.
 * Summon Randomizer: Randomizes summoned characters.
   * Buying drones
   * Squid Polyp
@@ -35,6 +35,28 @@ Current features:
 Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
+
+**0.7.0 Changes:**
+
+* Projectile Randomizer:
+  * Added more types of projectiles to the randomization pool:
+    * Huntress primaries
+    * Squid turret projectile
+    * Plasma shrimp projectile
+    * Royal capacitor
+    * Huntress Glaive
+    * Ukulele
+    * Preon zaps
+    * Razorwire
+    * Acrid Epidemic spreading
+    * Probably a few more minor ones I've forgotten to list
+  * Excluded a projectile that does nothing.
+
+* Status Effect Randomizer:
+  * Fixed Void Fiend 「?Tr?espass】 (Utility Skill) cleansing the corrupted status effect if it is randomized into a DOT, resulting in permanent corruption mode.
+
+* Summon Randomizer:
+  * Fixed randomized summons sometimes changing mid-run.
 
 **0.6.0 Changes:**
 
