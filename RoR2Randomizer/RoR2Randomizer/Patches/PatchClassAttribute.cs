@@ -63,6 +63,11 @@ namespace RoR2Randomizer.Patches
                 }
             }
 
+            public override string ToString()
+            {
+                return $"{_type.FullName} (Patch)";
+            }
+
             public static readonly IEqualityComparer<PatchClassInfo> Comparer = new EqualityComparer();
 
             class EqualityComparer : IEqualityComparer<PatchClassInfo>
@@ -89,7 +94,14 @@ namespace RoR2Randomizer.Patches
         {
             foreach (PatchClassInfo patchClass in _patchClasses.Get)
             {
-                patchClass.Apply();
+                try
+                {
+                    patchClass.Apply();
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Exception while applying {patchClass}: {e}");
+                }
             }
 
 #if DEBUG
@@ -101,7 +113,14 @@ namespace RoR2Randomizer.Patches
         {
             foreach (PatchClassInfo patchClass in _patchClasses.Get)
             {
-                patchClass.Cleanup();
+                try
+                {
+                    patchClass.Cleanup();
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Exception while cleaning up {patchClass}: {e}");
+                }
             }
 
 #if DEBUG
