@@ -205,27 +205,37 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 
         public static bool TryReplaceBuffIndex(ref BuffIndex index)
         {
-            if (IsActive)
+            if (TryGetReplacementBuffIndex(index, out BuffIndex replacement))
             {
-                BuffIndex replacement;
+                index = replacement;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryGetReplacementBuffIndex(BuffIndex original, out BuffIndex replacement)
+        {
+            if (original != BuffIndex.None && IsActive)
+            {
                 if (
 #if DEBUG
-                    tryGetDebugOverrideReplacement(index, out replacement) ||
+                    tryGetDebugOverrideReplacement(original, out replacement) ||
 #endif
-                    _buffReplacements.Value.TryGetReplacement(index, out replacement))
+                    _buffReplacements.Value.TryGetReplacement(original, out replacement))
                 {
 #if DEBUG
                     if (SuppressBuffReplacementLogCount == 0)
                     {
-                        Log.Debug($"Buff Randomizer: Replaced {toLogString(index)} -> {toLogString(replacement)}");
+                        Log.Debug($"Buff Randomizer: Replaced {toLogString(original)} -> {toLogString(replacement)}");
                     }
 #endif
 
-                    index = replacement;
-                    return true;
+                    return replacement != BuffIndex.None;
                 }
             }
 
+            replacement = BuffIndex.None;
             return false;
         }
 
