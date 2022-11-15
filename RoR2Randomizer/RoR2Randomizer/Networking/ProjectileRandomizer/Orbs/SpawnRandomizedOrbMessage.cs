@@ -17,13 +17,15 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
 {
     public sealed class SpawnRandomizedOrbMessage : NetworkMessageBase
     {
+        const float MAX_TARGET_DISTANCE = 200f;
+
         static readonly BullseyeSearch _orbTargetSearch = new BullseyeSearch
         {
             minAngleFilter = 0f,
             maxAngleFilter = 7.5f,
             filterByLoS = true,
             minDistanceFilter = 0f,
-            maxDistanceFilter = float.PositiveInfinity,
+            maxDistanceFilter = MAX_TARGET_DISTANCE,
             sortMode = BullseyeSearch.SortMode.Distance
         };
 
@@ -77,17 +79,15 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                 }
                 else
                 {
-                    const float MAX_DISTANCE = 100f;
-
                     Ray ray = new Ray(_origin, direction);
 
-                    if (Physics.Raycast(ray, out RaycastHit hit, MAX_DISTANCE, LayerIndex.world.mask))
+                    if (Physics.Raycast(ray, out RaycastHit hit, MAX_TARGET_DISTANCE, LayerIndex.world.mask))
                     {
                         _overrideTargetPosition = hit.point;
                     }
                     else
                     {
-                        _overrideTargetPosition = ray.GetPoint(MAX_DISTANCE);
+                        _overrideTargetPosition = ray.GetPoint(MAX_TARGET_DISTANCE);
                     }
                 }
             }
