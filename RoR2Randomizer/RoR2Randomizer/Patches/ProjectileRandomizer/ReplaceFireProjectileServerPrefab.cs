@@ -18,7 +18,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
         static void ProjectileManager_FireProjectile_FireProjectileInfo(On.RoR2.Projectile.ProjectileManager.orig_FireProjectile_FireProjectileInfo orig, ProjectileManager self, FireProjectileInfo fireProjectileInfo)
         {
-            if (ProjectileRandomizerController.TryReplaceFire(fireProjectileInfo, self.gameObject))
+            if (ProjectileRandomizerController.TryReplaceFire(fireProjectileInfo, null))
             {
                 return;
             }
