@@ -1,5 +1,6 @@
 ﻿using RoR2;
 using RoR2Randomizer.Networking.Generic;
+using RoR2Randomizer.Networking.Generic.Chunking;
 using RoR2Randomizer.RandomizerControllers.Projectile;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.ProjectileRandomizer
 {
-    public sealed class SyncProjectileReplacements : NetworkMessageBase
+    public sealed class SyncProjectileReplacements : ChunkedNetworkMessage
     {
         public delegate void OnReceiveDelegate(ReplacementDictionary<ProjectileTypeIdentifier> projectileReplacements, bool isAppendedReplacements);
         public static event OnReceiveDelegate OnReceive;
@@ -15,12 +16,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
         static uint _currentAppendedServerVersion = 0;
         static uint? _latestAppendedServerVersionReceived = null;
 
-        bool _isAppendedReplacements;
-        uint _appendedServerVersion;
-        ReplacementDictionary<ProjectileTypeIdentifier> _projectileReplacements;
-
-        [SystemInitializer]
-        static void Init()
+        static SyncProjectileReplacements()
         {
             Run.onRunDestroyGlobal += static _ =>
             {
@@ -28,6 +24,10 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
                 _latestAppendedServerVersionReceived = null;
             };
         }
+
+        bool _isAppendedReplacements;
+        uint _appendedServerVersion;
+        ReplacementDictionary<ProjectileTypeIdentifier> _projectileReplacements;
 
         public SyncProjectileReplacements()
         {

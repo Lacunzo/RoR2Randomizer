@@ -38,11 +38,14 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             Log.Debug($"Sending {nameof(SyncEffectReplacements)} to clients");
 #endif
 
-            return SyncEffectReplacements.CreateMessagesFor(_effectReplacements);
+            yield return new SyncEffectReplacements(_effectReplacements);
         }
 
         void setEffectReplacementsFromServerEvent(IndexReplacementsCollection replacements)
         {
+            if (NetworkServer.active || !NetworkClient.active)
+                return;
+            
             _effectReplacements.Value = replacements;
             _hasRecievedEffectReplacementsFromServer.Value = _effectReplacements.HasValue;
         }
@@ -51,7 +54,7 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
         {
             base.Awake();
 
-            SyncEffectReplacements.OnCompleteMessageReceived += setEffectReplacementsFromServerEvent;
+            SyncEffectReplacements.OnReceive += setEffectReplacementsFromServerEvent;
         }
 
         protected override void OnDestroy()
@@ -61,7 +64,7 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             _hasRecievedEffectReplacementsFromServer.Dispose();
             _effectReplacements.Dispose();
 
-            SyncEffectReplacements.OnCompleteMessageReceived -= setEffectReplacementsFromServerEvent;
+            SyncEffectReplacements.OnReceive -= setEffectReplacementsFromServerEvent;
         }
 
         public static void TryReplaceEffectIndex(ref EffectIndex index)

@@ -4,6 +4,7 @@ using RoR2Randomizer.Networking.CharacterReplacements;
 using RoR2Randomizer.Networking.DamageOrbTargetDummy;
 using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
+using RoR2Randomizer.Networking.Generic.Chunking;
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
 using RoR2Randomizer.Networking.HoldoutZoneRandomizer;
 #endif
@@ -20,6 +21,9 @@ namespace RoR2Randomizer.Networking
     {
         public static void RegisterMessages()
         {
+            NetworkingAPI.RegisterMessageType<ChunkedNetworkMessage.ChunkedMessageHeader>();
+            NetworkingAPI.RegisterMessageType<ChunkedNetworkMessage.MessageChunk>();
+
             NetworkingAPI.RegisterMessageType<SyncBossReplacementCharacter>();
 
             NetworkingAPI.RegisterMessageType<SyncExplicitSpawnReplacement>();
