@@ -279,13 +279,8 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
             internal MessageChunkHeader Header { get; private set; }
             internal byte[] Data { get; private set; }
 
-            readonly uint? _startIndex;
-            readonly uint? _count;
-
             public MessageChunk()
             {
-                _startIndex = null;
-                _count = null;
             }
 
             public MessageChunk(MessageChunkHeader header, byte[] data, uint startIndex, uint count)
@@ -295,19 +290,11 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                 int chunkSize = Mathf.Min((int)count, data.Length - (int)startIndex);
                 Data = new byte[count];
                 Array.Copy(data, startIndex, Data, 0, chunkSize);
-
-                _startIndex = startIndex;
-                _count = count;
             }
 
             public override void Serialize(NetworkWriter writer)
             {
                 Header.Serialize(writer);
-
-                if (!_startIndex.HasValue || !_count.HasValue)
-                {
-                    throw new InvalidOperationException($"Attempting to serialize {nameof(ChunkedNetworkMessage)}+{nameof(MessageChunk)} with null {nameof(_startIndex)} or {nameof(_count)}");
-                }
 
                 writer.WriteBytesFull(Data);
             }
