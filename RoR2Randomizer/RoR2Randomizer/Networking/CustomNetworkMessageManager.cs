@@ -13,6 +13,7 @@ using RoR2Randomizer.Networking.ProjectileRandomizer.Bullet;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.GenericDamage;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.Lightning;
+using RoR2Randomizer.Networking.ProjectileRandomizer.SpiteBomb;
 using RoR2Randomizer.Networking.SniperWeakPointRandomizer;
 
 namespace RoR2Randomizer.Networking
@@ -47,6 +48,7 @@ namespace RoR2Randomizer.Networking
             NetworkingAPI.RegisterMessageType<ClientRequestOrbTargetMarkerObjects.Reply>();
 
             NetworkingAPI.RegisterMessageType<SpawnRandomizedOrbMessage>();
+            NetworkingAPI.RegisterMessageType<SpawnRandomizedSpiteBombMessage>();
 
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 

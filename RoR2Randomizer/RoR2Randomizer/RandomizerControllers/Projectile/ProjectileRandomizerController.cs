@@ -1,5 +1,7 @@
-﻿using R2API.Networking;
+﻿using HarmonyLib;
+using R2API.Networking;
 using RoR2;
+using RoR2.Artifacts;
 using RoR2.Orbs;
 using RoR2.Projectile;
 using RoR2Randomizer.Configuration;
@@ -111,6 +113,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             identifiers = identifiers.Concat(DamageOrbCatalog.Instance.GetAllDamageOrbProjectileIdentifiers());
             identifiers = identifiers.Concat(LightningOrbCatalog.Instance.GetAllLightningOrbProjectileIdentifiers());
+
+            identifiers = identifiers.AddItem(ProjectileTypeIdentifier.SpiteBomb);
 
             if (ConfigManager.ProjectileRandomizer.ExcludeInstakillProjeciles)
             {
@@ -290,6 +294,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     case ProjectileType.Bullet:
                     case ProjectileType.DamageOrb:
                     case ProjectileType.LightningOrb:
+                    case ProjectileType.SpiteBomb:
                         _replacingTempDisabled = true;
                         replacement.Fire(origin, rotation, damage, force, isCrit, genericArgs);
                         _replacingTempDisabled = false;
@@ -423,6 +428,22 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 Weapon = weapon,
                 DamageType = info.damageTypeOverride,
                 Target = targetHurtBox
+            });
+        }
+
+        public static bool TryReplaceFire(BombArtifactManager.BombRequest spiteBombRequest)
+        {
+            if (!IsActive)
+                return false;
+
+            const float DEVIATION = 5f;
+            Quaternion rotation = Util.QuaternionSafeLookRotation(Quaternion.Euler(UnityEngine.Random.Range(-DEVIATION, DEVIATION),
+                                                                                   UnityEngine.Random.Range(0, 360f),
+                                                                                   UnityEngine.Random.Range(-DEVIATION, DEVIATION)) * Vector3.up);
+
+            return TryReplaceFire(ProjectileTypeIdentifier.SpiteBomb, spiteBombRequest.spawnPosition + new Vector3(0f, 1f, 0f), rotation, spiteBombRequest.bombBaseDamage, 0f, false, new GenericFireProjectileArgs
+            {
+                Owner = spiteBombRequest.attacker
             });
         }
 

@@ -7,5 +7,6 @@
         Bullet,
         DamageOrb,
         LightningOrb,
+        SpiteBomb,
     }
 }

@@ -1,7 +1,9 @@
-﻿using RoR2;
+﻿using R2API.Networking;
+using RoR2;
 using RoR2.Projectile;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs;
+using RoR2Randomizer.Networking.ProjectileRandomizer.SpiteBomb;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
 using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
 using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandling;
@@ -15,13 +17,14 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     public readonly struct ProjectileTypeIdentifier : IEquatable<ProjectileTypeIdentifier>
     {
         public static readonly ProjectileTypeIdentifier Invalid = new ProjectileTypeIdentifier(ProjectileType.Invalid, -1, null);
+        public static readonly ProjectileTypeIdentifier SpiteBomb = new ProjectileTypeIdentifier(ProjectileType.SpiteBomb, -1, null);
 
         public readonly ProjectileType Type;
         public readonly int Index;
 
         public readonly DamageType? DamageType;
 
-        public readonly bool IsValid => Type != ProjectileType.Invalid && Index != -1;
+        public readonly bool IsValid => Type != ProjectileType.Invalid && (Type == ProjectileType.SpiteBomb || Index != -1);
 
         public readonly bool IsInstaKill => DamageType.HasValue && (DamageType.Value & RoR2.DamageType.VoidDeath) != 0;
 
@@ -69,6 +72,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                         return lightningOrbIdentifier.CreateInstance().damageType;
                     }
 
+                    break;
+                case ProjectileType.SpiteBomb:
                     break;
                 default:
                     Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {type}");
@@ -176,6 +181,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 case ProjectileType.DamageOrb:
                 case ProjectileType.LightningOrb:
                     new SpawnRandomizedOrbMessage(this, origin, rotation, damage, force, isCrit, genericArgs).SpawnOrSendMessage();
+                    break;
+                case ProjectileType.SpiteBomb:
+                    new SpawnRandomizedSpiteBombMessage(damage, origin, genericArgs).SendTo(NetworkDestination.Server);
                     break;
                 default:
                     Log.Warning(LOG_PREFIX + $"unhandled type {Type}");
