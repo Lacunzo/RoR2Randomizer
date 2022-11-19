@@ -36,6 +36,17 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.7.1 Changes:**
+
+* Projectile Randomizer:
+  * Added Spite Bombs to Projectile Randomizer
+  * Added option to exclude instakill projectiles from the randomizer, disabled by default.
+  * Randomized bullets now inherit the max range of the original bullet.
+  * Fixed certain projectile types having infinite lock-on range.
+
+* Status Effect Randomizer:
+  * Excluded an "invisible" (no icon, has no effect) status effect from the randomizer.
+
 **0.7.0 Changes:**
 
 * Projectile Randomizer:
