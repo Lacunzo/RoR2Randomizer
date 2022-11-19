@@ -1,10 +1,11 @@
 ﻿using RoR2Randomizer.Networking.Generic;
+using RoR2Randomizer.Networking.Generic.Chunking;
 using RoR2Randomizer.Utility;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.CharacterReplacements
 {
-    public sealed class SyncCharacterMasterReplacements : NetworkMessageBase
+    public sealed class SyncCharacterMasterReplacements : ChunkedNetworkMessage
     {
         public delegate void OnReceivedDelegate(IndexReplacementsCollection masterReplacements);
         public static event OnReceivedDelegate OnReceive;
