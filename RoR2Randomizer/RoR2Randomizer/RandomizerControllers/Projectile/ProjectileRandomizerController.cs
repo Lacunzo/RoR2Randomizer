@@ -112,6 +112,21 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             identifiers = identifiers.Concat(DamageOrbCatalog.Instance.GetAllDamageOrbProjectileIdentifiers());
             identifiers = identifiers.Concat(LightningOrbCatalog.Instance.GetAllLightningOrbProjectileIdentifiers());
 
+            if (ConfigManager.ProjectileRandomizer.ExcludeInstakillProjeciles)
+            {
+                identifiers = identifiers.Where(static i =>
+                {
+                    bool isInstaKill = i.IsInstaKill;
+#if DEBUG
+                    if (isInstaKill)
+                    {
+                        Log.Debug($"Projectile Randomizer: Excluding projectile identifier {i} from all identifiers due to instakill projectiles not allowed");
+                    }
+#endif
+                    return !isInstaKill;
+                });
+            }
+
             return identifiers;
         }
 

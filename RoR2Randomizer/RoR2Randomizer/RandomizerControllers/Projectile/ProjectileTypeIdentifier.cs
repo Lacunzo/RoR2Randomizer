@@ -1,7 +1,10 @@
 ﻿using RoR2;
 using RoR2.Projectile;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs;
 using RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling;
+using RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandling;
 using System;
 using System.Text;
 using UnityEngine;
@@ -11,34 +14,98 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 {
     public readonly struct ProjectileTypeIdentifier : IEquatable<ProjectileTypeIdentifier>
     {
-        public static readonly ProjectileTypeIdentifier Invalid = new ProjectileTypeIdentifier(ProjectileType.Invalid, -1);
+        public static readonly ProjectileTypeIdentifier Invalid = new ProjectileTypeIdentifier(ProjectileType.Invalid, -1, null);
 
         public readonly ProjectileType Type;
         public readonly int Index;
 
+        public readonly DamageType? DamageType;
+
         public readonly bool IsValid => Type != ProjectileType.Invalid && Index != -1;
 
-        public ProjectileTypeIdentifier(ProjectileType type, int index)
+        public readonly bool IsInstaKill => DamageType.HasValue && (DamageType.Value & RoR2.DamageType.VoidDeath) != 0;
+
+        public ProjectileTypeIdentifier(ProjectileType type, int index, DamageType? damageType)
         {
             Type = type;
             Index = index;
+            DamageType = damageType;
         }
 
-        public ProjectileTypeIdentifier(NetworkReader reader)
+        static DamageType? getDamageType(ProjectileType type, int index)
         {
-            Type = (ProjectileType)reader.ReadPackedIndex32();
-            Index = reader.ReadPackedIndex32();
+            const string LOG_PREFIX = $"{nameof(ProjectileTypeIdentifier)}.{nameof(getDamageType)} ";
+
+            switch (type)
+            {
+                case ProjectileType.OrdinaryProjectile:
+                    GameObject projectilePrefab = ProjectileCatalog.GetProjectilePrefab(index);
+                    if (projectilePrefab && projectilePrefab.TryGetComponent(out ProjectileDamage projectileDamage))
+                    {
+                        return projectileDamage.damageType;
+                    }
+
+                    break;
+                case ProjectileType.Bullet:
+                    BulletAttackIdentifier bulletAttackIdentifier = BulletAttackCatalog.Instance.GetIdentifier(index);
+                    if (bulletAttackIdentifier.IsValid)
+                    {
+                        return bulletAttackIdentifier.CreateInstance().damageType;
+                    }
+
+                    break;
+                case ProjectileType.DamageOrb:
+                    DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.Instance.GetIdentifier(index);
+                    if (damageOrbIdentifier.IsValid)
+                    {
+                        return damageOrbIdentifier.CreateInstance().damageType;
+                    }
+
+                    break;
+                case ProjectileType.LightningOrb:
+                    LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.Instance.GetIdentifier(index);
+                    if (lightningOrbIdentifier.IsValid)
+                    {
+                        return lightningOrbIdentifier.CreateInstance().damageType;
+                    }
+
+                    break;
+                default:
+                    Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {type}");
+                    break;
+            }
+
+            return null;
+        }
+
+        public ProjectileTypeIdentifier(ProjectileType type, int index) : this(type, index, getDamageType(type, index))
+        {
+        }
+
+        public ProjectileTypeIdentifier(NetworkReader reader) : this((ProjectileType)reader.ReadPackedIndex32(), reader.ReadPackedIndex32(), reader.ReadNullableDamageType())
+        {
         }
 
         public static ProjectileTypeIdentifier FromProjectilePrefab(GameObject prefab)
         {
-            return new ProjectileTypeIdentifier(ProjectileType.OrdinaryProjectile, ProjectileCatalog.GetProjectileIndex(prefab));
+            DamageType? damageType;
+            if (prefab.TryGetComponent(out ProjectileDamage projectileDamage))
+            {
+                damageType = projectileDamage.damageType;
+            }
+            else
+            {
+                damageType = null;
+            }
+
+            return new ProjectileTypeIdentifier(ProjectileType.OrdinaryProjectile, ProjectileCatalog.GetProjectileIndex(prefab), damageType);
         }
 
         public readonly void Serialize(NetworkWriter writer)
         {
             writer.WritePackedIndex32((int)Type);
             writer.WritePackedIndex32(Index);
+            writer.WriteNullableDamageType(DamageType);
         }
 
         public readonly void Fire(Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
