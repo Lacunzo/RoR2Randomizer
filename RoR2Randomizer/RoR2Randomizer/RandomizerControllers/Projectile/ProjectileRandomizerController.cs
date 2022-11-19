@@ -291,17 +291,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     case ProjectileType.OrdinaryProjectile:
                         projectilePrefab = ProjectileCatalog.GetProjectilePrefab(replacement.Index);
                         return true;
-                    case ProjectileType.Bullet:
-                    case ProjectileType.DamageOrb:
-                    case ProjectileType.LightningOrb:
-                    case ProjectileType.SpiteBomb:
+                    default:
                         _replacingTempDisabled = true;
                         replacement.Fire(origin, rotation, damage, force, isCrit, genericArgs);
                         _replacingTempDisabled = false;
                         return false;
-                    default:
-                        Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {replacement.Type}");
-                        break;
                 }
             }
 
