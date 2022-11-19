@@ -49,6 +49,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public string MuzzleName;
 
+        public float MaxDistance = -1f;
+
         public GenericFireProjectileArgs()
         {
         }
@@ -59,6 +61,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             DamageType = bulletAttack.damageType;
             Weapon = bulletAttack.weapon;
             MuzzleName = bulletAttack.muzzleName;
+            MaxDistance = bulletAttack.maxDistance;
         }
 
         public void ModifyArgs(ref Vector3 position)
@@ -92,6 +95,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             writer.Write(Weapon);
 
             writer.Write(MuzzleName);
+
+            writer.Write(MaxDistance);
         }
 
         void ISerializableObject.Deserialize(NetworkReader reader)
@@ -107,6 +112,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             Weapon = reader.ReadGameObject();
 
             MuzzleName = reader.ReadString();
+
+            MaxDistance = reader.ReadSingle();
         }
     }
 }

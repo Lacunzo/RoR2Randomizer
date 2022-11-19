@@ -159,6 +159,14 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     bulletAttack.weapon = genericArgs.Weapon;
                     bulletAttack.muzzleName = genericArgs.MuzzleName;
                     bulletAttack.tracerEffectPrefab = EffectCatalog.GetEffectDef(bulletIdentifier.TracerEffectIndex)?.prefab;
+
+                    if (genericArgs.MaxDistance >= 0f)
+                    {
+                        bulletAttack.maxDistance = genericArgs.MaxDistance;
+#if DEBUG
+                        Log.Debug(LOG_PREFIX + $"bullet {nameof(bulletAttack.maxDistance)}={bulletAttack.maxDistance}");
+#endif
+                    }
                     
                     //if (damageType.HasValue)
                     //    bulletAttack.damageType |= damageType.Value;

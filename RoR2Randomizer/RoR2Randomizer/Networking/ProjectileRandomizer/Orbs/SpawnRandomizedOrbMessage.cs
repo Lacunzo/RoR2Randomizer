@@ -80,15 +80,28 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                 }
                 else
                 {
-                    Ray ray = new Ray(_origin, direction);
+                    float maxDistance;
+                    if (genericArgs.MaxDistance >= 0f)
+                    {
+                        maxDistance = genericArgs.MaxDistance;
+                    }
+                    else
+                    {
+                        maxDistance = MAX_TARGET_DISTANCE;
+                    }
 
-                    if (Physics.Raycast(ray, out RaycastHit hit, MAX_TARGET_DISTANCE, LayerIndex.world.mask))
+#if DEBUG
+                    Log.Debug($"Spawning randomized orb {orbIdentifier.Type} with {nameof(maxDistance)}={maxDistance}");
+#endif
+
+                    Ray ray = new Ray(_origin, direction);
+                    if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, LayerIndex.world.mask))
                     {
                         _overrideTargetPosition = hit.point;
                     }
                     else
                     {
-                        _overrideTargetPosition = ray.GetPoint(MAX_TARGET_DISTANCE);
+                        _overrideTargetPosition = ray.GetPoint(maxDistance);
                     }
                 }
             }
