@@ -39,7 +39,7 @@ namespace RoR2Randomizer.Patches.StageRandomizer
                         availableArtifactIndices = onlyDisabledArtifactIndices;
                 }
 
-                ArtifactTrialMissionController.trialArtifact = ArtifactCatalog.GetArtifactDef((ArtifactIndex)availableArtifactIndices.GetRandomOrDefault());
+                ArtifactTrialMissionController.trialArtifact = ArtifactCatalog.GetArtifactDef((ArtifactIndex)availableArtifactIndices.GetRandomOrDefault(StageRandomizerController.Instance.RNG));
             }
 
             orig(self);

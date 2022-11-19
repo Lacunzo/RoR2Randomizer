@@ -129,7 +129,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 {
                     if ((!givePickupsOnStart || !givePickupsOnStart.HasAnyEquipment()) && inventory.GetEquipmentIndex() == EquipmentIndex.None)
                     {
-                        EquipmentIndex equipment = CharacterReplacements.AvailableDroneEquipments.GetRandomOrDefault(EquipmentIndex.None);
+                        EquipmentIndex equipment = CharacterReplacements.AvailableDroneEquipments.GetRandomOrDefault(RoR2Application.rng, EquipmentIndex.None);
                         inventory.SetEquipmentIndex(equipment);
 
 #if DEBUG

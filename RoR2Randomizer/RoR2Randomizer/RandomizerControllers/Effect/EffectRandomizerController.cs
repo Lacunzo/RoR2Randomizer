@@ -13,12 +13,15 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
     [RandomizerController]
     public sealed class EffectRandomizerController : BaseRandomizerController
     {
+        static EffectRandomizerController _instance;
+        public static EffectRandomizerController Instance => _instance;
+
         static readonly RunSpecific<bool> _hasRecievedEffectReplacementsFromServer = new RunSpecific<bool>();
         static readonly RunSpecific<IndexReplacementsCollection> _effectReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
             if (NetworkServer.active && ConfigManager.Misc.EffectRandomizerEnabled)
             {
-                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(Enumerable.Range(0, EffectCatalog.effectCount)), EffectCatalog.effectCount);
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(Enumerable.Range(0, EffectCatalog.effectCount), Instance.RNG), EffectCatalog.effectCount);
                 return true;
             }
 
@@ -55,6 +58,8 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             base.Awake();
 
             SyncEffectReplacements.OnReceive += setEffectReplacementsFromServerEvent;
+
+            SingletonHelper.Assign(ref _instance, this);
         }
 
         protected override void OnDestroy()
@@ -65,6 +70,8 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             _effectReplacements.Dispose();
 
             SyncEffectReplacements.OnReceive -= setEffectReplacementsFromServerEvent;
+
+            SingletonHelper.Unassign(ref _instance, this);
         }
 
         public static void TryReplaceEffectIndex(ref EffectIndex index)

@@ -12,6 +12,9 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
     [RandomizerController]
     public class SurvivorPodRandomizerController : BaseRandomizerController
     {
+        static SurvivorPodRandomizerController _instance;
+        public static SurvivorPodRandomizerController Instance => _instance;
+
         static CharacterBody[] _bodiesWithPods;
         static SpawnPodPrefabData[] _distinctPodPrefabs;
 
@@ -51,7 +54,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
                 foreach (CharacterBody body in _bodiesWithPods)
                 {
                     SpawnPodPrefabData defaultSpawnData = getDefaultSpawnData(body);
-                    result.Add(body.bodyIndex, _distinctPodPrefabs.PickWeighted(s => s == defaultSpawnData ? 0.5f : 1f));
+                    result.Add(body.bodyIndex, _distinctPodPrefabs.PickWeighted(Instance.RNG, s => s == defaultSpawnData ? 0.5f : 1f));
                 }
 
                 return true;
@@ -66,11 +69,20 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         protected override bool isNetworked => false;
 
+        protected override void Awake()
+        {
+            base.Awake();
+
+            SingletonHelper.Assign(ref _instance, this);
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
 
             _overrideSpawnPodPrefabs.Dispose();
+
+            SingletonHelper.Unassign(ref _instance, this);
         }
 
         public static void TryOverrideIntroAnimation(CharacterBody body)

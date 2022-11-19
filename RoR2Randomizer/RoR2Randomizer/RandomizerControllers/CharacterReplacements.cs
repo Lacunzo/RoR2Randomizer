@@ -149,12 +149,26 @@ namespace RoR2Randomizer.RandomizerControllers
 #endif
         }
 
+        static readonly RunSpecific<Xoroshiro128Plus> _rng = new RunSpecific<Xoroshiro128Plus>((out Xoroshiro128Plus result) =>
+        {
+            if (RNGManager.RandomizerServerRNG.HasValue)
+            {
+                result = new Xoroshiro128Plus(RNGManager.RandomizerServerRNG.Value.Next());
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
+        }, 9);
+
         static readonly RunSpecific<bool> _hasReceivedMasterIndexReplacementsFromServer = new RunSpecific<bool>(1);
         static readonly RunSpecific<IndexReplacementsCollection> _masterIndexReplacements = new RunSpecific<IndexReplacementsCollection>((out IndexReplacementsCollection result) =>
         {
             if (NetworkServer.active && _replacementMode.Value == CharacterReplacementMode.Random)
             {
-                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize, (key, value) =>
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize, _rng, (key, value) =>
                 {
                     if (Caches.Masters.Heretic.isValid && key == Caches.Masters.Heretic.i)
                     {

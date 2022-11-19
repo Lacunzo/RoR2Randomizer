@@ -19,6 +19,9 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
     [RandomizerController]
     public class StageRandomizerController : BaseRandomizerController
     {
+        static StageRandomizerController _instance;
+        public static StageRandomizerController Instance => _instance;
+
         static bool _isInitialized;
         static StageRandomizingInfo[] _stages;
 
@@ -90,6 +93,8 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             base.Awake();
 
             SceneCatalog.onMostRecentSceneDefChanged += sceneLoaded;
+
+            SingletonHelper.Assign(ref _instance, this);
         }
 
         protected override void OnDestroy()
@@ -97,6 +102,8 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             base.OnDestroy();
 
             SceneCatalog.onMostRecentSceneDefChanged -= sceneLoaded;
+
+            SingletonHelper.Unassign(ref _instance, this);
         }
 
         void sceneLoaded(SceneDef scene)
@@ -204,7 +211,10 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                     Log.Warning($"Could not find scene index for {firstStageSceneName}");
                 }
 
-                _stageIndexReplacements = IndexReplacementsCollection.Create(ReplacementDictionary<SceneIndex>.CreateFrom(_stages, s => s.SceneIndex, (key, value) =>
+                // HACK: The run started callback is not invoked yet at this point, so Instance.RNG is null. Just use the run seed directly
+                Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.seed);
+
+                _stageIndexReplacements = IndexReplacementsCollection.Create(ReplacementDictionary<SceneIndex>.CreateFrom(_stages, rng, s => s.SceneIndex, (key, value) =>
                 {
                     if (ConfigManager.StageRandomizer.FirstStageBlacklistEnabled && firstStageIndex != SceneIndex.Invalid && key.SceneIndex == firstStageIndex && (value.Flags & StageFlags.FirstStageBlacklist) != 0)
                     {

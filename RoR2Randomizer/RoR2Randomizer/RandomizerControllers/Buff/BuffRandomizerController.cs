@@ -14,6 +14,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
     public class BuffRandomizerController : BaseRandomizerController
     {
         static BuffRandomizerController _instance;
+        public static BuffRandomizerController Instance => _instance;
 
         static BuffIndex[] _invincibilityBuffs;
 
@@ -72,7 +73,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                 }
 #endif
 
-                ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, b => b.buffIndex, static (key, value) =>
+                ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, Instance.RNG, b => b.buffIndex, static (key, value) =>
                 {
                     if (!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs && key.isDebuff != value.isDebuff)
                     {

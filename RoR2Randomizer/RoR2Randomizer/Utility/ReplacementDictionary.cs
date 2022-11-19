@@ -10,12 +10,12 @@ namespace RoR2Randomizer.Utility
 {
     public class ReplacementDictionary<T> : ReadOnlyDictionary<T, T>
     {
-        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc)
+        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Xoroshiro128Plus rng, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc)
         {
-            return CreateFrom(collection, converter, canReplaceFunc, null);
+            return CreateFrom(collection, rng, converter, canReplaceFunc, null);
         }
 
-        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc, Func<TSrc, TSrc, float> weightSelector)
+        public static ReplacementDictionary<T> CreateFrom<TSrc>(IEnumerable<TSrc> collection, Xoroshiro128Plus rng, Func<TSrc, T> converter, Func<TSrc, TSrc, bool> canReplaceFunc, Func<TSrc, TSrc, float> weightSelector)
         {
             Dictionary<T, T> result = new Dictionary<T, T>();
 
@@ -35,11 +35,11 @@ namespace RoR2Randomizer.Utility
                     TSrc value;
                     if (hasWeightSelector)
                     {
-                        value = availableValues.PickWeighted(v => weightSelector(key, v));
+                        value = availableValues.PickWeighted(rng, v => weightSelector(key, v));
                     }
                     else
                     {
-                        value = availableValues.GetRandomOrDefault();
+                        value = availableValues.GetRandomOrDefault(rng);
                     }
 
                     valuesList.Remove(value);
@@ -56,19 +56,19 @@ namespace RoR2Randomizer.Utility
             return new ReplacementDictionary<T>(result);
         }
 
-        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection)
+        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Xoroshiro128Plus rng)
         {
-            return CreateFrom(collection, canReplaceFunc: null, null);
+            return CreateFrom(collection, rng, canReplaceFunc: null, null);
         }
 
-        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc, Func<T, T, float> weightSelector)
+        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Xoroshiro128Plus rng, Func<T, T, bool> canReplaceFunc, Func<T, T, float> weightSelector)
         {
-            return CreateFrom(collection, t => t, canReplaceFunc, weightSelector);
+            return CreateFrom(collection, rng, t => t, canReplaceFunc, weightSelector);
         }
 
-        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Func<T, T, bool> canReplaceFunc)
+        public static ReplacementDictionary<T> CreateFrom(IEnumerable<T> collection, Xoroshiro128Plus rng, Func<T, T, bool> canReplaceFunc)
         {
-            return CreateFrom(collection, t => t, canReplaceFunc, null);
+            return CreateFrom(collection, rng, t => t, canReplaceFunc, null);
         }
 
         readonly InitializeOnAccess<ReadOnlyDictionary<T, T>> _reverseDictionary;

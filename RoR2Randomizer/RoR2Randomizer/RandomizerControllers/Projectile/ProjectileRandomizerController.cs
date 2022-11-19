@@ -22,6 +22,9 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
     [RandomizerController]
     public class ProjectileRandomizerController : BaseRandomizerController
     {
+        static ProjectileRandomizerController _instance;
+        public static ProjectileRandomizerController Instance => _instance;
+
         static int[] _projectileIndicesToRandomize;
 
         [SystemInitializer(typeof(ProjectileCatalog))]
@@ -138,7 +141,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         {
             if (shouldBeActive)
             {
-                result = ReplacementDictionary<ProjectileTypeIdentifier>.CreateFrom(getAllProjectileIdentifiers());
+                result = ReplacementDictionary<ProjectileTypeIdentifier>.CreateFrom(getAllProjectileIdentifiers(), Instance.RNG);
                 return true;
             }
 
@@ -218,7 +221,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             if (!_appendedProjectileReplacements.Value.ContainsKey(identifier))
             {
-                _appendedProjectileReplacements.Value.Add(identifier, getAllProjectileIdentifiers().GetRandomOrDefault());
+                _appendedProjectileReplacements.Value.Add(identifier, getAllProjectileIdentifiers().GetRandomOrDefault(Instance.RNG));
 
                 if (!NetworkServer.dontListen)
                 {
@@ -260,6 +263,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             BulletAttackCatalog.Instance.OnIdentifierAppended += BulletAttackCatalog_OnIdentifierAppendedServer;
             DamageOrbCatalog.Instance.OnIdentifierAppended += DamageOrbCatalog_OnIdentifierAppended;
             LightningOrbCatalog.Instance.OnIdentifierAppended += LightningOrbCatalog_OnIdentifierAppended;
+
+            SingletonHelper.Assign(ref _instance, this);
         }
 
         protected override void OnDestroy()
@@ -276,6 +281,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             _appendedProjectileReplacements.Dispose();
             _shouldRandomizeHitscanServer.Dispose();
             _hasReceivedProjectileReplacementsFromServer.Dispose();
+
+            SingletonHelper.Unassign(ref _instance, this);
         }
 
         public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
@@ -397,7 +404,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 }
                 else if (info.target.TryGetComponent<HurtBoxGroup>(out HurtBoxGroup hurtBoxGroup))
                 {
-                    targetHurtBox = hurtBoxGroup.hurtBoxes.GetRandomOrDefault();
+                    targetHurtBox = hurtBoxGroup.hurtBoxes.GetRandomOrDefault(RoR2Application.rng);
                 }
                 else
                 {
