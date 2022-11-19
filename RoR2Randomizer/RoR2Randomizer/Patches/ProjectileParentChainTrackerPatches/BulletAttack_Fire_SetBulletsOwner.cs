@@ -18,7 +18,7 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 
         static void BulletAttack_Fire(On.RoR2.BulletAttack.orig_Fire orig, RoR2.BulletAttack self)
         {
-            BulletAttackIdentifier identifier = BulletAttackCatalog.GetBulletAttackIdentifier(self);
+            BulletAttackIdentifier identifier = BulletAttackCatalog.Instance.GetIdentifier(self);
             bool isValid = identifier.IsValid;
             if (isValid)
             {

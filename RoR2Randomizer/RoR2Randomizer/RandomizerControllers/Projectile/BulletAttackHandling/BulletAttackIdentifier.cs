@@ -1,9 +1,10 @@
 ﻿using RoR2;
+using RoR2Randomizer.Utility;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 {
-    public struct BulletAttackIdentifier
+    public struct BulletAttackIdentifier : ICatalogIdentifier<BulletAttack, BulletAttackIdentifier>
     {
         public static readonly BulletAttackIdentifier Invalid = new BulletAttackIdentifier(default, default, default, default) { Index = -1 };
 
@@ -14,7 +15,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 
         public readonly BulletAttackFlags Flags;
 
-        public int Index;
+        public int Index { get; set; }
 
         public readonly bool IsValid => Index != -1;
 
@@ -44,7 +45,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
             return bulletAttack != null && EffectCatalog.FindEffectIndexFromPrefab(bulletAttack.tracerEffectPrefab) == TracerEffectIndex && EffectCatalog.FindEffectIndexFromPrefab(bulletAttack.hitEffectPrefab) == HitEffectIndex && bulletAttack.damageType == DamageType;
         }
 
-        public readonly bool Matches(BulletAttackIdentifier other, bool compareIndex)
+        public readonly bool Equals(BulletAttackIdentifier other, bool compareIndex)
         {
             return compareIndex ? Index == other.Index : TracerEffectIndex == other.TracerEffectIndex &&
                                                          HitEffectIndex == other.HitEffectIndex &&

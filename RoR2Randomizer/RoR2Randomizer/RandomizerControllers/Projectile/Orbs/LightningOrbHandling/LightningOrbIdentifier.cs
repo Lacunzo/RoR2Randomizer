@@ -1,15 +1,16 @@
 ﻿using RoR2;
 using RoR2.Orbs;
+using RoR2Randomizer.Utility;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandling
 {
-    public struct LightningOrbIdentifier
+    public struct LightningOrbIdentifier : ICatalogIdentifier<LightningOrb, LightningOrbIdentifier>
     {
         public static readonly LightningOrbIdentifier Invalid = new LightningOrbIdentifier { Index = -1 };
 
-        public int Index = -1;
+        public int Index { get; set; }
 
         public readonly LightningOrb.LightningType LightningType;
         public readonly uint DefaultNumBounces;

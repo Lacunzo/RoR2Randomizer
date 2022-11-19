@@ -106,11 +106,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
             if (ConfigManager.ProjectileRandomizer.RandomizeHitscanAttacks)
             {
-                identifiers = identifiers.Concat(BulletAttackCatalog.GetAllBulletAttackProjectileIdentifiers());
+                identifiers = identifiers.Concat(BulletAttackCatalog.Instance.GetAllBulletAttackProjectileIdentifiers());
             }
 
-            identifiers = identifiers.Concat(DamageOrbCatalog.GetAllDamageOrbProjectileIdentifiers());
-            identifiers = identifiers.Concat(LightningOrbCatalog.GetAllLightningOrbProjectileIdentifiers());
+            identifiers = identifiers.Concat(DamageOrbCatalog.Instance.GetAllDamageOrbProjectileIdentifiers());
+            identifiers = identifiers.Concat(LightningOrbCatalog.Instance.GetAllLightningOrbProjectileIdentifiers());
 
             return identifiers;
         }
@@ -208,7 +208,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        static void BulletAttackCatalog_BulletAttackAppended(BulletAttackIdentifier identifier)
+        static void BulletAttackCatalog_OnIdentifierAppendedServer(BulletAttackIdentifier identifier)
         {
             if (Run.instance && NetworkServer.active)
             {
@@ -216,17 +216,17 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        static void DamageOrbCatalog_DamageOrbAppendedServer(DamageOrbIdentifier identifier)
+        static void DamageOrbCatalog_OnIdentifierAppended(DamageOrbIdentifier identifier)
         {
-            if (Run.instance)
+            if (Run.instance && NetworkServer.active)
             {
                 appendProjectileReplacement(identifier);
             }
         }
 
-        static void LightningOrbCatalog_LightningOrbIdentifierAppendedServer(LightningOrbIdentifier identifier)
+        static void LightningOrbCatalog_OnIdentifierAppended(LightningOrbIdentifier identifier)
         {
-            if (Run.instance)
+            if (Run.instance && NetworkServer.active)
             {
                 appendProjectileReplacement(identifier);
             }
@@ -237,9 +237,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             base.Awake();
 
             SyncProjectileReplacements.OnReceive += onProjectileReplacementsReceivedFromServer;
-            BulletAttackCatalog.BulletAttackAppended += BulletAttackCatalog_BulletAttackAppended;
-            DamageOrbCatalog.DamageOrbAppendedServer += DamageOrbCatalog_DamageOrbAppendedServer;
-            LightningOrbCatalog.LightningOrbIdentifierAppendedServer += LightningOrbCatalog_LightningOrbIdentifierAppendedServer;
+
+            BulletAttackCatalog.Instance.OnIdentifierAppended += BulletAttackCatalog_OnIdentifierAppendedServer;
+            DamageOrbCatalog.Instance.OnIdentifierAppended += DamageOrbCatalog_OnIdentifierAppended;
+            LightningOrbCatalog.Instance.OnIdentifierAppended += LightningOrbCatalog_OnIdentifierAppended;
         }
 
         protected override void OnDestroy()
@@ -247,9 +248,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             base.OnDestroy();
 
             SyncProjectileReplacements.OnReceive -= onProjectileReplacementsReceivedFromServer;
-            BulletAttackCatalog.BulletAttackAppended -= BulletAttackCatalog_BulletAttackAppended;
-            DamageOrbCatalog.DamageOrbAppendedServer -= DamageOrbCatalog_DamageOrbAppendedServer;
-            LightningOrbCatalog.LightningOrbIdentifierAppendedServer -= LightningOrbCatalog_LightningOrbIdentifierAppendedServer;
+
+            BulletAttackCatalog.Instance.OnIdentifierAppended -= BulletAttackCatalog_OnIdentifierAppendedServer;
+            DamageOrbCatalog.Instance.OnIdentifierAppended -= DamageOrbCatalog_OnIdentifierAppended;
+            LightningOrbCatalog.Instance.OnIdentifierAppended -= LightningOrbCatalog_OnIdentifierAppended;
 
             _projectileIndicesReplacements.Dispose();
             _appendedProjectileReplacements.Dispose();
@@ -327,7 +329,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 force = damageOrb is SquidOrb squidOrb ? squidOrb.forceScalar : 0f;
                 isCrit = damageOrb.isCrit;
 
-                DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.GetIdentifier(damageOrb);
+                DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.Instance.GetIdentifier(damageOrb);
                 if (damageOrbIdentifier.IsValid)
                 {
                     genericArgs.Owner = damageOrb.attacker;
@@ -343,7 +345,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 force = 0f;
                 isCrit = lightningOrb.isCrit;
 
-                LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.GetIdentifier(lightningOrb);
+                LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.Instance.GetIdentifier(lightningOrb);
                 if (lightningOrbIdentifier.IsValid)
                 {
                     genericArgs.Owner = lightningOrb.attacker;
@@ -363,7 +365,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryReplaceFire(BulletAttack bulletAttack, Vector3 fireDirection)
         {
-            BulletAttackIdentifier identifier = BulletAttackCatalog.GetBulletAttackIdentifier(bulletAttack);
+            BulletAttackIdentifier identifier = BulletAttackCatalog.Instance.GetIdentifier(bulletAttack);
             return identifier.IsValid && TryReplaceFire(identifier, bulletAttack.origin, Util.QuaternionSafeLookRotation(fireDirection), bulletAttack.damage, bulletAttack.force, bulletAttack.isCrit, new GenericFireProjectileArgs(bulletAttack));
         }
 

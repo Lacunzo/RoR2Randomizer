@@ -5,28 +5,34 @@ using RoR2.Orbs;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.GenericDamage;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
 {
-    public class DamageOrbCatalog : INetMessageProvider
+    public class DamageOrbCatalog : GenericNetworkedCatalog<GenericDamageOrb, DamageOrbIdentifier>
     {
-        static DamageOrbCatalog _instance;
+        public static readonly DamageOrbCatalog Instance = new DamageOrbCatalog();
 
-        [SystemInitializer]
+        static DamageOrbCatalog()
+        {
+            SyncDamageOrbCatalog.OnReceive += Instance.SyncCatalog_OnReceive;
+            SyncDamageOrbIndexNeeded.OnReceive += Instance.SyncIndexNeeded_OnReceive;
+        }
+
+        [SystemInitializer(typeof(EffectCatalog))]
         static void Init()
         {
-            _instance = new DamageOrbCatalog();
-            NetworkingManager.RegisterMessageProvider(_instance, MessageProviderFlags.Persistent);
-
             static void initIdentifiersForType<T>() where T : GenericDamageOrb, new()
             {
                 static void initIdentifier(GenericDamageOrb damageOrb)
                 {
                     DamageOrbIdentifier identifier = new DamageOrbIdentifier(damageOrb);
-                    appendIdentifier(ref identifier, true);
+                    Instance.appendIdentifier(ref identifier, true);
                 }
 
                 initIdentifier(new T());
@@ -40,140 +46,28 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
             initIdentifiersForType<MissileVoidOrb>();
             initIdentifiersForType<SimpleLightningStrikeOrb>();
             initIdentifiersForType<SquidOrb>();
-
-            SyncDamageOrbCatalog.OnReceive += SyncDamageOrbCatalog_OnReceive;
-            SyncDamageOrbIndexNeeded.OnReceive += SyncDamageOrbIndexNeeded_OnReceive;
         }
 
-        public static event Action<DamageOrbIdentifier> DamageOrbAppendedServer;
+        protected override DamageOrbIdentifier InvalidIdentifier => DamageOrbIdentifier.Invalid;
 
-        static int _damageOrbsCount = 0;
-        static DamageOrbIdentifier[] _damageOrbsByIndex = new DamageOrbIdentifier[10];
-
-        static void appendIdentifier(ref DamageOrbIdentifier identifier, bool checkExisting)
+        protected override DamageOrbIdentifier createIdentifierForObject(GenericDamageOrb damageOrb)
         {
-            const string LOG_PREFIX = $"{nameof(DamageOrbCatalog)}.{nameof(appendIdentifier)} ";
-
-            if (!identifier.ValuesValid)
-                return;
-
-            if (checkExisting)
-            {
-                for (int i = 0; i < _damageOrbsCount; i++)
-                {
-                    if (_damageOrbsByIndex[i].Equals(identifier, false))
-                    {
-#if DEBUG
-                        Log.Warning(LOG_PREFIX + $"duplicate damage orb identifier {identifier}");
-#endif
-
-                        return;
-                    }
-                }
-            }
-
-            identifier.Index = _damageOrbsCount;
-
-#if DEBUG
-            Log.Debug(LOG_PREFIX + $"appended {identifier}");
-#endif
-
-            ArrayUtils.ArrayAppend(ref _damageOrbsByIndex, ref _damageOrbsCount, identifier);
-
-            if (NetworkServer.active)
-            {
-                DamageOrbAppendedServer?.Invoke(identifier);
-            }
+            return new DamageOrbIdentifier(damageOrb);
         }
 
-        static bool tryGetIdentifier(GenericDamageOrb damageOrb, out DamageOrbIdentifier identifier)
+        protected override NetworkMessageBase getSyncIdentifierNeededMessage(DamageOrbIdentifier identifier)
         {
-            for (int i = 0; i < _damageOrbsCount; i++)
-            {
-                if (_damageOrbsByIndex[i].Matches(damageOrb))
-                {
-                    identifier = _damageOrbsByIndex[i];
-                    return true;
-                }
-            }
-
-            identifier = default;
-            return false;
+            return new SyncDamageOrbIndexNeeded(identifier);
         }
 
-        public static DamageOrbIdentifier GetIdentifier(GenericDamageOrb damageOrb)
+        public override IEnumerable<NetworkMessageBase> GetNetMessages()
         {
-            if (!tryGetIdentifier(damageOrb, out DamageOrbIdentifier identifier))
-            {
-                identifier = new DamageOrbIdentifier(damageOrb);
-                if (NetworkServer.active)
-                {
-                    appendIdentifier(ref identifier, false);
-
-#if DEBUG
-                    Log.Debug($"Created {nameof(DamageOrbIdentifier)} '{identifier}'");
-#endif
-
-                    if (!NetworkServer.dontListen)
-                    {
-                        _instance.TrySendAll(NetworkDestination.Clients);
-                    }
-                }
-                else
-                {
-                    if (NetworkClient.active)
-                    {
-                        new SyncDamageOrbIndexNeeded(identifier).SendTo(NetworkDestination.Server);
-                    }
-
-                    return DamageOrbIdentifier.Invalid;
-                }
-            }
-
-            return identifier;
+            yield return new SyncDamageOrbCatalog(_identifiers, _identifiersCount);
         }
 
-        public static DamageOrbIdentifier GetIdentifier(int index)
+        public IEnumerable<ProjectileTypeIdentifier> GetAllDamageOrbProjectileIdentifiers()
         {
-            if (index < 0 || index >= _damageOrbsCount)
-                return DamageOrbIdentifier.Invalid;
-
-            return _damageOrbsByIndex[index];
-        }
-
-        bool INetMessageProvider.SendMessages => true;
-
-        IEnumerable<NetworkMessageBase> INetMessageProvider.GetNetMessages()
-        {
-            yield return new SyncDamageOrbCatalog(_damageOrbsByIndex, _damageOrbsCount);
-        }
-
-        static void SyncDamageOrbCatalog_OnReceive(DamageOrbIdentifier[] identifiers, int identifiersCount)
-        {
-            if (!NetworkServer.active && NetworkClient.active)
-            {
-                _damageOrbsCount = identifiersCount;
-
-                ArrayUtils.EnsureCapacity(ref _damageOrbsByIndex, identifiersCount);
-                Array.Copy(identifiers, _damageOrbsByIndex, identifiersCount);
-            }
-        }
-
-        static void SyncDamageOrbIndexNeeded_OnReceive(DamageOrbIdentifier required)
-        {
-            if (NetworkServer.active)
-            {
-                appendIdentifier(ref required, true);
-                _instance.TrySendAll(NetworkDestination.Clients);
-            }
-        }
-
-        public static IEnumerable<ProjectileTypeIdentifier> GetAllDamageOrbProjectileIdentifiers()
-        {
-            for (int i = 0; i < _damageOrbsCount; i++)
-            {
-                yield return _damageOrbsByIndex[i];
-            }
+            return this.Select<DamageOrbIdentifier, ProjectileTypeIdentifier>(i => i);
         }
     }
 }

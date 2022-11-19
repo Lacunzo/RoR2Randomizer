@@ -73,7 +73,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     });
                     break;
                 case ProjectileType.Bullet:
-                    BulletAttackIdentifier bulletIdentifier = BulletAttackCatalog.GetBulletAttack(Index);
+                    BulletAttackIdentifier bulletIdentifier = BulletAttackCatalog.Instance.GetIdentifier(Index);
                     if (!bulletIdentifier.IsValid)
                     {
                         Log.Warning(LOG_PREFIX + $"invalid bullet attack at index {Index}");

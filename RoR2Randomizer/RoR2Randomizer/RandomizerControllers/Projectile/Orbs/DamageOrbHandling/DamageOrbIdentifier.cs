@@ -2,16 +2,17 @@
 using RoR2;
 using RoR2.Orbs;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Utility;
 using System;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
 {
-    public struct DamageOrbIdentifier : IEquatable<DamageOrbIdentifier>
+    public struct DamageOrbIdentifier : ICatalogIdentifier<GenericDamageOrb, DamageOrbIdentifier>, IEquatable<DamageOrbIdentifier>
     {
         public static readonly DamageOrbIdentifier Invalid = new DamageOrbIdentifier() { Index = -1 };
 
-        public int Index;
+        public int Index { get; set; }
 
         public readonly EffectIndex OrbEffectIndex;
         public readonly SerializableSystemType OrbType;

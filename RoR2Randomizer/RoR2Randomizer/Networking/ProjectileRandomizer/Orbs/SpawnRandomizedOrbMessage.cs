@@ -103,7 +103,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
             writer.Write(_isCrit);
             writer.Write(_genericArgs);
             writer.WriteNullableVector3(_overrideTargetPosition);
-            }
+        }
 
         public override void Deserialize(NetworkReader reader)
         {
@@ -114,7 +114,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
             _isCrit = reader.ReadBoolean();
             _genericArgs = reader.Read<GenericFireProjectileArgs>();
             _overrideTargetPosition = reader.ReadNullableVector3();
-            }
+        }
 
         public override void OnReceived()
         {
@@ -148,7 +148,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
             switch (_orbIdentifier.Type)
             {
                 case ProjectileType.DamageOrb:
-                    DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.GetIdentifier(_orbIdentifier.Index);
+                    DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.Instance.GetIdentifier(_orbIdentifier.Index);
                     if (!damageOrbIdentifier.IsValid)
                     {
                         Log.Warning(LOG_PREFIX + $"invalid damage orb at index {_orbIdentifier.Index}");
@@ -168,7 +168,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                     orb = damageOrb;
                     break;
                 case ProjectileType.LightningOrb:
-                    LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.GetIdentifier(_orbIdentifier.Index);
+                    LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.Instance.GetIdentifier(_orbIdentifier.Index);
                     if (!lightningOrbIdentifier.IsValid)
                     {
                         Log.Warning(LOG_PREFIX + $"invalid lightning orb at index {_orbIdentifier.Index}");

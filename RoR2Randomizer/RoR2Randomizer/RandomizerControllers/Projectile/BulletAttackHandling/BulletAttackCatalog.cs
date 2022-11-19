@@ -4,26 +4,30 @@ using RoR2;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Bullet;
+using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 {
     // Not identified by this method:
     // EntityStates.TitanMonster.FireMegaLaser
-    // EntityStates.TitanMonster.FireGoldMegaLaser
 
-    public class BulletAttackCatalog : INetMessageProvider
+    public class BulletAttackCatalog : GenericNetworkedCatalog<BulletAttack, BulletAttackIdentifier>
     {
-        static BulletAttackCatalog _instance;
+        public static readonly BulletAttackCatalog Instance = new BulletAttackCatalog();
+
+        BulletAttackCatalog() : base()
+        {
+            SyncBulletAttackCatalog.OnReceive += SyncCatalog_OnReceive;
+            SyncBulletAttackIndexNeeded.OnReceive += SyncIndexNeeded_OnReceive;
+        }
 
         [SystemInitializer(typeof(EffectCatalog))]
         static void Init()
         {
-            _instance = new BulletAttackCatalog();
-            NetworkingManager.RegisterMessageProvider(_instance, MessageProviderFlags.Persistent);
-
             #region Predefined Identifiers
             static void initIdentifier(string tracerEffectName, string hitEffectName, DamageType damageType = DamageType.Generic, BulletAttackFlags flags = BulletAttackFlags.None)
             {
@@ -55,7 +59,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
                 const bool IS_DEBUG = false;
 #endif
 
-                appendIdentifier(ref identifier, IS_DEBUG);
+                Instance.appendIdentifier(ref identifier, IS_DEBUG);
             }
 
             // EntityStates.Bandit2.Weapon.FireSidearmResetRevolver
@@ -161,134 +165,28 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
             // EntityStates.Wisp1Monster.FireEmbers
             initIdentifier("TracerEmbers", "OmniImpactVFX");
             #endregion
-
-            SyncBulletAttackCatalog.OnReceive += SyncBulletAttackCatalog_OnReceive;
-            SyncBulletAttackIndexNeeded.OnReceive += SyncBulletAttackIndexNeeded_OnReceive;
         }
 
-        public static event Action<BulletAttackIdentifier> BulletAttackAppended;
+        protected override BulletAttackIdentifier InvalidIdentifier => BulletAttackIdentifier.Invalid;
 
-        static int _attackIdentifierCount = 0;
-        static BulletAttackIdentifier[] _attackIdentifiers = new BulletAttackIdentifier[20];
-
-        public static BulletAttackIdentifier GetBulletAttack(int index)
+        protected override BulletAttackIdentifier createIdentifierForObject(BulletAttack bulletAttack)
         {
-            if (index < 0 || index >= _attackIdentifierCount)
-                return BulletAttackIdentifier.Invalid;
-
-            return _attackIdentifiers[index];
+            return new BulletAttackIdentifier(bulletAttack, BulletAttackFlags.None);
         }
 
-        static void appendIdentifier(ref BulletAttackIdentifier identifier, bool checkExisting)
+        protected override NetworkMessageBase getSyncIdentifierNeededMessage(BulletAttackIdentifier identifier)
         {
-            const string LOG_PREFIX = $"{nameof(BulletAttackCatalog)}.{nameof(appendIdentifier)} ";
-
-            if (checkExisting)
-            {
-                for (int i = 0; i < _attackIdentifierCount; i++)
-                {
-                    if (_attackIdentifiers[i].Matches(identifier, false))
-                    {
-#if DEBUG
-                        Log.Warning(LOG_PREFIX + $"duplicate attack identifier {identifier}");
-#endif
-
-                        return;
-                    }
-                }
-            }
-
-            identifier.Index = _attackIdentifierCount;
-
-#if DEBUG
-            Log.Debug(LOG_PREFIX + $"appended {identifier}");
-#endif
-
-            ArrayUtils.ArrayAppend(ref _attackIdentifiers, ref _attackIdentifierCount, identifier);
-
-            BulletAttackAppended?.Invoke(identifier);
+            return new SyncBulletAttackIndexNeeded(identifier);
         }
 
-        static bool tryGetAttackIdentifier(BulletAttack bulletAttack, out BulletAttackIdentifier identifier)
+        public override IEnumerable<NetworkMessageBase> GetNetMessages()
         {
-            for (int i = 0; i < _attackIdentifierCount; i++)
-            {
-                if (_attackIdentifiers[i].Matches(bulletAttack))
-                {
-                    identifier = _attackIdentifiers[i];
-                    return true;
-                }
-            }
-
-            identifier = default;
-            return false;
+            yield return new SyncBulletAttackCatalog(_identifiers, _identifiersCount);
         }
 
-        public static BulletAttackIdentifier GetBulletAttackIdentifier(BulletAttack bulletAttack)
+        public IEnumerable<ProjectileTypeIdentifier> GetAllBulletAttackProjectileIdentifiers()
         {
-            if (!tryGetAttackIdentifier(bulletAttack, out BulletAttackIdentifier identifier))
-            {
-                identifier = new BulletAttackIdentifier(bulletAttack, BulletAttackFlags.None);
-                if (NetworkServer.active)
-                {
-                    appendIdentifier(ref identifier, false);
-
-#if DEBUG
-                    Log.Debug($"Created {nameof(BulletAttackIdentifier)} '{identifier}'");
-#endif
-
-                    if (!NetworkServer.dontListen)
-                    {
-                        _instance.TrySendAll(NetworkDestination.Clients);
-                    }
-                }
-                else
-                {
-                    if (NetworkClient.active)
-                    {
-                        new SyncBulletAttackIndexNeeded(identifier).SendTo(NetworkDestination.Server);
-                    }
-
-                    return BulletAttackIdentifier.Invalid;
-                }
-            }
-
-            return identifier;
-        }
-
-        bool INetMessageProvider.SendMessages => true;
-
-        IEnumerable<NetworkMessageBase> INetMessageProvider.GetNetMessages()
-        {
-            yield return new SyncBulletAttackCatalog(_attackIdentifiers, _attackIdentifierCount);
-        }
-
-        static void SyncBulletAttackCatalog_OnReceive(BulletAttackIdentifier[] identifiers, int identifiersCount)
-        {
-            if (!NetworkServer.active && NetworkClient.active)
-            {
-                _attackIdentifierCount = identifiersCount;
-
-                ArrayUtils.EnsureCapacity(ref _attackIdentifiers, identifiersCount);
-                Array.Copy(identifiers, _attackIdentifiers, identifiersCount);
-            }
-        }
-
-        static void SyncBulletAttackIndexNeeded_OnReceive(BulletAttackIdentifier required)
-        {
-            if (NetworkServer.active)
-            {
-                appendIdentifier(ref required, true);
-                _instance.TrySendAll(NetworkDestination.Clients);
-            }
-        }
-
-        public static IEnumerable<ProjectileTypeIdentifier> GetAllBulletAttackProjectileIdentifiers()
-        {
-            for (int i = 0; i < _attackIdentifierCount; i++)
-            {
-                yield return _attackIdentifiers[i];
-            }
+            return this.Select<BulletAttackIdentifier, ProjectileTypeIdentifier>(static i => i);
         }
     }
 }
