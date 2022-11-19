@@ -87,7 +87,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                     typeName = "???";
                 }
 
-                Log.Debug(LOG_PREFIX + $"({typeName}) received chunk {chunk.Header.ChunkIndex + 1}/{_collectedMessageData.Length}");
+                Log.Debug(LOG_PREFIX + $"({typeName}) received {chunk.Data.Length} bytes in chunk {chunk.Header.ChunkIndex + 1}/{_collectedMessageData.Length}");
 #endif
 
                 refreshMessages();
@@ -129,9 +129,17 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
             {
                 const string LOG_PREFIX = $"{nameof(ChunkedNetworkMessage)}+{nameof(ConstructingMessage)}.{nameof(receiveMessage)} ";
 
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"{message.GetType().Name}");
+#endif
+
                 if (message is INetMessage netMessage)
                 {
                     byte[] completeMessageData = new byte[_collectedMessageData.Sum(static m => m.Length)];
+
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"complete message length: {completeMessageData.Length} bytes");
+#endif
 
                     int currentIndex = 0;
                     foreach (byte[] chunkData in _collectedMessageData)
@@ -296,7 +304,8 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
             {
                 Header.Serialize(writer);
 
-                writer.WriteBytesFull(Data);
+                writer.WritePackedUInt32((uint)Data.Length);
+                writer.Write(Data, Data.Length);
             }
 
             public override void Deserialize(NetworkReader reader)
