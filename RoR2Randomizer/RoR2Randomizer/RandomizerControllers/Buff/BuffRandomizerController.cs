@@ -62,7 +62,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
         {
             if (shouldBeActive)
             {
-                IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None &&
+                IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None && !b.isHidden &&
                    (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.BinarySearch(_invincibilityBuffs, b.buffIndex) < 0));
 
 #if DEBUG
