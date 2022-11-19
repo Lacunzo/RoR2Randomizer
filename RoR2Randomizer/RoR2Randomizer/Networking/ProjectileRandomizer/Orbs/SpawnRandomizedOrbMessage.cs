@@ -3,6 +3,7 @@ using R2API.Networking.Interfaces;
 using RoR2;
 using RoR2.Networking;
 using RoR2.Orbs;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Patches.OrbEffectOverrideTarget;
 using RoR2Randomizer.Patches.ProjectileRandomizer.Orbs;
@@ -101,13 +102,8 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
             writer.Write(_force);
             writer.Write(_isCrit);
             writer.Write(_genericArgs);
-
-            writer.Write(_overrideTargetPosition.HasValue);
-            if (_overrideTargetPosition.HasValue)
-            {
-                writer.Write(_overrideTargetPosition.Value);
+            writer.WriteNullableVector3(_overrideTargetPosition);
             }
-        }
 
         public override void Deserialize(NetworkReader reader)
         {
@@ -117,12 +113,8 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
             _force = reader.ReadSingle();
             _isCrit = reader.ReadBoolean();
             _genericArgs = reader.Read<GenericFireProjectileArgs>();
-
-            if (reader.ReadBoolean())
-            {
-                _overrideTargetPosition = reader.ReadVector3();
+            _overrideTargetPosition = reader.ReadNullableVector3();
             }
-        }
 
         public override void OnReceived()
         {

@@ -1,5 +1,6 @@
 ﻿using R2API.Networking.Interfaces;
 using RoR2;
+using RoR2Randomizer.Extensions;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -84,9 +85,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         {
             writer.Write(Owner);
 
-            writer.Write(DamageType.HasValue);
-            if (DamageType.HasValue)
-                writer.Write(DamageType.Value);
+            writer.WriteNullableDamageType(DamageType);
 
             HurtBoxReference.FromHurtBox(Target).Write(writer);
 
@@ -99,8 +98,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         {
             Owner = reader.ReadGameObject();
 
-            if (reader.ReadBoolean())
-                DamageType = reader.ReadDamageType();
+            DamageType = reader.ReadNullableDamageType();
 
             HurtBoxReference hurtBoxReference = new HurtBoxReference();
             hurtBoxReference.Read(reader);
