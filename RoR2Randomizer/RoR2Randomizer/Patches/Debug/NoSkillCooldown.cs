@@ -17,10 +17,10 @@ namespace RoR2Randomizer.Patches.Debug
 
         static bool _enabled;
 
-        static readonly Hook GenericSkill_get_stock_Hook = new Hook(AccessTools.PropertyGetter(typeof(GenericSkill), nameof(GenericSkill.stock)), new Func<Func<GenericSkill, int>, GenericSkill, int>((Func<GenericSkill, int> orig, GenericSkill self) =>
+        static readonly Hook GenericSkill_get_stock_Hook = new Hook(AccessTools.PropertyGetter(typeof(GenericSkill), nameof(GenericSkill.stock)), (Func<GenericSkill, int> orig, GenericSkill self) =>
         {
             return _enabled ? self.maxStock : orig(self);
-        }).Method, new ILHookConfig() { ManualApply = true });
+        }, new HookConfig() { ManualApply = true });
 
         static void Apply()
         {
