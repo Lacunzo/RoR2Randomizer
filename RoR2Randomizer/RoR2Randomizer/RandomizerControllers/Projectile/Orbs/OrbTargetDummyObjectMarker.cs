@@ -61,7 +61,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
                 do
                 {
                     marker = _availableLocalInstances.Pop();
-                } while (!marker || marker.isInUse);
+                } while (_availableLocalInstances.Count > 0 && (!marker || marker.isInUse));
 
                 if (_availableLocalInstances.Count < MIN_ALLOWED_LOCAL_OBJECTS)
                 {
