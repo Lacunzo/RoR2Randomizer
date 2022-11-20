@@ -47,5 +47,10 @@
         {
             public const string VOIDSURVIVOR_CORRUPT_MODE_NAME = "bdVoidSurvivorCorruptMode";
         }
+
+        public static class DLCNames
+        {
+            public const string SOTV_NAME = "DLC1";
+        }
     }
 }

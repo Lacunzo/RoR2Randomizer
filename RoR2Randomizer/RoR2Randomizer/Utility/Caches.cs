@@ -1,5 +1,6 @@
 ﻿using HG;
 using RoR2;
+using RoR2.ExpansionManagement;
 using RoR2Randomizer.Extensions;
 using System;
 using System.Collections.Generic;
@@ -364,6 +365,20 @@ namespace RoR2Randomizer.Utility
                 }
 
                 PossibleStartingStagesIndices = new ReadOnlyArray<SceneIndex>(possibleStartingStages.Where(i => i != SceneIndex.Invalid).Distinct().OrderBy(i => i).ToArray());
+            }
+        }
+
+        public static class DLC
+        {
+            public static ExpansionDef SOTV { get; private set; }
+
+            [SystemInitializer(typeof(ExpansionCatalog))]
+            static void Init()
+            {
+                SOTV = ExpansionCatalog.expansionDefs.FirstOrDefault(static e => e.name == Constants.DLCNames.SOTV_NAME);
+#if DEBUG
+                if (!SOTV) Log.Warning($"Unable to find {nameof(ExpansionDef)} {Constants.DLCNames.SOTV_NAME}");
+#endif
             }
         }
     }
