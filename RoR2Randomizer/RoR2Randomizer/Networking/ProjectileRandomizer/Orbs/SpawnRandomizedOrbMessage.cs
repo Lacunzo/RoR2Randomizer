@@ -54,10 +54,22 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
 
             if (!_genericArgs.Target)
             {
+                float maxDistance;
+                if (genericArgs.MaxDistance >= 0f)
+                {
+                    maxDistance = genericArgs.MaxDistance;
+                }
+                else
+                {
+                    maxDistance = MAX_TARGET_DISTANCE;
+                }
+
                 Vector3 direction = rotation * Vector3.forward;
 
                 _orbTargetSearch.searchOrigin = _origin;
                 _orbTargetSearch.searchDirection = direction;
+
+                _orbTargetSearch.maxDistanceFilter = maxDistance;
 
                 CharacterBody ownerBody = _genericArgs.OwnerBody;
                 if (ownerBody)
@@ -80,16 +92,6 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                 }
                 else
                 {
-                    float maxDistance;
-                    if (genericArgs.MaxDistance >= 0f)
-                    {
-                        maxDistance = genericArgs.MaxDistance;
-                    }
-                    else
-                    {
-                        maxDistance = MAX_TARGET_DISTANCE;
-                    }
-
 #if DEBUG
                     Log.Debug($"Spawning randomized orb {orbIdentifier.Type} with {nameof(maxDistance)}={maxDistance}");
 #endif
