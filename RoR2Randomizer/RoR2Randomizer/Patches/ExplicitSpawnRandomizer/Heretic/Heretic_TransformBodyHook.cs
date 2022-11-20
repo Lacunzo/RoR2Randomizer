@@ -76,8 +76,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
 
                 cursor.Emit(OpCodes.Brtrue, label);
             }
-
-            Log.Debug(il.ToString());
         }
 
         static void CharacterMaster_TransformBody(On.RoR2.CharacterMaster.orig_TransformBody orig, CharacterMaster self, string bodyName)
