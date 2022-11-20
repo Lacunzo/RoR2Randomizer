@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using HG;
 using R2API.Networking;
 using RoR2;
 using RoR2Randomizer.Extensions;
@@ -11,12 +12,6 @@ namespace RoR2Randomizer.Utility
 {
     public static class MiscUtils
     {
-        public static void AddItem<T>(ref T[] array, T item)
-        {
-            Array.Resize(ref array, array.Length + 1);
-            array[array.Length - 1] = item;
-        }
-
         public static void AddItems<T>(ref T[] array, IEnumerable<T> items)
         {
             AddItems(ref array, items is T[] itemsArray ? itemsArray : items.ToArray());

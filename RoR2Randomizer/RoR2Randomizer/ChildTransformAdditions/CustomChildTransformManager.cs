@@ -1,4 +1,5 @@
 ﻿using EntityStates;
+using HG;
 using RoR2;
 using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
@@ -30,7 +31,7 @@ namespace RoR2Randomizer.ChildTransformAdditions
             if (!body || !locator || locator.FindChild(name))
                 return;
 
-            MiscUtils.AddItem(ref locator.transformPairs, getCustomChildTransformPair(body, locator, name, flags));
+            ArrayUtils.ArrayAppend(ref locator.transformPairs, getCustomChildTransformPair(body, locator, name, flags));
 
 #if DEBUG
             Log.Debug($"Add child {name} to {body.GetDisplayName()}");

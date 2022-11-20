@@ -1,4 +1,5 @@
 ﻿using EntityStates.BrotherMonster;
+using HG;
 using R2API;
 using RoR2;
 using RoR2Randomizer.Networking.BossRandomizer;
@@ -115,7 +116,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 
             if (healthComponent)
             {
-                MiscUtils.AddItem(ref healthComponent.onTakeDamageReceivers, newReturnItems);
+                ArrayUtils.ArrayAppend(ref healthComponent.onTakeDamageReceivers, newReturnItems);
             }
 
             return newReturnItems;
