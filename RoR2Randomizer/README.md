@@ -36,6 +36,15 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.7.2 Changes:**
+
+* Projectile Randomizer:
+  * Fixed an issue where the Projectile Randomizer would randomly stop working for the rest of the run.
+  * Fixed certain projectiles lock-on range not respecting the max travel distance of the original projectile.
+
+* Summon Randomizer:
+  * Fixed summons randomizing into Heretic immediately turning into the Heretic replacement.
+
 **0.7.1 Changes:**
 
 * Projectile Randomizer:
