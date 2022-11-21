@@ -240,7 +240,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
                 if (_timeToDestroy > 0f && Time.time >= _timeToDestroy)
                 {
                     isInUse = false;
-                    enabled = false;
                 }
             }
         }
