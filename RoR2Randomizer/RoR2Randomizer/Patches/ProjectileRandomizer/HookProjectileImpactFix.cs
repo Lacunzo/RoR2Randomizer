@@ -24,19 +24,26 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
         static void HookProjectileImpact_Start(On.RoR2.Projectile.HookProjectileImpact.orig_Start orig, HookProjectileImpact self)
         {
-            Transform ownerTransform = self.GetComponent<ProjectileController>().owner.transform;
-            if (ownerTransform)
+            if (self.TryGetComponent(out ProjectileController projectileController))
             {
-                ModelLocator modelLocator = ownerTransform.GetComponent<ModelLocator>();
-                if (modelLocator)
+                GameObject owner = projectileController.owner;
+                if (owner)
                 {
-                    Transform modelTransform = modelLocator.modelTransform;
-                    if (modelTransform)
+                    Transform ownerTransform = owner.transform;
+                    if (ownerTransform)
                     {
-                        ChildLocator childLocator = modelTransform.GetComponent<ChildLocator>();
-                        if (childLocator)
+                        ModelLocator modelLocator = ownerTransform.GetComponent<ModelLocator>();
+                        if (modelLocator)
                         {
-                            CustomChildTransformManager.AutoAddChildTransform(ownerTransform.GetComponent<CharacterBody>(), childLocator, self.attachmentString);
+                            Transform modelTransform = modelLocator.modelTransform;
+                            if (modelTransform)
+                            {
+                                ChildLocator childLocator = modelTransform.GetComponent<ChildLocator>();
+                                if (childLocator)
+                                {
+                                    CustomChildTransformManager.AutoAddChildTransform(ownerTransform.GetComponent<CharacterBody>(), childLocator, self.attachmentString);
+                                }
+                            }
                         }
                     }
                 }
