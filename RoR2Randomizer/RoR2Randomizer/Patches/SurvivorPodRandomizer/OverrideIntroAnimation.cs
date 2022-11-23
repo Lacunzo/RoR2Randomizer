@@ -9,28 +9,17 @@ namespace RoR2Randomizer.Patches.SurvivorPodRandomizer
     {
         static void Apply()
         {
-            On.RoR2.Run.HandlePlayerFirstEntryAnimation += Run_HandlePlayerFirstEntryAnimation;
-            On.RoR2.InfiniteTowerRun.HandlePlayerFirstEntryAnimation += InfiniteTowerRun_HandlePlayerFirstEntryAnimation;
+            CharacterBody.onBodyAwakeGlobal += CharacterBody_onBodyAwakeGlobal;
         }
 
         static void Cleanup()
         {
-            On.RoR2.Run.HandlePlayerFirstEntryAnimation -= Run_HandlePlayerFirstEntryAnimation;
-            On.RoR2.InfiniteTowerRun.HandlePlayerFirstEntryAnimation -= InfiniteTowerRun_HandlePlayerFirstEntryAnimation;
+            CharacterBody.onBodyAwakeGlobal -= CharacterBody_onBodyAwakeGlobal;
         }
 
-        static void Run_HandlePlayerFirstEntryAnimation(On.RoR2.Run.orig_HandlePlayerFirstEntryAnimation orig, Run self, CharacterBody body, Vector3 spawnPosition, Quaternion spawnRotation)
+        static void CharacterBody_onBodyAwakeGlobal(CharacterBody body)
         {
             SurvivorPodRandomizerController.TryOverrideIntroAnimation(body);
-
-            orig(self, body, spawnPosition, spawnRotation);
-        }
-
-        static void InfiniteTowerRun_HandlePlayerFirstEntryAnimation(On.RoR2.InfiniteTowerRun.orig_HandlePlayerFirstEntryAnimation orig, InfiniteTowerRun self, CharacterBody body, Vector3 spawnPosition, Quaternion spawnRotation)
-        {
-            SurvivorPodRandomizerController.TryOverrideIntroAnimation(body);
-
-            orig(self, body, spawnPosition, spawnRotation);
         }
     }
 }

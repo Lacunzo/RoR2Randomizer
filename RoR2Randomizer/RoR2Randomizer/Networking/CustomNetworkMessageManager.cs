@@ -15,6 +15,7 @@ using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.GenericDamage;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.Lightning;
 using RoR2Randomizer.Networking.ProjectileRandomizer.SpiteBomb;
 using RoR2Randomizer.Networking.SniperWeakPointRandomizer;
+using RoR2Randomizer.Networking.SurvivorPodRandomizer;
 
 namespace RoR2Randomizer.Networking
 {
@@ -53,6 +54,8 @@ namespace RoR2Randomizer.Networking
             NetworkingAPI.RegisterMessageType<SyncSniperWeakPointReplacements>();
 
             NetworkingAPI.RegisterMessageType<SyncCharacterMasterReplacementMode>();
+
+            NetworkingAPI.RegisterMessageType<SyncSurvivorPodReplacements>();
 
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
             NetworkingAPI.RegisterMessageType<SyncHoldoutZoneReplacements>();

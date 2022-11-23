@@ -1,6 +1,8 @@
 ﻿using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Networking.Generic;
+using RoR2Randomizer.Networking.SurvivorPodRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,20 +31,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         static SpawnPodPrefabData getDefaultSpawnData(CharacterBody body)
         {
-            GameObject prefab = BodyCatalog.GetBodyPrefab(body.bodyIndex);
-            if (prefab && prefab.TryGetComponent<CharacterBody>(out CharacterBody bodyPrefab))
-            {
-                if (bodyPrefab.preferredPodPrefab)
-                {
-                    return new SpawnPodPrefabData(bodyPrefab.preferredPodPrefab);
-                }
-                else
-                {
-                    return new SpawnPodPrefabData(bodyPrefab.preferredInitialStateType);
-                }
-            }
-
-            return default;
+            return new SpawnPodPrefabData(body.bodyIndex);
         }
 
         static readonly RunSpecific<Dictionary<BodyIndex, SpawnPodPrefabData>> _overrideSpawnPodPrefabs = new RunSpecific<Dictionary<BodyIndex, SpawnPodPrefabData>>((out Dictionary<BodyIndex, SpawnPodPrefabData> result) =>
@@ -64,14 +53,34 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             return false;
         });
 
-        static bool shouldBeActive => NetworkServer.active && ConfigManager.Misc.SurvivorPodRandomizerEnabled;
+        static readonly RunSpecific<bool> _hasReceivedPodReplacementsFromServer = new RunSpecific<bool>();
+
+        static bool shouldBeActive => (NetworkServer.active && ConfigManager.Misc.SurvivorPodRandomizerEnabled) || (NetworkClient.active && _hasReceivedPodReplacementsFromServer);
         public override bool IsRandomizerEnabled => shouldBeActive;
 
-        protected override bool isNetworked => false;
+        protected override bool isNetworked => true;
+        protected override IEnumerable<NetworkMessageBase> getNetMessages()
+        {
+            if (_overrideSpawnPodPrefabs.HasValue)
+            {
+                yield return new SyncSurvivorPodReplacements(_overrideSpawnPodPrefabs);
+            }
+        }
+
+        static void SyncSurvivorPodReplacements_OnReceive(Dictionary<BodyIndex, SpawnPodPrefabData> overrideSpawnPods)
+        {
+            if (!NetworkServer.active && NetworkClient.active)
+            {
+                _overrideSpawnPodPrefabs.Value = overrideSpawnPods;
+                _hasReceivedPodReplacementsFromServer.Value = true;
+            }
+        }
 
         protected override void Awake()
         {
             base.Awake();
+
+            SyncSurvivorPodReplacements.OnReceive += SyncSurvivorPodReplacements_OnReceive;
 
             SingletonHelper.Assign(ref _instance, this);
         }
@@ -81,6 +90,9 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             base.OnDestroy();
 
             _overrideSpawnPodPrefabs.Dispose();
+            _hasReceivedPodReplacementsFromServer.Dispose();
+
+            SyncSurvivorPodReplacements.OnReceive -= SyncSurvivorPodReplacements_OnReceive;
 
             SingletonHelper.Unassign(ref _instance, this);
         }
@@ -89,16 +101,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
         {
             if (shouldBeActive && _overrideSpawnPodPrefabs.HasValue && _overrideSpawnPodPrefabs.Value.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
             {
-                if (replacementPod.IsSpawnState)
-                {
-                    body.preferredInitialStateType = replacementPod.SpawnState;
-                    body.preferredPodPrefab = null;
-                }
-                else
-                {
-                    body.preferredPodPrefab = replacementPod.PodPrefab;
-                    body.preferredInitialStateType = default;
-                }
+                replacementPod.OverrideIntroAnimationOnBody(body);
             }
         }
     }
