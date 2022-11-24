@@ -529,7 +529,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         {
             if (IsActive)
             {
-                if (_projectileIndicesReplacements.Value.TryGetReplacement(original, out replacement) ||
+                if (
+#if DEBUG
+                    (replacement = ConfigManager.ProjectileRandomizer.DebugProjectileIdentifier).IsValid ||
+#endif
+                    _projectileIndicesReplacements.Value.TryGetReplacement(original, out replacement) ||
                     (_appendedProjectileReplacements.HasValue && _appendedProjectileReplacements.Value.TryGetValue(original, out replacement)))
                 {
 #if DEBUG
