@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace RoR2Randomizer.RandomizerControllers
 {
@@ -17,7 +18,13 @@ namespace RoR2Randomizer.RandomizerControllers
         protected CharacterMaster _master;
         protected CharacterBody _body;
 
-        protected abstract CharacterMaster originalMasterPrefab { get; }
+        public void SetOriginalMasterIndex(MasterCatalog.MasterIndex index)
+        {
+            _masterPrefab = MasterCatalog.GetMasterPrefab(index)?.GetComponent<CharacterMaster>();
+        }
+
+        CharacterMaster _masterPrefab;
+        protected virtual CharacterMaster originalMasterPrefab => _masterPrefab;
 
         protected CharacterBody originalBodyPrefab
         {
@@ -152,6 +159,22 @@ namespace RoR2Randomizer.RandomizerControllers
 
         protected virtual void initializeClient()
         {
+            if (_master && originalMasterPrefab && !_master.GetComponent<PlayerCharacterMasterController>())
+            {
+                if (originalMasterPrefab.GetComponent<SetDontDestroyOnLoad>())
+                {
+                    gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
+                }
+                else if (_master.TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
+                {
+                    Destroy(setDontDestroyOnLoad);
+
+                    if (RoR2.Util.IsDontDestroyOnLoad(_master.gameObject))
+                    {
+                        SceneManager.MoveGameObjectToScene(_master.gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
+                    }
+                }
+            }
         }
 
         protected virtual void initializeServer()

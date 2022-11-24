@@ -124,46 +124,11 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             return false;
         }
 
-        public static void ReplaceDirectorSpawnRequest(DirectorSpawnRequest spawnRequest)
+        public static void TryReplaceDirectorSpawnRequest(DirectorSpawnRequest spawnRequest)
         {
-            const string LOG_PREFIX = $"{nameof(ExplicitSpawnRandomizerController)}.{nameof(ReplaceDirectorSpawnRequest)} ";
-
-            if (spawnRequest == null)
-                return;
-
-            SpawnCard originalSpawnCard = spawnRequest.spawnCard;
-            if (!originalSpawnCard)
-                return;
-
-            if (TryReplaceSummon(ref originalSpawnCard.prefab, out GameObject originalPrefab))
+            if (IsActive)
             {
-#if DEBUG
-                Log.Debug($"Override spawn request ({originalSpawnCard}) prefab {originalPrefab?.name ?? "null"} -> {originalSpawnCard?.prefab?.name ?? "null"}");
-#endif
-
-                void trySpawnObjectPostfix(ref GameObject result, DirectorSpawnRequest spawnRequest)
-                {
-                    if (spawnRequest.spawnCard == originalSpawnCard)
-                    {
-#if DEBUG
-                        Log.Debug($"Reset spawn request ({originalSpawnCard}) prefab {originalSpawnCard?.prefab?.name ?? "null"} -> {originalPrefab?.name ?? "null"} (success: {(bool)result})");
-#endif
-
-                        originalSpawnCard.prefab = originalPrefab;
-
-                        if (result)
-                        {
-                            if (originalPrefab && originalPrefab.TryGetComponent<CharacterMaster>(out CharacterMaster originalMasterPrefab))
-                            {
-                                RegisterSpawnedReplacement(result, originalMasterPrefab.masterIndex);
-                            }
-                        }
-
-                        DirectorCore_TrySpawnObject.Postfix -= trySpawnObjectPostfix;
-                    }
-                }
-
-                DirectorCore_TrySpawnObject.Postfix += trySpawnObjectPostfix;
+                CharacterReplacements.TryReplaceDirectorSpawnRequest(spawnRequest, RegisterSpawnedReplacement);
             }
         }
 

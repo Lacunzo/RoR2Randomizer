@@ -106,7 +106,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                 }
             }
 
-            static void SyncBossReplacementCharacter_OnReceive(GameObject masterObject, BossReplacementType replacementType)
+            static void SyncBossReplacementCharacter_OnReceive(GameObject masterObject, BossReplacementType replacementType, MasterCatalog.MasterIndex? originalMasterIndex)
             {
                 switch (replacementType)
                 {
@@ -116,12 +116,12 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 #if DEBUG
                         Log.Debug($"Running {nameof(handleSpawnedMithrixCharacterClient)}");
 #endif
-                        handleSpawnedMithrixCharacterClient(masterObject, replacementType);
+                        handleSpawnedMithrixCharacterClient(masterObject, replacementType, originalMasterIndex);
                         break;
                 }
             }
 
-            static void handleSpawnedMithrixCharacterClient(GameObject masterObject, BossReplacementType type)
+            static void handleSpawnedMithrixCharacterClient(GameObject masterObject, BossReplacementType type, MasterCatalog.MasterIndex? originalMasterIndex)
             {
                 BaseMithrixReplacement baseMithrixReplacement;
                 if (type == BossReplacementType.MithrixPhase2)
@@ -130,6 +130,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                     Log.Debug($"Adding {nameof(MithrixPhase2EnemiesReplacement)} component to {masterObject}");
 #endif
                     baseMithrixReplacement = masterObject.AddComponent<MithrixPhase2EnemiesReplacement>();
+                    baseMithrixReplacement.SetOriginalMasterIndex(originalMasterIndex.GetValueOrDefault(MasterCatalog.MasterIndex.none));
                 }
                 else
                 {

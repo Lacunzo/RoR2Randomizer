@@ -20,7 +20,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
             Log.Debug($"{nameof(AurelioniteReplacement)} {nameof(bodyResolved)}");
 #endif
 
-            setBodySubtitleIfNull("TITANGOLD_BODY_SUBTITLE");
+            setBodySubtitle("TITANGOLD_BODY_SUBTITLE");
         }
     }
 }

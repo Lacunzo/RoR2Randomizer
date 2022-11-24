@@ -14,7 +14,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         {
             base.bodyResolved();
 
-            setBodySubtitleIfNull("SUPERROBOBALLBOSS_BODY_SUBTITLE");
+            setBodySubtitle("SUPERROBOBALLBOSS_BODY_SUBTITLE");
         }
     }
 }

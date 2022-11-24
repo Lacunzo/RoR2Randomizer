@@ -15,6 +15,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 
         protected override bool isNetworked => true;
 
+        protected virtual bool sendOriginalCharacterMasterIndex => false;
+
         protected override void bodyResolved()
         {
             base.bodyResolved();
@@ -56,21 +58,31 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
             Log.Debug($"Sending {nameof(SyncBossReplacementCharacter)} to clients");
 #endif
 
-            yield return new SyncBossReplacementCharacter(_master.gameObject, replacementType);
+            yield return new SyncBossReplacementCharacter(_master.gameObject, replacementType, sendOriginalCharacterMasterIndex ? originalMasterPrefab?.masterIndex : null);
         }
 
-        protected void setBodySubtitleIfNull(string subtitleToken)
+        public enum SetSubtitleMode : byte
         {
-            if (string.IsNullOrEmpty(_body.subtitleNameToken))
-            {
-                setBodySubtitle(subtitleToken);
-            }
+            OnlyIfExistingIsNull,
+            DontOverrideIfBothNotNull,
+            AlwaysOverride
         }
 
-        protected void setBodySubtitle(string subtitleToken)
+        protected void setBodySubtitle(string subtitleToken, SetSubtitleMode mode = SetSubtitleMode.OnlyIfExistingIsNull)
         {
             if (_body && _body.subtitleNameToken != subtitleToken)
             {
+                if (mode == SetSubtitleMode.OnlyIfExistingIsNull)
+                {
+                    if (!string.IsNullOrEmpty(_body.subtitleNameToken))
+                        return;
+                }
+                else if (mode == SetSubtitleMode.DontOverrideIfBothNotNull)
+                {
+                    if (!string.IsNullOrEmpty(_body.subtitleNameToken) && !string.IsNullOrEmpty(subtitleToken))
+                        return;
+                }
+
                 _body.subtitleNameToken = subtitleToken;
 
                 // Update BossGroup
@@ -83,8 +95,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 
         void resetBossGroupSubtitle()
         {
-            BossGroup[] bossGroups = GameObject.FindObjectsOfType<BossGroup>();
-            foreach (BossGroup group in bossGroups)
+            foreach (BossGroup group in InstanceTracker.GetInstancesList<BossGroup>())
             {
                 for (int i = 0; i < group.bossMemoryCount; i++)
                 {

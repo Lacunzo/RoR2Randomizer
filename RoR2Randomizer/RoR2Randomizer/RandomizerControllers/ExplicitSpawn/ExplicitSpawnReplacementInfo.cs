@@ -36,27 +36,5 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         {
             yield return new SyncExplicitSpawnReplacement(_master.gameObject, _originalMasterIndex);
         }
-
-        protected override void initializeClient()
-        {
-            base.initializeClient();
-
-            if (!GetComponent<PlayerCharacterMasterController>())
-            {
-                if (originalMasterPrefab.GetComponent<SetDontDestroyOnLoad>())
-                {
-                    gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
-                }
-                else if (TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
-                {
-                    Destroy(setDontDestroyOnLoad);
-
-                    if (RoR2.Util.IsDontDestroyOnLoad(gameObject))
-                    {
-                        SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
-                    }
-                }
-            }
-        }
     }
 }

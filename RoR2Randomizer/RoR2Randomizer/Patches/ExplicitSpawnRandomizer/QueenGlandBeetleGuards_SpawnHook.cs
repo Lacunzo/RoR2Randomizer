@@ -37,7 +37,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 c.Emit(OpCodes.Dup);
                 c.EmitDelegate((DirectorSpawnRequest directorSpawnRequest) =>
                 {
-                    ExplicitSpawnRandomizerController.ReplaceDirectorSpawnRequest(directorSpawnRequest);
+                    ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(directorSpawnRequest);
 
                     if (ExplicitSpawnRandomizerController.IsActive)
                     {

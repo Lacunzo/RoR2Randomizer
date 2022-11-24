@@ -25,7 +25,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
             {
                 c.Emit(OpCodes.Dup);
-                c.EmitDelegate(ExplicitSpawnRandomizerController.ReplaceDirectorSpawnRequest);
+                c.EmitDelegate(ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest);
             }
         }
     }

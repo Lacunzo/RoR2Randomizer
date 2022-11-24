@@ -30,6 +30,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
             Aurelionite.Initialize();
             LunarScav.Initialize();
             AlloyWorshipUnit.Initialize();
+            HoldoutBoss.Initialize();
         }
 
         protected override void OnDestroy()
@@ -41,6 +42,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
             Aurelionite.Uninitialize();
             LunarScav.Uninitialize();
             AlloyWorshipUnit.Uninitialize();
+            HoldoutBoss.Uninitialize();
 
             SingletonHelper.Unassign(ref _instance, this);
         }

@@ -18,6 +18,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
         public readonly BoolConfigValue RandomizeAlloyWorshipUnit;
 
+        public readonly BoolConfigValue RandomizeTeleporterBosses;
+
         public BossRandomizerConfig(ConfigFile file) : base("Boss", file)
         {
             RandomizeMithrix = new BoolConfigValue(getEntry("Randomize Mithrix", "Randomizes the character type of Mithrix", true));
@@ -30,6 +32,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
             RandomizeLunarScav = new BoolConfigValue(getEntry("Randomize Twisted Scavengers", "Randomizes the character type of Twisted Scavengers", true));
 
             RandomizeAlloyWorshipUnit = new BoolConfigValue(getEntry("Randomize Alloy Worship Unit", "Randomizes the character type of Alloy Worship Unit on Siren's Call", true));
+
+            RandomizeTeleporterBosses = new BoolConfigValue(getEntry("Randomize Teleporter Bosses", "Randomizes the character types of teleporter bosses", true));
         }
     }
 }

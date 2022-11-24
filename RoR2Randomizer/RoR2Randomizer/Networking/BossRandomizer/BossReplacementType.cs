@@ -15,6 +15,7 @@
         LunarScav3,
         LunarScav4,
         AlloyWorshipUnit,
+        TeleporterBoss,
         Count
     }
 }

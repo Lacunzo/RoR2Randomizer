@@ -48,6 +48,13 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 
         protected override BossReplacementType replacementType => IsHurt ? BossReplacementType.MithrixHurt : BossReplacementType.MithrixNormal;
 
+        protected override CharacterMaster originalMasterPrefab => replacementType switch
+        {
+            BossReplacementType.MithrixNormal => Caches.MasterPrefabs["BrotherMaster"],
+            BossReplacementType.MithrixHurt => Caches.MasterPrefabs["BrotherHurtMaster"],
+            _ => null
+        };
+
         protected override void bodyResolved()
         {
             base.bodyResolved();
@@ -56,7 +63,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
             Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(bodyResolved)}: body.subtitleNameToken={_body.subtitleNameToken}");
 #endif
 
-            setBodySubtitleIfNull("BROTHER_BODY_SUBTITLE");
+            setBodySubtitle("BROTHER_BODY_SUBTITLE");
             
             if (NetworkServer.active)
             {

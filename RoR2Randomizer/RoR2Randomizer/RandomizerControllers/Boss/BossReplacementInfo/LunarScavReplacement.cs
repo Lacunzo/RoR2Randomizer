@@ -16,7 +16,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         {
             base.bodyResolved();
 
-            setBodySubtitleIfNull("SCAVLUNAR_BODY_SUBTITLE");
+            setBodySubtitle("SCAVLUNAR_BODY_SUBTITLE");
         }
     }
 }

@@ -8,6 +8,7 @@ using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.CharacterReplacements;
 using RoR2Randomizer.Networking.Generic;
+using RoR2Randomizer.Patches.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections.Generic;
@@ -542,6 +543,79 @@ namespace RoR2Randomizer.RandomizerControllers
                     }
                 }
             };
+        }
+
+        public delegate void OnDirectorSpawnReplacedCallback(GameObject result, MasterCatalog.MasterIndex originalMasterIndex);
+
+        public static void TryReplaceDirectorSpawnRequest(DirectorSpawnRequest spawnRequest, OnDirectorSpawnReplacedCallback onDirectorSpawnReplaced)
+        {
+            const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(TryReplaceDirectorSpawnRequest)} ";
+
+            if (spawnRequest == null)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"Not replacing due to: null {nameof(spawnRequest)}");
+#endif
+                return;
+            }
+
+            SpawnCard spawnCard = spawnRequest.spawnCard;
+            if (spawnCard == null)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"Not replacing due to: null {nameof(spawnCard)}");
+#endif
+                return;
+            }
+
+            MasterCatalog.MasterIndex replacementMasterIndex = GetReplacementForMasterIndex(MasterCatalog.FindMasterIndex(spawnCard.prefab));
+            if (!replacementMasterIndex.isValid)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"Not replacing due to: invalid replacement MasterIndex");
+#endif
+                return;
+            }
+
+            GameObject replacementMasterPrefab = MasterCatalog.GetMasterPrefab(replacementMasterIndex);
+            if (!replacementMasterPrefab)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"Not replacing due to: invalid replacement prefab");
+#endif
+                return;
+            }
+
+            GameObject originalPrefab = spawnCard.prefab;
+            spawnCard.prefab = replacementMasterPrefab;
+
+#if DEBUG
+            Log.Debug($"Override spawn request ({spawnCard}) prefab {originalPrefab?.name ?? "null"} -> {spawnCard?.prefab?.name ?? "null"}");
+#endif
+
+            void trySpawnObjectPostfix(ref GameObject result, DirectorSpawnRequest spawnRequest)
+            {
+                if (spawnRequest.spawnCard == spawnCard)
+                {
+#if DEBUG
+                    Log.Debug($"Reset spawn request ({spawnCard}) prefab {spawnCard?.prefab?.name ?? "null"} -> {originalPrefab?.name ?? "null"} (success: {(bool)result})");
+#endif
+
+                    spawnCard.prefab = originalPrefab;
+
+                    if (result)
+                    {
+                        if (originalPrefab && originalPrefab.TryGetComponent<CharacterMaster>(out CharacterMaster originalMasterPrefab))
+                        {
+                            onDirectorSpawnReplaced?.Invoke(result, originalMasterPrefab.masterIndex);
+                        }
+                    }
+
+                    DirectorCore_TrySpawnObject.Postfix -= trySpawnObjectPostfix;
+                }
+            }
+
+            DirectorCore_TrySpawnObject.Postfix += trySpawnObjectPostfix;
         }
     }
 }
