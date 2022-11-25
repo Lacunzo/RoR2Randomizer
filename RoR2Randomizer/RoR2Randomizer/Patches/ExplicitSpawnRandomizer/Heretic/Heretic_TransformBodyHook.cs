@@ -82,11 +82,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
         {
             if (ExplicitSpawnRandomizerController.IsActive && !self.GetComponent<ExplicitSpawnReplacementInfo>())
             {
-                if (
-#if DEBUG
-                    ConfigManager.Debug.CharacterDebugMode.Entry.Value > DebugMode.None ||
-#endif
-                    CharacterReplacements.IsAnyForcedCharacterModeEnabled ||
+                if (CharacterReplacements.IsAnyForcedCharacterModeEnabled ||
                     (ExplicitSpawnRandomizerController.TryGetOriginalBodyName(bodyName, out string originalBody) &&
                      originalBody == Constants.BodyNames.HERETIC_NAME))
                 {

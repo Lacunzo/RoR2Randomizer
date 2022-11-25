@@ -221,11 +221,17 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static bool IsEnabled => NetworkServer.active || (NetworkClient.active && (_hasReceivedMasterIndexReplacementsFromServer || _replacementMode.HasValue));
 
-        public static bool IsAnyForcedCharacterModeEnabled => _replacementMode.HasValue && _replacementMode.Value switch
+        public static bool IsAnyForcedCharacterModeEnabled
         {
-            CharacterReplacementMode.Gup => true,
-            _ => false
-        };
+            get
+            {
+                return
+#if DEBUG
+                       ConfigManager.Debug.CharacterDebugMode.Entry.Value > DebugMode.None ||
+#endif
+                       (_replacementMode.HasValue && _replacementMode.Value >= CharacterReplacementMode.Gup);
+            }
+        }
 
         public bool SendMessages => _masterIndexReplacements.HasValue || IsAnyForcedCharacterModeEnabled;
 
