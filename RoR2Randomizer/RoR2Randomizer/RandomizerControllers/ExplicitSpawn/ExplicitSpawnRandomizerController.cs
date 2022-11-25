@@ -17,13 +17,31 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         static void Init()
         {
             if (Caches.Bodies.SquidTurretBodyIndex != BodyIndex.None)
-                ItemDescriptionNameReplacementManager.AddEntry("ITEM_SQUIDTURRET_PICKUP", Caches.Bodies.SquidTurretBodyIndex);
+            {
+                ItemDescriptionNameReplacementManager.AddEntry("ITEM_SQUIDTURRET_PICKUP", Caches.Bodies.SquidTurretBodyIndex, ConfigManager.ExplicitSpawnRandomizer.RandomizeSquidTurrets);
+            }
 
             if (Caches.Bodies.MinorConstructOnKillBodyIndex != BodyIndex.None)
-                ItemDescriptionNameReplacementManager.AddEntry("ITEM_MINORCONSTRUCTONKILL_PICKUP", Caches.Bodies.MinorConstructOnKillBodyIndex);
+            {
+                ItemDescriptionNameReplacementManager.AddEntry("ITEM_MINORCONSTRUCTONKILL_PICKUP", Caches.Bodies.MinorConstructOnKillBodyIndex, ConfigManager.ExplicitSpawnRandomizer.RandomizeDefenseNucleusAlphaConstruct);
+            }
         }
 
         static readonly RunSpecific<bool> _isEnabledServer = new RunSpecific<bool>();
+
+        public static readonly RunSpecific<bool> IsHereticRandomized = new RunSpecific<bool>((out bool result) =>
+        {
+            if (NetworkServer.active)
+            {
+                result = IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeHeretic;
+                return true;
+            }
+            else
+            {
+                result = default;
+                return false;
+            }
+        });
 
         public override bool IsRandomizerEnabled => IsActive;
         public static bool IsActive => (NetworkServer.active && (ConfigManager.ExplicitSpawnRandomizer.Enabled || CharacterReplacements.IsAnyForcedCharacterModeEnabled)) || (NetworkClient.active && _isEnabledServer);
@@ -32,7 +50,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
-            yield return new SyncExplicitSpawnRandomizerEnabled(IsActive);
+            yield return new SyncExplicitSpawnRandomizerEnabled(IsActive, ConfigManager.ExplicitSpawnRandomizer.RandomizeHeretic);
         }
 
         public static MasterCatalog.MasterIndex GetOriginalMasterIndex(GameObject replacementObject)
@@ -205,9 +223,10 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             SyncExplicitSpawnRandomizerEnabled.OnReceive -= SyncExplicitSpawnRandomizerEnabled_OnReceive;
         }
 
-        static void SyncExplicitSpawnRandomizerEnabled_OnReceive(bool isEnabled)
+        static void SyncExplicitSpawnRandomizerEnabled_OnReceive(bool isEnabled, bool randomizeHeretic)
         {
             _isEnabledServer.Value = isEnabled;
+            IsHereticRandomized.Value = randomizeHeretic;
         }
 
         public static void RegisterSpawnedReplacement(GameObject masterObject, MasterCatalog.MasterIndex originalMasterIndex)

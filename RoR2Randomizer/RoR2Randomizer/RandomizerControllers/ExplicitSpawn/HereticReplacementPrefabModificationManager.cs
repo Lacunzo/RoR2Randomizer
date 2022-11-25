@@ -26,6 +26,9 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                 if (!Caches.Masters.Heretic.isValid)
                     return;
 
+                if (!ExplicitSpawnRandomizerController.IsHereticRandomized)
+                    return;
+
                 MasterCatalog.MasterIndex hereticReplacementIndex = CharacterReplacements.GetReplacementForMasterIndex(Caches.Masters.Heretic);
                 if (!hereticReplacementIndex.isValid)
                     return;

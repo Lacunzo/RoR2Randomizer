@@ -1,5 +1,6 @@
 ﻿using R2API;
 using RoR2;
+using RoR2Randomizer.Configuration.ConfigValue;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,10 +13,11 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             public readonly string ItemPickupToken;
             public readonly BodyIndex SearchIndex;
             public readonly string SearchToken;
+            public readonly BoolConfigValue IsEnabledConfigValue;
 
             LanguageAPI.LanguageOverlay[] _currentOverlays;
 
-            public Entry(string itemPickupToken, BodyIndex searchIndex)
+            public Entry(string itemPickupToken, BodyIndex searchIndex, BoolConfigValue isEnabledConfigValue)
             {
                 const string LOG_PREFIX = $"{nameof(ItemDescriptionNameReplacementManager)}+{nameof(Entry)}..ctor ";
 
@@ -32,10 +34,15 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                     Log.Warning(LOG_PREFIX + $"null body prefab for search index {searchIndex}");
                     SearchToken = "UNKNOWN";
                 }
+
+                IsEnabledConfigValue = isEnabledConfigValue;
             }
 
             public void ApplyOverlays()
             {
+                if (IsEnabledConfigValue != null && !IsEnabledConfigValue)
+                    return;
+
                 if (!ExplicitSpawnRandomizerController.TryGetReplacementBodyIndex(SearchIndex, out BodyIndex replacementIndex))
                     return;
 
@@ -99,9 +106,9 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             }
         }
 
-        public static void AddEntry(string itemPickupToken, BodyIndex searchIndex)
+        public static void AddEntry(string itemPickupToken, BodyIndex searchIndex, BoolConfigValue isEnabledConfigValue)
         {
-            _entries.Add(new Entry(itemPickupToken, searchIndex));
+            _entries.Add(new Entry(itemPickupToken, searchIndex, isEnabledConfigValue));
         }
     }
 }

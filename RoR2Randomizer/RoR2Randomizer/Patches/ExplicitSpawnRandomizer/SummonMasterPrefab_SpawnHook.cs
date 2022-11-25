@@ -1,4 +1,5 @@
 ﻿using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using UnityEngine;
 
@@ -19,6 +20,11 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static CharacterMaster SummonMasterBehavior_OpenSummonReturnMaster(On.RoR2.SummonMasterBehavior.orig_OpenSummonReturnMaster orig, SummonMasterBehavior self, Interactor activator)
         {
+            if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeDrones)
+            {
+                return orig(self, activator);
+            }
+
             bool hasReplaced = ExplicitSpawnRandomizerController.TryReplaceSummon(ref self.masterPrefab, out GameObject originalPrefab);
 
             CharacterMaster result = orig(self, activator);

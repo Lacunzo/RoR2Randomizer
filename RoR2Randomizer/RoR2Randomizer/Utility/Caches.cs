@@ -95,6 +95,16 @@ namespace RoR2Randomizer.Utility
 
             public static MasterCatalog.MasterIndex Heretic { get; private set; } = MasterCatalog.MasterIndex.none;
 
+            public static MasterCatalog.MasterIndex MalachiteUrchin { get; private set; } = MasterCatalog.MasterIndex.none;
+
+            public static MasterCatalog.MasterIndex VoidInfestor { get; private set; } = MasterCatalog.MasterIndex.none;
+
+            public static MasterCatalog.MasterIndex SoulWisp { get; private set; } = MasterCatalog.MasterIndex.none;
+
+            public static MasterCatalog.MasterIndex HealingCore { get; private set; } = MasterCatalog.MasterIndex.none;
+
+            public static MasterCatalog.MasterIndex ShopkeeperNewt { get; private set; } = MasterCatalog.MasterIndex.none;
+
             [SystemInitializer(typeof(MasterCatalog))]
             static void Init()
             {
@@ -106,6 +116,31 @@ namespace RoR2Randomizer.Utility
                 Heretic = MasterCatalog.FindMasterIndex(Constants.MasterNames.HERETIC_NAME);
 #if DEBUG
                 if (!Heretic.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.HERETIC_NAME}'");
+#endif
+
+                MalachiteUrchin = MasterCatalog.FindMasterIndex(Constants.MasterNames.MALACHITE_URCHIN_NAME);
+#if DEBUG
+                if (!MalachiteUrchin.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.MALACHITE_URCHIN_NAME}'");
+#endif
+
+                VoidInfestor = MasterCatalog.FindMasterIndex(Constants.MasterNames.VOID_INFESTOR_NAME);
+#if DEBUG
+                if (!VoidInfestor.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.VOID_INFESTOR_NAME}'");
+#endif
+
+                SoulWisp = MasterCatalog.FindMasterIndex(Constants.MasterNames.SOUL_WISP_NAME);
+#if DEBUG
+                if (!SoulWisp.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.SOUL_WISP_NAME}'");
+#endif
+
+                HealingCore = MasterCatalog.FindMasterIndex(Constants.MasterNames.HEALING_CORE_NAME);
+#if DEBUG
+                if (!HealingCore.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.HEALING_CORE_NAME}'");
+#endif
+
+                ShopkeeperNewt = MasterCatalog.FindMasterIndex(Constants.MasterNames.SHOPKEEPER_NEWT_NAME);
+#if DEBUG
+                if (!ShopkeeperNewt.isValid) Log.Warning($"Unable to find master index '{Constants.MasterNames.SHOPKEEPER_NEWT_NAME}'");
 #endif
             }
         }

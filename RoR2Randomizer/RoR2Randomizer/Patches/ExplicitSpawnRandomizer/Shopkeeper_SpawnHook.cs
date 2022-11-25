@@ -1,4 +1,5 @@
 ﻿using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using RoR2Randomizer.Utility;
 using UnityEngine;
@@ -9,17 +10,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
     [PatchClass]
     static class Shopkeeper_SpawnHook
     {
-        static MasterCatalog.MasterIndex _shopkeeperMasterIndex = MasterCatalog.MasterIndex.none;
-        static SceneIndex _newtShopSceneIndex = SceneIndex.Invalid;
-
-        [SystemInitializer(typeof(SceneCatalog), typeof(MasterCatalog))]
-        static void Init()
-        {
-            _newtShopSceneIndex = SceneCatalog.FindSceneIndex(Constants.SceneNames.NEWT_SHOP_SCENE_NAME);
-
-            _shopkeeperMasterIndex = MasterCatalog.FindMasterIndex("ShopkeeperMaster");
-        }
-
         static void Apply()
         {
             SceneCatalog.onMostRecentSceneDefChanged += onSceneLoaded;
@@ -32,37 +22,48 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void onSceneLoaded(SceneDef scene)
         {
-            if (_newtShopSceneIndex != SceneIndex.Invalid && _shopkeeperMasterIndex.isValid && NetworkServer.active && scene.sceneDefIndex == _newtShopSceneIndex)
-            {
-                MasterCatalog.MasterIndex replacementIndex = ExplicitSpawnRandomizerController.GetSummonReplacement(_shopkeeperMasterIndex);
-                if (replacementIndex.isValid)
-                {
-                    GameObject replacementPrefabObj = MasterCatalog.GetMasterPrefab(replacementIndex);
-                    if (replacementPrefabObj && replacementPrefabObj.TryGetComponent<CharacterMaster>(out CharacterMaster replacementPrefab) && replacementPrefab.bodyPrefab)
-                    {
-                        const string STORE_HOLDER_OBJECT_NAME = "HOLDER: Store";
-                        GameObject storeHolder = GameObject.Find(STORE_HOLDER_OBJECT_NAME);
-                        if (storeHolder)
-                        {
-                            Transform shopkeeperMasterTransform = storeHolder.transform.Find("HOLDER: Store Platforms/ShopkeeperPosition/ShopkeeperMaster");
-                            if (shopkeeperMasterTransform && shopkeeperMasterTransform.TryGetComponent<CharacterMaster>(out CharacterMaster shopKeeperMaster))
-                            {
-                                shopKeeperMaster.bodyPrefab = replacementPrefab.bodyPrefab;
+            if (!NetworkServer.active)
+                return;
 
-                                ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(shopKeeperMaster.gameObject, _shopkeeperMasterIndex);
+            if (Caches.Scene.NewtShopSceneIndex == SceneIndex.Invalid || scene.sceneDefIndex != Caches.Scene.NewtShopSceneIndex)
+                return;
+
+            if (!Caches.Masters.ShopkeeperNewt.isValid)
+                return;
+
+            if (!ExplicitSpawnRandomizerController.IsActive || !ConfigManager.ExplicitSpawnRandomizer.RandomizeShopkeeperNewt)
+                return;
+
+            MasterCatalog.MasterIndex replacementIndex = ExplicitSpawnRandomizerController.GetSummonReplacement(Caches.Masters.ShopkeeperNewt);
+            if (!replacementIndex.isValid)
+                return;
+
+            GameObject replacementPrefabObj = MasterCatalog.GetMasterPrefab(replacementIndex);
+            if (!replacementPrefabObj)
+                return;
+
+            if (!replacementPrefabObj.TryGetComponent<CharacterMaster>(out CharacterMaster replacementPrefab) || !replacementPrefab.bodyPrefab)
+                return;
+
+            const string STORE_HOLDER_OBJECT_NAME = "HOLDER: Store";
+            GameObject storeHolder = GameObject.Find(STORE_HOLDER_OBJECT_NAME);
+            if (!storeHolder)
+            {
+                Log.Warning($"{nameof(Shopkeeper_SpawnHook)}.{nameof(onSceneLoaded)} could not find {STORE_HOLDER_OBJECT_NAME}");
+                return;
+            }
+
+            Transform shopkeeperMasterTransform = storeHolder.transform.Find("HOLDER: Store Platforms/ShopkeeperPosition/ShopkeeperMaster");
+            if (!shopkeeperMasterTransform || !shopkeeperMasterTransform.TryGetComponent<CharacterMaster>(out CharacterMaster shopKeeperMaster))
+                return;
+            
+            shopKeeperMaster.bodyPrefab = replacementPrefab.bodyPrefab;
+
+            ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(shopKeeperMaster.gameObject, Caches.Masters.ShopkeeperNewt);
 
 #if DEBUG
-                                Log.Debug("Replaced Shopkeeper");
+            Log.Debug("Replaced Shopkeeper");
 #endif
-                            }
-                        }
-                        else
-                        {
-                            Log.Warning($"{nameof(Shopkeeper_SpawnHook)}.{nameof(onSceneLoaded)} could not find {STORE_HOLDER_OBJECT_NAME}");
-                        }
-                    }
-                }
-            }
         }
     }
 }

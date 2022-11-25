@@ -21,6 +21,9 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         static void FullExplicitSpawnInitListener_OnFullInit()
         {
+            if (!ExplicitSpawnRandomizerController.IsHereticRandomized)
+                return;
+
             if (ExplicitSpawnRandomizerController.TryGetReplacementBodyIndex(Caches.Bodies.HereticBodyIndex, out BodyIndex replacementIndex))
             {
                 GameObject replacementBodyPrefab = BodyCatalog.GetBodyPrefab(replacementIndex);

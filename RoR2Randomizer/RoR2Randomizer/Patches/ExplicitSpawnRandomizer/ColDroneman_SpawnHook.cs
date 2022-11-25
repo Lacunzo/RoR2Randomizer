@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 
 namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
@@ -25,7 +26,13 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
             {
                 c.Emit(OpCodes.Dup);
-                c.EmitDelegate(ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest);
+                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest) =>
+                {
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeDrones)
+                    {
+                        ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
+                    }
+                });
             }
         }
     }

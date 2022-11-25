@@ -3,6 +3,7 @@ using HarmonyLib;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using RoR2Randomizer.Utility;
 using UnityEngine;
@@ -39,6 +40,9 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             {
                 c.EmitDelegate((MasterCatalog.MasterIndex original) =>
                 {
+                    if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeEngiTurrets)
+                        return original;
+
                     MasterCatalog.MasterIndex replacement = ExplicitSpawnRandomizerController.GetSummonReplacement(original);
                     return replacement.isValid ? replacement : original;
                 });
@@ -54,7 +58,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 c.Emit(OpCodes.Dup);
                 c.EmitDelegate((CharacterMaster summoned) =>
                 {
-                    if (NetworkServer.active)
+                    if (NetworkServer.active && ConfigManager.ExplicitSpawnRandomizer.RandomizeEngiTurrets)
                     {
                         ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(summoned.gameObject);
                     }
@@ -75,16 +79,19 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate((float originalDistance, PlaceTurret instance) =>
                 {
-                    GameObject turretReplacementMasterObject = ExplicitSpawnRandomizerController.GetSummonReplacement(instance.turretMasterPrefab);
-                    if (turretReplacementMasterObject && turretReplacementMasterObject.TryGetComponent<CharacterMaster>(out CharacterMaster replacementTurretMaster))
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeEngiTurrets)
                     {
-                        if (replacementTurretMaster.bodyPrefab && Caches.CharacterBodyRadius.TryGetValue(replacementTurretMaster.bodyPrefab, out float radius))
+                        GameObject turretReplacementMasterObject = ExplicitSpawnRandomizerController.GetSummonReplacement(instance.turretMasterPrefab);
+                        if (turretReplacementMasterObject && turretReplacementMasterObject.TryGetComponent<CharacterMaster>(out CharacterMaster replacementTurretMaster))
                         {
-                            float result = radius + (TURRET_PLACE_DISTANCE - TURRET_RADUIS);
+                            if (replacementTurretMaster.bodyPrefab && Caches.CharacterBodyRadius.TryGetValue(replacementTurretMaster.bodyPrefab, out float radius))
+                            {
+                                float result = radius + (TURRET_PLACE_DISTANCE - TURRET_RADUIS);
 #if DEBUG
-                            Log.Debug($"Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
+                                Log.Debug($"Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
 #endif
-                            return Mathf.Max(originalDistance, result);
+                                return Mathf.Max(originalDistance, result);
+                            }
                         }
                     }
 
@@ -98,7 +105,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             {
                 c.EmitDelegate((PlaceTurret.PlacementInfo result) =>
                 {
-                    if (ExplicitSpawnRandomizerController.IsActive)
+                    if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeEngiTurrets)
                     {
                         // Rotate turret to face away from the engineer
                         result.rotation *= Quaternion.Euler(0f, 180f, 0f);

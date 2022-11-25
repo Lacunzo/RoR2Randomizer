@@ -31,23 +31,39 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             {
                 c.Emit(OpCodes.Dup);
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest, CombatDirector instance) =>
+                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest, CombatDirector combatDirector) =>
                 {
-                    if (instance.GetComponent<HoldoutZoneController>() && string.Equals(instance.customName, "Boss", StringComparison.OrdinalIgnoreCase))
+                    if (combatDirector.GetComponent<HoldoutZoneController>() && string.Equals(combatDirector.customName, "Boss", StringComparison.OrdinalIgnoreCase))
                     {
 #if DEBUG
-                        Log.Debug($"Attempting holdout boss spawn replacement from {nameof(CombatDirector)} {instance} ({instance.customName})");
+                        Log.Debug($"Attempting holdout boss spawn replacement from {nameof(CombatDirector)} {combatDirector} ({combatDirector.customName})");
 #endif
 
                         BossRandomizerController.HoldoutBoss.TryReplaceDirectorSpawnRequest(spawnRequest);
                         return;
                     }
 
-                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeDirectorSpawns ||
-                        (instance.TryGetComponent(out VoidSeedMarker voidSeedMarker) && voidSeedMarker.Type == VoidSeedMarker.MarkerType.Monsters_Interactibles))
+                    bool shouldRandomizeAsExplicitSpawn()
+                    {
+                        if (ConfigManager.ExplicitSpawnRandomizer.RandomizeDirectorSpawns)
+                            return true;
+
+                        if (ConfigManager.ExplicitSpawnRandomizer.RandomizeVoidSeedMonsters)
+                        {
+                            if (combatDirector.TryGetComponent(out VoidSeedMarker voidSeedMarker) &&
+                                voidSeedMarker.Type == VoidSeedMarker.MarkerType.Monsters_Interactibles)
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+
+                    if (shouldRandomizeAsExplicitSpawn())
                     {
 #if DEBUG
-                        Log.Debug($"Attempting spawn replacement from {nameof(CombatDirector)} {instance} ({instance.customName})");
+                        Log.Debug($"Attempting spawn replacement from {nameof(CombatDirector)} {combatDirector} ({combatDirector.customName})");
 #endif
 
                         ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
@@ -55,7 +71,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     }
 
 #if DEBUG
-                    Log.Debug($"Not replacing spawn from {nameof(CombatDirector)} {instance} ({instance.customName})");
+                    Log.Debug($"Not replacing spawn from {nameof(CombatDirector)} {combatDirector} ({combatDirector.customName})");
 #endif
                 });
             }

@@ -1,5 +1,7 @@
 ﻿using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Patches.BossRandomizer;
+using RoR2Randomizer.PrefabMarkers;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using UnityEngine;
 
@@ -20,9 +22,9 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void ScriptedCombatEncounter_Spawn(On.RoR2.ScriptedCombatEncounter.orig_Spawn orig, ScriptedCombatEncounter self, ref ScriptedCombatEncounter.SpawnInfo spawnInfo)
         {
-            if (ExplicitSpawnRandomizerController.IsActive)
+            if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeVoidInfestors)
             {
-                if (self.TryGetComponent<GenericDisplayNameProvider>(out GenericDisplayNameProvider displayNameProvider) && displayNameProvider.displayToken == "VOID_CHEST_NAME")
+                if (self.GetComponent<VoidCradleMarker>())
                 {
                     if (ExplicitSpawnRandomizerController.TryReplaceSummon(ref spawnInfo.spawnCard.prefab, out GameObject originalPrefab))
                     {

@@ -24,7 +24,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             RoR2Application.onUpdate += update;
         }
 
-        static void SyncExplicitSpawnRandomizerEnabled_OnReceive(bool isEnabled)
+        static void SyncExplicitSpawnRandomizerEnabled_OnReceive(bool isEnabled, bool randomizeHeretic)
         {
             _explicitSpawnRandomizerEnabledAvailable.Value = true;
         }

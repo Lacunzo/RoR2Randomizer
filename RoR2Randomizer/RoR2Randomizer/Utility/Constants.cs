@@ -41,6 +41,11 @@
         {
             public const string GUP_NAME = "GupMaster";
             public const string HERETIC_NAME = "HereticMonsterMaster";
+            public const string MALACHITE_URCHIN_NAME = "UrchinTurretMaster";
+            public const string VOID_INFESTOR_NAME = "VoidInfestorMaster";
+            public const string SOUL_WISP_NAME = "WispSoulMaster";
+            public const string HEALING_CORE_NAME = "AffixEarthHealerMaster";
+            public const string SHOPKEEPER_NEWT_NAME = "ShopkeeperMaster";
         }
 
         public static class BuffNames

@@ -1,6 +1,7 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 
 namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
@@ -20,12 +21,31 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void DeployableMinionSpawner_SpawnMinion(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(DeployableMinionSpawner_SpawnHook)}.{nameof(DeployableMinionSpawner_SpawnMinion)} ";
+
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
             {
                 c.Emit(OpCodes.Dup);
-                c.EmitDelegate(ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest);
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest, DeployableMinionSpawner instance) =>
+                {
+                    switch (instance.deployableSlot)
+                    {
+                        case DeployableSlot.RoboBallRedBuddy:
+                        case DeployableSlot.RoboBallGreenBuddy:
+                            if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeRoboBallBuddies)
+                                return;
+
+                            break;
+                        default:
+                            Log.Warning(LOG_PREFIX + $"unhandled deployable slot {instance.deployableSlot}");
+                            break;
+                    }
+
+                    ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
+                });
             }
         }
     }

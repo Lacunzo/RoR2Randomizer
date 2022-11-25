@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using System;
 using UnityEngine;
@@ -33,14 +34,24 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 ILCursor last = foundCursors[foundCursors.Length - 1];
                 last.Index++;
 
-                last.EmitDelegate<Func<GameObject, GameObject>>(ExplicitSpawnRandomizerController.GetSummonReplacement);
+                last.EmitDelegate(static (GameObject strikeDronePrefab) =>
+                {
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeDrones)
+                    {
+                        return ExplicitSpawnRandomizerController.GetSummonReplacement(strikeDronePrefab);
+                    }
+                    else
+                    {
+                        return strikeDronePrefab;
+                    }
+                });
 
                 if (last.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt<EquipmentSlot>(nameof(EquipmentSlot.SummonMaster))))
                 {
                     last.Emit(OpCodes.Dup);
                     last.EmitDelegate((CharacterMaster summoned) =>
                     {
-                        if (summoned && NetworkServer.active)
+                        if (summoned && NetworkServer.active && ConfigManager.ExplicitSpawnRandomizer.RandomizeDrones)
                         {
                             ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(summoned.gameObject);
                         }

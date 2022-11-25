@@ -1,4 +1,5 @@
 ﻿using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using RoR2Randomizer.Utility;
 using System.Collections;
@@ -21,7 +22,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void onSceneLoaded(SceneDef scene)
         {
-            if (ExplicitSpawnRandomizerController.IsActive)
+            if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeAbandonedAqueductRingEvent)
             {
                 if (Caches.Scene.AbandonedAqueductSceneIndex != SceneIndex.Invalid && scene.sceneDefIndex == Caches.Scene.AbandonedAqueductSceneIndex)
                 {

@@ -2,8 +2,11 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
+using RoR2Randomizer.Utility;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
@@ -26,6 +29,8 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void GlobalEventManager_OnCharacterDeath(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(GlobalOnDeath_SpawnHook)}.{nameof(GlobalEventManager_OnCharacterDeath)} ";
+
             ILCursor c = new ILCursor(il);
 
             ILCursor[] findCursors;
@@ -38,16 +43,32 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 ILCursor last = findCursors[findCursors.Length - 1];
                 last.Index++;
 
-                last.EmitDelegate<Func<GameObject, GameObject>>(ExplicitSpawnRandomizerController.GetSummonReplacement);
+                last.EmitDelegate(static (GameObject urchinPrefab) =>
+                {
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeMalachiteUrchins)
+                    {
+                        return ExplicitSpawnRandomizerController.GetSummonReplacement(urchinPrefab);
+                    }
+                    else
+                    {
+                        return urchinPrefab;
+                    }
+                });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find Malachite Urchin spawn patch location");
             }
 
             // Soul wisp
             c.Index = 0;
+            int patchCount = 0;
             while (c.TryGotoNext(MoveType.After, x => x.MatchLdsfld(typeof(GlobalEventManager.CommonAssets), nameof(GlobalEventManager.CommonAssets.wispSoulMasterPrefabMasterComponent))))
             {
                 c.EmitDelegate((CharacterMaster soulWispOriginalMasterPrefab) =>
                 {
-                    if (ExplicitSpawnRandomizerController.TryGetReplacementMaster(soulWispOriginalMasterPrefab, out CharacterMaster replacementPrefab))
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeSoulWisps &&
+                        ExplicitSpawnRandomizerController.TryGetReplacementMaster(soulWispOriginalMasterPrefab, out CharacterMaster replacementPrefab))
                     {
                         return replacementPrefab;
                     }
@@ -56,13 +77,50 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                         return soulWispOriginalMasterPrefab;
                     }
                 });
+
+                patchCount++;
+            }
+
+            if (patchCount > 0)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for Soul Wisp spawn hook");
+#endif
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find Soul Wisp spawn patch location");
             }
 
             // Healing Core
             c.Index = 0;
+            patchCount = 0;
             while (c.TryGotoNext(MoveType.After, x => x.MatchLdsfld(typeof(GlobalEventManager.CommonAssets), nameof(GlobalEventManager.CommonAssets.eliteEarthHealerMaster))))
             {
-                c.EmitDelegate<Func<GameObject, GameObject>>(ExplicitSpawnRandomizerController.GetSummonReplacement);
+                c.EmitDelegate(static (GameObject healingCoreMasterPrefab) =>
+                {
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeHealingCores)
+                    {
+                        return ExplicitSpawnRandomizerController.GetSummonReplacement(healingCoreMasterPrefab);
+                    }
+                    else
+                    {
+                        return healingCoreMasterPrefab;
+                    }
+                });
+
+                patchCount++;
+            }
+
+            if (patchCount > 0)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for Healing Core spawn hook");
+#endif
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find Healing Core spawn patch location");
             }
 
             // Void Infestor (From killing void elite)
@@ -75,36 +133,124 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 ILCursor last = findCursors[findCursors.Length - 1];
 
                 last.Index++;
-
-                last.EmitDelegate<Func<GameObject, GameObject>>(ExplicitSpawnRandomizerController.GetSummonReplacement);
+                last.EmitDelegate(static (GameObject voidInfestorMasterPrefab) =>
+                {
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeVoidInfestors)
+                    {
+                        return ExplicitSpawnRandomizerController.GetSummonReplacement(voidInfestorMasterPrefab);
+                    }
+                    else
+                    {
+                        return voidInfestorMasterPrefab;
+                    }
+                });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find Void Infestor spawn patch location");
             }
 
             c.Index = 0;
+            patchCount = 0;
             while (c.TryGotoNext(MoveType.Before, x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo(() => NetworkServer.Spawn(default)))))
             {
                 c.Emit(OpCodes.Dup);
                 c.EmitDelegate((GameObject instantiated) =>
                 {
-                    if (NetworkServer.active && instantiated.GetComponent<CharacterMaster>())
+                    if (NetworkServer.active && instantiated && instantiated.TryGetComponent(out CharacterMaster masterPrefab))
                     {
+                        MasterCatalog.MasterIndex prefabMasterIndex = masterPrefab.masterIndex;
+                        if (!prefabMasterIndex.isValid)
+                            return;
+
+                        bool isMasterIndex(MasterCatalog.MasterIndex masterIndex)
+                        {
+                            return masterIndex.isValid && prefabMasterIndex == masterIndex;
+                        }
+
+                        if (isMasterIndex(Caches.Masters.MalachiteUrchin))
+                        {
+                            if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeMalachiteUrchins)
+                            {
+                                return;
+                            }
+                        }
+                        else if (isMasterIndex(Caches.Masters.VoidInfestor))
+                        {
+                            if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeVoidInfestors)
+                            {
+                                return;
+                            }
+                        }
+
                         ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(instantiated);
                     }
                 });
 
                 c.Index++;
+                patchCount++;
+            }
+
+            if (patchCount > 0)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for NetworkServer.Spawn register replacement hook");
+#endif
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location for NetworkServer.Spawn register replacement hook");
             }
 
             c.Index = 0;
+            patchCount = 0;
             while (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt<MasterSummon>(nameof(MasterSummon.Perform))))
             {
                 c.Emit(OpCodes.Dup);
                 c.EmitDelegate((CharacterMaster master) =>
                 {
-                    if (NetworkServer.active)
+                    if (NetworkServer.active && master)
                     {
+                        MasterCatalog.MasterIndex spawnedMasterIndex = master.masterIndex;
+                        if (!spawnedMasterIndex.isValid)
+                            return;
+
+                        bool isMasterIndex(MasterCatalog.MasterIndex masterIndex)
+                        {
+                            return masterIndex.isValid && spawnedMasterIndex == masterIndex;
+                        }
+
+                        if (isMasterIndex(Caches.Masters.SoulWisp))
+                        {
+                            if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeSoulWisps)
+                            {
+                                return;
+                            }
+                        }
+                        else if (isMasterIndex(Caches.Masters.HealingCore))
+                        {
+                            if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeHealingCores)
+                            {
+                                return;
+                            }
+                        }
+
                         ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(master.gameObject);
                     }
                 });
+
+                patchCount++;
+            }
+
+            if (patchCount > 0)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for MasterSummon.Perform register replacement hook");
+#endif
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location for MasterSummon.Perform register replacement hook");
             }
         }
     }

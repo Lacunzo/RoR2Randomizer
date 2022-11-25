@@ -1,6 +1,7 @@
 ﻿using MonoMod.Cil;
 using RoR2;
 using RoR2.CharacterSpeech;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 
 namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
@@ -28,7 +29,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                 c.Index++;
                 c.EmitDelegate(static (BodyIndex index) =>
                 {
-                    if (ExplicitSpawnRandomizerController.TryGetReplacementBodyIndex(index, out BodyIndex hereticReplacementIndex))
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeHeretic && ExplicitSpawnRandomizerController.TryGetReplacementBodyIndex(index, out BodyIndex hereticReplacementIndex))
                     {
                         return hereticReplacementIndex;
                     }

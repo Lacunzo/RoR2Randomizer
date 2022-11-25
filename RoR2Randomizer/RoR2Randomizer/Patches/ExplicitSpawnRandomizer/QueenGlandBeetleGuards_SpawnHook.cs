@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RoR2;
+using RoR2Randomizer.Configuration;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using System;
 using UnityEngine;
@@ -37,6 +38,9 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 c.Emit(OpCodes.Dup);
                 c.EmitDelegate((DirectorSpawnRequest directorSpawnRequest) =>
                 {
+                    if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeQueensGlandBeetleGuards)
+                        return;
+
                     ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(directorSpawnRequest);
 
                     if (ExplicitSpawnRandomizerController.IsActive)
@@ -68,7 +72,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             c.Emit(OpCodes.Ldarg_1);
             c.EmitDelegate((SpawnCard.SpawnResult spawnResult) =>
             {
-                if (NetworkServer.active && spawnResult.success && spawnResult.spawnedInstance)
+                if (NetworkServer.active && ConfigManager.ExplicitSpawnRandomizer.RandomizeQueensGlandBeetleGuards && spawnResult.success && spawnResult.spawnedInstance)
                 {
                     ExplicitSpawnRandomizerController.RegisterSpawnedReplacement(spawnResult.spawnedInstance);
                 }
@@ -76,15 +80,20 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
             while (c.TryGotoNext(x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo<Component>(_ => _.GetComponent<Deployable>()))))
             {
-                c.Remove();
-                c.EmitDelegate((Component component) =>
+                c.Emit(OpCodes.Dup);
+                c.Index++;
+                c.EmitDelegate((Component component, Deployable deployable) =>
                 {
-                    if (component.TryGetComponent<Deployable>(out Deployable existingDeployable) || !ExplicitSpawnRandomizerController.IsActive)
-                        return existingDeployable;
+                    if (!deployable)
+                    {
+                        if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeQueensGlandBeetleGuards)
+                        {
+                            deployable = component.gameObject.AddComponent<Deployable>();
+                            deployable.onUndeploy = new UnityEvent();
+                        }
+                    }
 
-                    Deployable newDeployable = component.gameObject.AddComponent<Deployable>();
-                    newDeployable.onUndeploy = new UnityEvent();
-                    return newDeployable;
+                    return deployable;
                 });
             }
         }

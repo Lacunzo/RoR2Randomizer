@@ -35,7 +35,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
             {
                 foundCursors[1].EmitDelegate(static (string bodyName) =>
                 {
-                    if (ExplicitSpawnRandomizerController.IsActive)
+                    if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeHeretic)
                     {
                         if (ExplicitSpawnRandomizerController.TryGetReplacementBodyName(bodyName, out string replacementName))
                         {
@@ -64,7 +64,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
                 cursor.Emit(OpCodes.Ldarg_0);
                 cursor.EmitDelegate(static (CharacterMaster instance) =>
                 {
-                    if (ExplicitSpawnRandomizerController.IsActive && Caches.Masters.Heretic.isValid)
+                    if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeHeretic && Caches.Masters.Heretic.isValid)
                     {
                         return instance.TryGetComponent(out ExplicitSpawnReplacementInfo replacementInfo) && replacementInfo.OriginalMasterIndex == Caches.Masters.Heretic;
                     }
@@ -80,7 +80,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
 
         static void CharacterMaster_TransformBody(On.RoR2.CharacterMaster.orig_TransformBody orig, CharacterMaster self, string bodyName)
         {
-            if (ExplicitSpawnRandomizerController.IsActive && !self.GetComponent<ExplicitSpawnReplacementInfo>())
+            if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeHeretic && !self.GetComponent<ExplicitSpawnReplacementInfo>())
             {
                 if (CharacterReplacements.IsAnyForcedCharacterModeEnabled ||
                     (ExplicitSpawnRandomizerController.TryGetOriginalBodyName(bodyName, out string originalBody) &&
