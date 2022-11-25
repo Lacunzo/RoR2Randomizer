@@ -2,6 +2,7 @@
 using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.PrefabMarkers;
 using RoR2Randomizer.RandomizerControllers.Boss;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using System;
@@ -32,51 +33,30 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate(static (DirectorSpawnRequest spawnRequest, CombatDirector instance) =>
                 {
-#if DEBUG
-                    Log.Debug($"Attempting spawn replacement from {nameof(CombatDirector)} {instance} ({instance.customName})");
-#endif
-
-                    if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeDirectorSpawns && instance.GetComponent<DirectorCore>())
+                    if (instance.GetComponent<HoldoutZoneController>() && string.Equals(instance.customName, "Boss", StringComparison.OrdinalIgnoreCase))
                     {
 #if DEBUG
-                        Log.Debug($"Not replacing spawn from {nameof(CombatDirector)} {instance} due to randomizing director spawns disabled");
+                        Log.Debug($"Attempting holdout boss spawn replacement from {nameof(CombatDirector)} {instance} ({instance.customName})");
 #endif
 
+                        BossRandomizerController.HoldoutBoss.TryReplaceDirectorSpawnRequest(spawnRequest);
                         return;
                     }
 
-                    bool isHoldoutZone = instance.GetComponent<HoldoutZoneController>();
-                    if (isHoldoutZone && string.Equals(instance.customName, "Boss", StringComparison.OrdinalIgnoreCase))
+                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeDirectorSpawns ||
+                        (instance.TryGetComponent(out VoidSeedMarker voidSeedMarker) && voidSeedMarker.Type == VoidSeedMarker.MarkerType.Monsters_Interactibles))
                     {
-                        BossRandomizerController.HoldoutBoss.TryReplaceDirectorSpawnRequest(spawnRequest);
-                    }
-                    else
-                    {
-                        if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeDirectorSpawns)
-                        {
-                            // Count all non-boss combat directors on a holdout zone as ordinary director spawns
-                            if (isHoldoutZone)
-                            {
 #if DEBUG
-                                Log.Debug($"Not replacing spawn from {nameof(CombatDirector)} {instance} due to randomizing director spawns disabled");
+                        Log.Debug($"Attempting spawn replacement from {nameof(CombatDirector)} {instance} ({instance.customName})");
 #endif
-
-                                return;
-                            }
-
-                            // Void Seed Combat directors don't have customName set, so we have to compare it by object name
-                            if (instance.GetComponent<CampDirector>() && instance.name == "Camp 2 - Flavor Props & Void Elites")
-                            {
-#if DEBUG
-                                Log.Debug($"Not replacing spawn from {nameof(CombatDirector)} {instance} due to randomizing director spawns disabled");
-#endif
-
-                                return;
-                            }
-                        }
 
                         ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
+                        return;
                     }
+
+#if DEBUG
+                    Log.Debug($"Not replacing spawn from {nameof(CombatDirector)} {instance} ({instance.customName})");
+#endif
                 });
             }
         }
