@@ -36,6 +36,22 @@ Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
 
 ## Changelog
 
+**0.8.0 Changes:**
+
+* Boss Randomizer:
+  * Added teleporter bosses to Boss Randomizer
+
+* Summon Randomizer:
+  * Added Void Enemies in Void Seeds (Barnacles, Reavers, and Jailers) to summon randomizer
+  * Added settings to enable/disable every "type" of summon in the mod settings, all enabled by default.
+  * Added option to randomize the "ambient" stage (director) spawns, disabled by default (all spawns are completely random, and no measures are taken to balance them, it's Artifact of Dissonance on crack)
+
+* Survivor Starting Animation Randomizer:
+  * Fixed spawn animations randomized into Acrid spawn animation not playing for client players.
+
+* Projectile Randomizer:
+  * Fixed an error that could cause large amounts of objects to be created and not cleaned up.
+
 **0.7.2 Changes:**
 
 * Projectile Randomizer:
