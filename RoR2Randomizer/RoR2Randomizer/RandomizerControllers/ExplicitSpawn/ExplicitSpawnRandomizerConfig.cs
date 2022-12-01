@@ -6,6 +6,8 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {
     public sealed class ExplicitSpawnRandomizerConfig : BaseRandomizerConfig
     {
+        public readonly BoolConfigValue RandomizeDirectorSpawns;
+
         public readonly BoolConfigValue RandomizeAbandonedAqueductRingEvent;
 
         public readonly BoolConfigValue RandomizeBeetleQueenSummonGuards;
@@ -39,8 +41,6 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         public readonly BoolConfigValue RandomizeDrones;
 
         public readonly BoolConfigValue RandomizeZoeaVoidAllies;
-
-        public readonly BoolConfigValue RandomizeDirectorSpawns;
 
         public ExplicitSpawnRandomizerConfig(ConfigFile file) : base("Summon", file)
         {
