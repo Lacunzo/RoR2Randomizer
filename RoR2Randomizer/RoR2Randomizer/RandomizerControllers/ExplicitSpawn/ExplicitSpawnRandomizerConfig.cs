@@ -78,7 +78,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
             RandomizeZoeaVoidAllies = new BoolConfigValue(getEntry("Randomize Newly Hatched Zoea", "Randomizes the character types of the allies spawned by Newly Hatched Zoea", true));
 
-            RandomizeDirectorSpawns = new BoolConfigValue(getEntry("Randomize Director Spawns", "Randomizes stage director spawns, no measures have been taken to \"balance\" the spawns, and quite literally anything can spawn.\n\nDisabled by default.", false));
+            RandomizeDirectorSpawns = new BoolConfigValue(getEntry("Randomize Director Spawns", "Randomizes stage director spawns, no measures have been taken to \"balance\" the spawns, and anything can spawn. Basically Artifact of Dissonance on crack.\n\nDisabled by default.", false));
         }
     }
 }
