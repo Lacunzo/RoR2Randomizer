@@ -123,9 +123,10 @@ namespace RoR2Randomizer.RandomizerControllers
             {
                 GivePickupsOnStart givePickupsOnStart = _master.GetComponent<GivePickupsOnStart>();
 
-                if (originalMasterPrefab)
+                CharacterMaster originalMaster = originalMasterPrefab;
+                if (originalMaster)
                 {
-                    GivePickupsOnStart originalGivePickupsOnStart = originalMasterPrefab.GetComponent<GivePickupsOnStart>();
+                    GivePickupsOnStart originalGivePickupsOnStart = originalMaster.GetComponent<GivePickupsOnStart>();
 
                     ItemIndex adaptiveArmorItemIndex = RoR2Content.Items.AdaptiveArmor.itemIndex;
                     if (originalGivePickupsOnStart && originalGivePickupsOnStart.HasItems(adaptiveArmorItemIndex, out int originalAdaptiveArmorCount))
@@ -167,7 +168,7 @@ namespace RoR2Randomizer.RandomizerControllers
         }
 
         void syncDontDestroyOnLoadStatusWithOriginal()
-            {
+        {
             if (!_master || _master.GetComponent<PlayerCharacterMasterController>())
                 return;
 
@@ -176,19 +177,19 @@ namespace RoR2Randomizer.RandomizerControllers
                 return;
 
             if (originalMaster.GetComponent<SetDontDestroyOnLoad>())
-                {
+            {
                 _master.gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
-                }
-                else if (_master.TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
-                {
-                    Destroy(setDontDestroyOnLoad);
+            }
+            else if (_master.TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
+            {
+                Destroy(setDontDestroyOnLoad);
 
-                    if (RoR2.Util.IsDontDestroyOnLoad(_master.gameObject))
-                    {
-                        SceneManager.MoveGameObjectToScene(_master.gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
-                    }
+                if (RoR2.Util.IsDontDestroyOnLoad(_master.gameObject))
+                {
+                    SceneManager.MoveGameObjectToScene(_master.gameObject, SceneManager.GetActiveScene()); // Remove DontDestroyOnLoad "flag"
                 }
             }
+        }
 
         protected virtual void initializeServer()
         {
