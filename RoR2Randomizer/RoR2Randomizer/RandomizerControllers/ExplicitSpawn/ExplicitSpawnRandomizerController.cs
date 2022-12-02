@@ -1,8 +1,10 @@
-﻿using RoR2;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using RoR2;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.Configuration.ConfigValue;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.Patches.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
 using UnityEngine;
@@ -242,6 +244,26 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         public static void RegisterSpawnedReplacement(GameObject masterObject)
         {
             RegisterSpawnedReplacement(masterObject, GetOriginalMasterIndex(masterObject));
+        }
+
+        public static ILContext.Manipulator GetSimpleDirectorSpawnRequestHook(BoolConfigValue isEnabledConfigValue)
+        {
+            return il =>
+            {
+                ILCursor c = new ILCursor(il);
+
+                if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
+                {
+                    c.Emit(OpCodes.Dup);
+                    c.EmitDelegate((DirectorSpawnRequest spawnRequest) =>
+                    {
+                        if (isEnabledConfigValue == null || isEnabledConfigValue)
+                        {
+                            TryReplaceDirectorSpawnRequest(spawnRequest);
+                        }
+                    });
+                }
+            };
         }
     }
 }
