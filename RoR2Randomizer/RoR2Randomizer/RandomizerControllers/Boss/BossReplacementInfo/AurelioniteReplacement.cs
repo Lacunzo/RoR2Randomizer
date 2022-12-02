@@ -11,16 +11,5 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         protected override CharacterMaster originalMasterPrefab => Caches.MasterPrefabs["TitanGoldMaster"];
 
         protected override bool replaceBossDropEvenIfExisting => true;
-
-        protected override void bodyResolved()
-        {
-            base.bodyResolved();
-
-#if DEBUG
-            Log.Debug($"{nameof(AurelioniteReplacement)} {nameof(bodyResolved)}");
-#endif
-
-            setBodySubtitle("TITANGOLD_BODY_SUBTITLE");
-        }
     }
 }

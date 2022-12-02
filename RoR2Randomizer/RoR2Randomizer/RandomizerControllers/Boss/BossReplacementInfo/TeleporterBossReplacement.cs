@@ -11,15 +11,6 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
     {
         protected override BossReplacementType replacementType => BossReplacementType.TeleporterBoss;
 
-        protected override void bodyResolved()
-        {
-            base.bodyResolved();
-
-            CharacterBody originalBody = originalBodyPrefab;
-            if (originalBody)
-            {
-                setBodySubtitle(originalBody.subtitleNameToken, SetSubtitleMode.DontOverrideIfBothNotNull);
-            }
-        }
+        protected override SetSubtitleMode subtitleOverrideMode => SetSubtitleMode.DontOverrideIfBothNotNull;
     }
 }

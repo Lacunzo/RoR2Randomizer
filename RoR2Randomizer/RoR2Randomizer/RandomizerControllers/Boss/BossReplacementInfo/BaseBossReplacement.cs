@@ -17,6 +17,8 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 
         protected virtual bool sendOriginalCharacterMasterIndex => false;
 
+        protected override SetSubtitleMode subtitleOverrideMode => SetSubtitleMode.OnlyIfExistingIsNull;
+
         protected override void bodyResolved()
         {
             base.bodyResolved();
@@ -59,55 +61,6 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 #endif
 
             yield return new SyncBossReplacementCharacter(_master.gameObject, replacementType, sendOriginalCharacterMasterIndex ? originalMasterPrefab?.masterIndex : null);
-        }
-
-        public enum SetSubtitleMode : byte
-        {
-            OnlyIfExistingIsNull,
-            DontOverrideIfBothNotNull,
-            AlwaysOverride
-        }
-
-        protected void setBodySubtitle(string subtitleToken, SetSubtitleMode mode = SetSubtitleMode.OnlyIfExistingIsNull)
-        {
-            if (_body && _body.subtitleNameToken != subtitleToken)
-            {
-                if (mode == SetSubtitleMode.OnlyIfExistingIsNull)
-                {
-                    if (!string.IsNullOrEmpty(_body.subtitleNameToken))
-                        return;
-                }
-                else if (mode == SetSubtitleMode.DontOverrideIfBothNotNull)
-                {
-                    if (!string.IsNullOrEmpty(_body.subtitleNameToken) && !string.IsNullOrEmpty(subtitleToken))
-                        return;
-                }
-
-                _body.subtitleNameToken = subtitleToken;
-
-                // Update BossGroup
-                if (_master.isBoss)
-                {
-                    resetBossGroupSubtitle();
-                }
-            }
-        }
-
-        void resetBossGroupSubtitle()
-        {
-            foreach (BossGroup group in InstanceTracker.GetInstancesList<BossGroup>())
-            {
-                for (int i = 0; i < group.bossMemoryCount; i++)
-                {
-                    if (group.bossMemories[i].cachedMaster == _master)
-                    {
-                        // Force a refresh of the boss subtitle
-                        group.bestObservedName = string.Empty;
-                        group.bestObservedSubtitle = string.Empty;
-                        return;
-                    }
-                }
-            }
         }
     }
 }

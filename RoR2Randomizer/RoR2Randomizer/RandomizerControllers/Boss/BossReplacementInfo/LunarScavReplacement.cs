@@ -11,12 +11,5 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         protected override BossReplacementType replacementType => BossReplacementType.LunarScav1 + LunarScavIndex;
 
         protected override CharacterMaster originalMasterPrefab => Caches.MasterPrefabs[$"ScavLunar{LunarScavIndex + 1}Master"];
-
-        protected override void bodyResolved()
-        {
-            base.bodyResolved();
-
-            setBodySubtitle("SCAVLUNAR_BODY_SUBTITLE");
-        }
     }
 }

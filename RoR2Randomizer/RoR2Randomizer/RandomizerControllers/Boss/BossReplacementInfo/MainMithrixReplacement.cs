@@ -62,8 +62,6 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 #if DEBUG
             Log.Debug($"{nameof(MainMithrixReplacement)} {nameof(bodyResolved)}: body.subtitleNameToken={_body.subtitleNameToken}");
 #endif
-
-            setBodySubtitle("BROTHER_BODY_SUBTITLE");
             
             if (NetworkServer.active)
             {

@@ -30,6 +30,8 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
         CharacterMaster _cachedMasterPrefab;
         protected override CharacterMaster originalMasterPrefab => _cachedMasterPrefab;
 
+        protected override SetSubtitleMode subtitleOverrideMode => SetSubtitleMode.OnlyIfExistingIsNull;
+
         protected override bool isNetworked => true;
 
         protected override IEnumerable<NetworkMessageBase> getNetMessages()

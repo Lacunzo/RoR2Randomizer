@@ -43,6 +43,8 @@ namespace RoR2Randomizer.RandomizerControllers
         protected abstract bool isNetworked { get; }
         bool INetMessageProvider.SendMessages => isNetworked;
 
+        protected virtual SetSubtitleMode subtitleOverrideMode => SetSubtitleMode.DontOverride;
+
         void Awake()
         {
             _master = GetComponent<CharacterMaster>();
@@ -155,6 +157,8 @@ namespace RoR2Randomizer.RandomizerControllers
 #endif
                 }
             }
+
+            tryOverrideBodySubtitle();
         }
 
         protected virtual void initializeClient()
@@ -195,6 +199,70 @@ namespace RoR2Randomizer.RandomizerControllers
         IEnumerable<NetworkMessageBase> INetMessageProvider.GetNetMessages()
         {
             return getNetMessages();
+        }
+
+        protected enum SetSubtitleMode : byte
+        {
+            DontOverride,
+            OnlyIfExistingIsNull,
+            DontOverrideIfBothNotNull,
+            AlwaysOverride
+        }
+
+        void tryOverrideBodySubtitle()
+        {
+            if (!_body)
+                return;
+
+            CharacterBody originalBody = originalBodyPrefab;
+            if (!originalBody)
+                return;
+
+            string overrideToken = originalBody.subtitleNameToken;
+            string currentToken = _body.subtitleNameToken;
+            if (string.Equals(currentToken, overrideToken))
+                return;
+
+            SetSubtitleMode mode = subtitleOverrideMode;
+            if (mode == SetSubtitleMode.DontOverride)
+            {
+                return;
+            }
+            else if (mode == SetSubtitleMode.OnlyIfExistingIsNull)
+            {
+                if (!string.IsNullOrEmpty(_body.subtitleNameToken))
+                    return;
+            }
+            else if (mode == SetSubtitleMode.DontOverrideIfBothNotNull)
+            {
+                if (!string.IsNullOrEmpty(_body.subtitleNameToken) && !string.IsNullOrEmpty(overrideToken))
+                    return;
+            }
+
+            _body.subtitleNameToken = overrideToken;
+
+            // Update BossGroup
+            if (_master && _master.isBoss)
+            {
+                forceRefreshBossGroupSubtitle();
+            }
+        }
+
+        void forceRefreshBossGroupSubtitle()
+        {
+            foreach (BossGroup group in InstanceTracker.GetInstancesList<BossGroup>())
+            {
+                for (int i = 0; i < group.bossMemoryCount; i++)
+                {
+                    if (group.bossMemories[i].cachedMaster == _master)
+                    {
+                        // Force a refresh of the boss subtitle
+                        group.bestObservedName = string.Empty;
+                        group.bestObservedSubtitle = string.Empty;
+                        return;
+                    }
+                }
+            }
         }
     }
 }

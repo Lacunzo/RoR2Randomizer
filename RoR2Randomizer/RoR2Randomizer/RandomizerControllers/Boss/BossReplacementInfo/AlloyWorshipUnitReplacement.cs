@@ -9,12 +9,5 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         protected override BossReplacementType replacementType => BossReplacementType.AlloyWorshipUnit;
 
         protected override CharacterMaster originalMasterPrefab => Caches.MasterPrefabs["SuperRoboBallBossMaster"];
-
-        protected override void bodyResolved()
-        {
-            base.bodyResolved();
-
-            setBodySubtitle("SUPERROBOBALLBOSS_BODY_SUBTITLE");
-        }
     }
 }
