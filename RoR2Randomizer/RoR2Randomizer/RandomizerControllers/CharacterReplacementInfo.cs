@@ -163,11 +163,21 @@ namespace RoR2Randomizer.RandomizerControllers
 
         protected virtual void initializeClient()
         {
-            if (_master && originalMasterPrefab && !_master.GetComponent<PlayerCharacterMasterController>())
+            syncDontDestroyOnLoadStatusWithOriginal();
+        }
+
+        void syncDontDestroyOnLoadStatusWithOriginal()
             {
-                if (originalMasterPrefab.GetComponent<SetDontDestroyOnLoad>())
+            if (!_master || _master.GetComponent<PlayerCharacterMasterController>())
+                return;
+
+            CharacterMaster originalMaster = originalMasterPrefab;
+            if (!originalMaster)
+                return;
+
+            if (originalMaster.GetComponent<SetDontDestroyOnLoad>())
                 {
-                    gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
+                _master.gameObject.GetOrAddComponent<SetDontDestroyOnLoad>();
                 }
                 else if (_master.TryGetComponent<SetDontDestroyOnLoad>(out SetDontDestroyOnLoad setDontDestroyOnLoad))
                 {
@@ -179,7 +189,6 @@ namespace RoR2Randomizer.RandomizerControllers
                     }
                 }
             }
-        }
 
         protected virtual void initializeServer()
         {
