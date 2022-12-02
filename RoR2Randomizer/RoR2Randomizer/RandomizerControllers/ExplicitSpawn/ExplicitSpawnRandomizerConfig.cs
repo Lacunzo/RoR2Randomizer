@@ -44,6 +44,8 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public readonly BoolConfigValue RandomizeAncestralPods;
 
+        public readonly BoolConfigValue RandomizeDoppelgangers;
+
         public ExplicitSpawnRandomizerConfig(ConfigFile file) : base("Summon", file)
         {
             // RandomizeAbandonedAqueductRingEvent = new BoolConfigValue(getEntry("Randomize Runald & Kjaro", "Randomizes the character types of Runald and Kjaro on Abandoned Aqueduct.", true));
@@ -83,6 +85,8 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             RandomizeDirectorSpawns = new BoolConfigValue(getEntry("Randomize Director Spawns", "Randomizes stage director spawns, no measures have been taken to \"balance\" the spawns, and anything can spawn. Basically Artifact of Dissonance on crack.\n\nDisabled by default.", false));
 
             RandomizeAncestralPods = new BoolConfigValue(getEntry("Randomize Ancestral Pods", "Randomizes the character types of the Parents hatched from Ancestral Pods", true));
+
+            RandomizeDoppelgangers = new BoolConfigValue(getEntry("Randomize Umbras", "Randomizes the character types of Umbras", true));
         }
     }
 }
