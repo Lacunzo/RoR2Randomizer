@@ -74,7 +74,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
             RandomizeSquidTurrets = new BoolConfigValue(getEntry("Randomize Squid Turrets", "Randomizes the character type of Squid Turrets", true));
 
-            RandomizeDrones = new BoolConfigValue(getEntry("Randomize Drones", "Randomizes the character types of drones", true));
+            RandomizeDrones = new BoolConfigValue(getEntry("Randomize Drones", "Randomizes the character types of drones and turrets", true));
 
             RandomizeZoeaVoidAllies = new BoolConfigValue(getEntry("Randomize Newly Hatched Zoea", "Randomizes the character types of the allies spawned by Newly Hatched Zoea", true));
 
