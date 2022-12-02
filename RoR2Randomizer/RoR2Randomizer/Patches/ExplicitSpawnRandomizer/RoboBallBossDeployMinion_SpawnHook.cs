@@ -9,31 +9,16 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
     [PatchClass]
     static class RoboBallBossDeployMinion_SpawnHook
     {
+        static readonly ILContext.Manipulator _replaceMinionsManipulator = ExplicitSpawnRandomizerController.GetSimpleDirectorSpawnRequestHook(ConfigManager.ExplicitSpawnRandomizer.RandomizeRoboBallBossMinions);
+
         static void Apply()
         {
-            IL.EntityStates.RoboBallBoss.Weapon.DeployMinions.SummonMinion += DeployMinions_SummonMinion;
+            IL.EntityStates.RoboBallBoss.Weapon.DeployMinions.SummonMinion += _replaceMinionsManipulator;
         }
 
         static void Cleanup()
         {
-            IL.EntityStates.RoboBallBoss.Weapon.DeployMinions.SummonMinion -= DeployMinions_SummonMinion;
-        }
-
-        static void DeployMinions_SummonMinion(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-
-            if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
-            {
-                c.Emit(OpCodes.Dup);
-                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest) =>
-                {
-                    if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeRoboBallBossMinions)
-                        return;
-
-                    ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
-                });
-            }
+            IL.EntityStates.RoboBallBoss.Weapon.DeployMinions.SummonMinion -= _replaceMinionsManipulator;
         }
     }
 }

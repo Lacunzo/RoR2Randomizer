@@ -9,31 +9,16 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
     [PatchClass]
     static class VoidMegaCrabItemBehavior_SpawnHook
     {
+        static readonly ILContext.Manipulator _replaceVoidAlliesManipulator = ExplicitSpawnRandomizerController.GetSimpleDirectorSpawnRequestHook(ConfigManager.ExplicitSpawnRandomizer.RandomizeZoeaVoidAllies);
+
         static void Apply()
         {
-            IL.RoR2.VoidMegaCrabItemBehavior.FixedUpdate += VoidMegaCrabItemBehavior_FixedUpdate;
+            IL.RoR2.VoidMegaCrabItemBehavior.FixedUpdate += _replaceVoidAlliesManipulator;
         }
 
         static void Cleanup()
         {
-            IL.RoR2.VoidMegaCrabItemBehavior.FixedUpdate -= VoidMegaCrabItemBehavior_FixedUpdate;
-        }
-
-        static void VoidMegaCrabItemBehavior_FixedUpdate(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-
-            if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
-            {
-                c.Emit(OpCodes.Dup);
-                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest) =>
-                {
-                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeZoeaVoidAllies)
-                    {
-                        ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
-                    }
-                });
-            }
+            IL.RoR2.VoidMegaCrabItemBehavior.FixedUpdate -= _replaceVoidAlliesManipulator;
         }
     }
 }

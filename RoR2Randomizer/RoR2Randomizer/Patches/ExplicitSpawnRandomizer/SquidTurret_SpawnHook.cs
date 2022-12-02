@@ -9,6 +9,8 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
     [PatchClass]
     static class SquidTurret_SpawnHook
     {
+        static readonly ILContext.Manipulator GlobalEventManager_OnInteractionBegin = ExplicitSpawnRandomizerController.GetSimpleDirectorSpawnRequestHook(ConfigManager.ExplicitSpawnRandomizer.RandomizeSquidTurrets);
+
         static void Apply()
         {
             IL.RoR2.GlobalEventManager.OnInteractionBegin += GlobalEventManager_OnInteractionBegin;
@@ -17,23 +19,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
         static void Cleanup()
         {
             IL.RoR2.GlobalEventManager.OnInteractionBegin -= GlobalEventManager_OnInteractionBegin;
-        }
-
-        static void GlobalEventManager_OnInteractionBegin(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-
-            if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
-            {
-                c.Emit(OpCodes.Dup);
-                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest) =>
-                {
-                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeSquidTurrets)
-                    {
-                        ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
-                    }
-                });
-            }
         }
     }
 }

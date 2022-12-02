@@ -9,31 +9,16 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
     [PatchClass]
     static class BeetleQueenSummonEggs_SpawnHook
     {
+        static readonly ILContext.Manipulator _replaceBeetleQueenGuardsManipulator = ExplicitSpawnRandomizerController.GetSimpleDirectorSpawnRequestHook(ConfigManager.ExplicitSpawnRandomizer.RandomizeBeetleQueenSummonGuards);
+
         static void Apply()
         {
-            IL.EntityStates.BeetleQueenMonster.SummonEggs.SummonEgg += SummonEggs_SummonEgg;
+            IL.EntityStates.BeetleQueenMonster.SummonEggs.SummonEgg += _replaceBeetleQueenGuardsManipulator;
         }
 
         static void Cleanup()
         {
-            IL.EntityStates.BeetleQueenMonster.SummonEggs.SummonEgg -= SummonEggs_SummonEgg;
-        }
-
-        static void SummonEggs_SummonEgg(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-
-            if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
-            {
-                c.Emit(OpCodes.Dup);
-                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest) =>
-                {
-                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeBeetleQueenSummonGuards)
-                    {
-                        ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
-                    }
-                });
-            }
+            IL.EntityStates.BeetleQueenMonster.SummonEggs.SummonEgg -= _replaceBeetleQueenGuardsManipulator;
         }
     }
 }

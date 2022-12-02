@@ -9,31 +9,16 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
     [PatchClass]
     static class ColDroneman_SpawnHook
     {
+        static readonly ILContext.Manipulator _replaceColDronemanSpawnManipulator = ExplicitSpawnRandomizerController.GetSimpleDirectorSpawnRequestHook(ConfigManager.ExplicitSpawnRandomizer.RandomizeDrones);
+
         static void Apply()
         {
-            IL.RoR2.DroneWeaponsBehavior.TrySpawnDrone += DroneWeaponsBehavior_TrySpawnDrone;
+            IL.RoR2.DroneWeaponsBehavior.TrySpawnDrone += _replaceColDronemanSpawnManipulator;
         }
 
         static void Cleanup()
         {
-            IL.RoR2.DroneWeaponsBehavior.TrySpawnDrone -= DroneWeaponsBehavior_TrySpawnDrone;
-        }
-
-        static void DroneWeaponsBehavior_TrySpawnDrone(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-
-            if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
-            {
-                c.Emit(OpCodes.Dup);
-                c.EmitDelegate(static (DirectorSpawnRequest spawnRequest) =>
-                {
-                    if (ConfigManager.ExplicitSpawnRandomizer.RandomizeDrones)
-                    {
-                        ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
-                    }
-                });
-            }
+            IL.RoR2.DroneWeaponsBehavior.TrySpawnDrone -= _replaceColDronemanSpawnManipulator;
         }
     }
 }

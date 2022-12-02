@@ -252,7 +252,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
             {
                 ILCursor c = new ILCursor(il);
 
-                if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
+                while (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
                 {
                     c.Emit(OpCodes.Dup);
                     c.EmitDelegate((DirectorSpawnRequest spawnRequest) =>
@@ -262,6 +262,8 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                             TryReplaceDirectorSpawnRequest(spawnRequest);
                         }
                     });
+
+                    c.Index++;
                 }
             };
         }
