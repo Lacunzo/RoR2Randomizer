@@ -18,9 +18,9 @@ namespace RoR2Randomizer.Patches.SniperWeakPointRandomizer
 
         static void CharacterModel_Awake(On.RoR2.CharacterModel.orig_Awake orig, CharacterModel self)
         {
-            if (self.TryGetComponent<HurtBoxGroup>(out HurtBoxGroup hurtBoxGroup))
+            if (self.TryGetComponent(out HurtBoxGroup hurtBoxGroup))
             {
-                SniperWeakPointRandomizerController.TryRandomizeSniperTargets(hurtBoxGroup, self.body);
+                SniperWeakPointRandomizerController.TryRandomizeSniperTargets(hurtBoxGroup);
             }
 
             orig(self);

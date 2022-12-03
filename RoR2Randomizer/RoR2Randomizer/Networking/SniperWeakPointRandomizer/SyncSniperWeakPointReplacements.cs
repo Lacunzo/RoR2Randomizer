@@ -3,6 +3,7 @@ using R2API.Networking;
 using RoR2;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.RandomizerControllers.SniperWeakPoint;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -103,34 +104,46 @@ namespace RoR2Randomizer.Networking.SniperWeakPointRandomizer
             Log.Debug($"{nameof(SyncSniperWeakPointReplacements)}: HurtBox root resolved ({obj})");
 #endif
 
-            if (obj.TryGetComponent<ModelLocator>(out ModelLocator modelLocator))
-            {
-                Transform modelTransform = modelLocator.modelTransform;
-                if (modelTransform && modelTransform.TryGetComponent<HurtBoxGroup>(out HurtBoxGroup hurtBoxGroup) && hurtBoxGroup.hurtBoxes != null)
-                {
-                    HurtBoxGroupRandomizerData hurtBoxGroupRandomizerData = hurtBoxGroup.gameObject.AddComponent<HurtBoxGroupRandomizerData>();
-                    hurtBoxGroupRandomizerData.OwnerBody = obj.GetComponent<CharacterBody>();
-                    
-                    hurtBoxGroupRandomizerData.OriginalIsSniperTargetValues = new bool[_totalLength];
-                    for (int i = 0; i < _totalLength; i++)
-                    {
-                        HurtBox hurtBox = ArrayUtils.GetSafe(hurtBoxGroup.hurtBoxes, i);
-                        if (hurtBox)
-                        {
-                            hurtBoxGroupRandomizerData.OriginalIsSniperTargetValues[i] = hurtBox.isSniperTarget;
+            if (!obj.TryGetComponent(out ModelLocator modelLocator))
+                return;
 
-                            foreach (HurtBoxData hurtBoxData in _hurtBoxDatas)
-                            {
-                                if (i == hurtBoxData.IndexPlusOne - 1)
-                                {
-                                    hurtBox.isSniperTarget = hurtBoxData.OverrideIsSniperTarget;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+            Transform modelTransform = modelLocator.modelTransform;
+            if (!modelTransform || !modelTransform.TryGetComponent(out HurtBoxGroup hurtBoxGroup) || hurtBoxGroup.hurtBoxes == null)
+                return;
+
+            HurtBoxGroupRandomizerData hurtBoxGroupRandomizerData = hurtBoxGroup.gameObject.AddComponent<HurtBoxGroupRandomizerData>();
+            hurtBoxGroupRandomizerData.Initialize(getOriginalIsSniperTargetValues(hurtBoxGroup), getOverrideIsSniperTargetValues());
+        }
+
+        bool[] getOriginalIsSniperTargetValues(HurtBoxGroup hurtBoxGroup)
+        {
+            bool[] originalIsSniperTargetValues = new bool[_totalLength];
+            for (int i = 0; i < _totalLength; i++)
+            {
+                HurtBox hurtBox = ArrayUtils.GetSafe(hurtBoxGroup.hurtBoxes, i);
+                if (hurtBox)
+                {
+                    originalIsSniperTargetValues[i] = hurtBox.isSniperTarget;
                 }
             }
+
+            return originalIsSniperTargetValues;
+        }
+
+        bool?[] getOverrideIsSniperTargetValues()
+        {
+            bool?[] overrideIsSniperTargetValues = new bool?[_totalLength];
+
+            foreach (HurtBoxData hurtBoxData in _hurtBoxDatas)
+            {
+                int index = hurtBoxData.IndexPlusOne - 1;
+                if (ArrayUtils.IsInBounds(overrideIsSniperTargetValues, index))
+                {
+                    overrideIsSniperTargetValues[index] = hurtBoxData.OverrideIsSniperTarget;
+                }
+            }
+
+            return overrideIsSniperTargetValues;
         }
     }
 }

@@ -18,18 +18,74 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
         public bool[] OriginalIsSniperTargetValues;
 
         HurtBoxGroup _group;
+        bool _isInitialized;
 
         void Awake()
         {
+            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(Awake)} ";
+
             _group = GetComponent<HurtBoxGroup>();
 
-            NetworkingManager.RegisterMessageProvider(this);
+            if (TryGetComponent(out CharacterModel characterModel))
+            {
+                OwnerBody = characterModel.body;
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "could not find owner body");
+            }
         }
 
-        void Start()
+        void OnEnable()
         {
-            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(Start)} ";
+            NetworkingManager.RegisterMessageProvider(this);
 
+            if (_isInitialized)
+            {
+                sendToClientsOrSetupHurtboxes();
+            }
+        }
+
+        void OnDisable()
+        {
+            NetworkingManager.UnregisterMessageProvider(this);
+        }
+
+        public void Initialize(bool[] originalIsSniperTargetValues, bool?[] overrideIsSniperTargetValues)
+        {
+            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(Initialize)} ";
+
+            if (_isInitialized)
+            {
+#if DEBUG
+                Log.Debug(LOG_PREFIX + "already initialized!");
+#endif
+                return;
+            }
+
+            if (!_group || _group.hurtBoxes == null)
+            {
+                Log.Warning(LOG_PREFIX + "unable to initialize: invalid group reference");
+                return;
+            }
+
+            OriginalIsSniperTargetValues = originalIsSniperTargetValues;
+
+            for (int i = 0; i < _group.hurtBoxes.Length; i++)
+            {
+                bool? overrideIsSniperTarget = overrideIsSniperTargetValues[i];
+                if (overrideIsSniperTarget.HasValue)
+                {
+                    _group.hurtBoxes[i].isSniperTarget = overrideIsSniperTarget.Value;
+                }
+            }
+
+            _isInitialized = true;
+            sendToClientsOrSetupHurtboxes();
+        }
+
+        void sendToClientsOrSetupHurtboxes()
+        {
             if (NetworkServer.active)
             {
                 if (!NetworkServer.dontListen)
@@ -39,50 +95,59 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
             }
             else if (NetworkClient.active)
             {
-                if (!_group || _group.hurtBoxes == null)
+                setupHurtboxesClient();
+            }
+        }
+
+        void setupHurtboxesClient()
+        {
+            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(setupHurtboxesClient)} ";
+
+            if (!_group || _group.hurtBoxes == null)
+            {
+                Log.Warning(LOG_PREFIX + $"invalid {nameof(_group)} reference");
+                return;
+            }
+
+            if (OriginalIsSniperTargetValues.Length != _group.hurtBoxes.Length)
+            {
+                Log.Warning(LOG_PREFIX + $"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
+            }
+
+            for (int i = 0; i < _group.hurtBoxes.Length; i++)
+            {
+                HurtBox hurtBox = _group.hurtBoxes[i];
+                if (hurtBox)
                 {
-                    Log.Warning(LOG_PREFIX + $"invalid {nameof(_group)} reference");
+                    overrideHurtboxIsSniperTarget(hurtBox, ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i, false));
+                }
+            }
+        }
+
+        void overrideHurtboxIsSniperTarget(HurtBox hurtBox, bool originalIsSniperTarget)
+        {
+            if (hurtBox.isSniperTarget != originalIsSniperTarget)
+            {
+                if (hurtBox.isSniperTarget)
+                {
+                    if (!hurtBox.isInSniperTargetList)
+                    {
+                        HurtBox.sniperTargetsList.Add(hurtBox);
+                        hurtBox.isInSniperTargetList = true;
+                    }
                 }
                 else
                 {
-                    if (OriginalIsSniperTargetValues.Length != _group.hurtBoxes.Length)
+                    if (hurtBox.isInSniperTargetList)
                     {
-                        Log.Warning(LOG_PREFIX + $"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
-                    }
-
-                    for (int i = 0; i < _group.hurtBoxes.Length; i++)
-                    {
-                        HurtBox hurtBox = _group.hurtBoxes[i];
-                        if (hurtBox.isSniperTarget != ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i, false))
-                        {
-                            if (hurtBox.isSniperTarget)
-                            {
-                                if (!hurtBox.isInSniperTargetList)
-                                {
-                                    HurtBox.sniperTargetsList.Add(hurtBox);
-                                    hurtBox.isInSniperTargetList = true;
-                                }
-                            }
-                            else
-                            {
-                                if (hurtBox.isInSniperTargetList)
-                                {
-                                    HurtBox.sniperTargetsList.Remove(hurtBox);
-                                    hurtBox.isInSniperTargetList = false;
-                                }
-                            }
-                        }
+                        HurtBox.sniperTargetsList.Remove(hurtBox);
+                        hurtBox.isInSniperTargetList = false;
                     }
                 }
             }
         }
 
-        void OnDestroy()
-        {
-            NetworkingManager.UnregisterMessageProvider(this);
-        }
-
-        public bool SendMessages => OwnerBody && _group;
+        public bool SendMessages => _isInitialized && OwnerBody && _group;
 
         public IEnumerable<NetworkMessageBase> GetNetMessages()
         {
