@@ -73,7 +73,7 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
             for (int i = 0; i < _group.hurtBoxes.Length; i++)
             {
-                bool? overrideIsSniperTarget = overrideIsSniperTargetValues[i];
+                bool? overrideIsSniperTarget = ArrayUtils.GetSafe(overrideIsSniperTargetValues, i);
                 if (overrideIsSniperTarget.HasValue)
                 {
                     _group.hurtBoxes[i].isSniperTarget = overrideIsSniperTarget.Value;
