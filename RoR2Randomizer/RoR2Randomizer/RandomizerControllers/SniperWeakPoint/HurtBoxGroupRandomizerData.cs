@@ -119,7 +119,7 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
                 HurtBox hurtBox = _group.hurtBoxes[i];
                 if (hurtBox)
                 {
-                    overrideHurtboxIsSniperTarget(hurtBox, ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i, false));
+                    overrideHurtboxIsSniperTarget(hurtBox, ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i));
                 }
             }
         }
@@ -159,8 +159,8 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
                 {
                     Log.Warning(LOG_PREFIX + $"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
                 }
-
-                yield return new SyncSniperWeakPointReplacements(OwnerBody, _group.hurtBoxes.Where((h, i) => h.isSniperTarget != ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i, false)), _group.hurtBoxes.Length);
+                
+                yield return new SyncSniperWeakPointReplacements(OwnerBody, _group.hurtBoxes.Where((h, i) => h.isSniperTarget != ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i)), _group.hurtBoxes.Length);
             }
             else
             {
