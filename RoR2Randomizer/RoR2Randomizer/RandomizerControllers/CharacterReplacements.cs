@@ -47,9 +47,22 @@ namespace RoR2Randomizer.RandomizerControllers
         [SystemInitializer(typeof(EquipmentCatalog), typeof(MasterCatalog))]
         static void Init()
         {
-            AvailableDroneEquipments = EquipmentCatalog.equipmentDefs.Where(eq => eq && (eq.canDrop || eq.name == "BossHunterConsumed"))
+            AvailableDroneEquipments = EquipmentCatalog.equipmentDefs.Where(eq => eq && (eq.canDrop ||
+                                                                                            eq.passiveBuffDef ||
+                                                                                            eq == RoR2Content.Equipment.QuestVolatileBattery ||
+                                                                                            eq == DLC1Content.Equipment.BossHunterConsumed ||
+                                                                                            eq == DLC1Content.Equipment.LunarPortalOnUse)
+                                                                                         && eq != DLC1Content.Equipment.EliteVoidEquipment)
                                                                      .Select(e => e.equipmentIndex)
+                                                                     .OrderBy(static ei => ei)
                                                                      .ToArray();
+
+#if DEBUG
+            foreach (EquipmentIndex equipmentIndex in AvailableDroneEquipments)
+            {
+                Log.Debug($"{Language.GetString(EquipmentCatalog.GetEquipmentDef(equipmentIndex).nameToken)} is in {nameof(AvailableDroneEquipments)}");
+            }
+#endif
 
             _masterIndicesToRandomize = MasterCatalog.masterPrefabs.Where(master =>
             {
