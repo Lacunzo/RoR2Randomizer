@@ -2,8 +2,8 @@
 	"name": "RoR2Randomizer",
 	"authorName": "Gorakh",
 	"displayName": "Risk of Rain 2 Randomizer",
-	"version_number": "0.8.0",
-	"website_url": "https://github.com/Goorakh/RoR2Mods",
+	"version_number": "0.8.1",
+	"website_url": "https://github.com/Goorakh/RoR2Randomizer",
 	"description": "A Risk of Rain 2 randomizer",
 	"dependencies": [
 		"bbepis-BepInExPack-5.4.2100",

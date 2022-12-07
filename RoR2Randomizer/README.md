@@ -4,6 +4,8 @@ A randomizer mod for Risk of Rain 2!
 
 It is *highly* recommended to take a look over the mod settings before starting a run. By default most randomizers are enabled, which can be a bit much to take in at once.
 
+Because I'm such a narcissist, this mod has a dedicated [Discord Server](https://discord.gg/29PTeWaKCj)! Join if you're into that.
+
 Current features:
 * Multiplayer Compatible. Every player needs to have the mod.
 * Compatibile with Risk of Options for easy configuration in-game.
@@ -32,9 +34,21 @@ Current features:
 * Effect Randomizer: Randomizes visual effects.
 * Weak Point Randomizer: Randomizes which hitboxes are considered weak points by Railgunner's scoped shot. The number of weak points per character remain the same.
 
-Questions, Bug Reports, Feedback? Please DM me on Discord: Gorakh#0821
+Questions, Bug Reports, Feedback? Please create a GitHub issue or post in the #feedback channel in the [Discord Server](https://discord.gg/29PTeWaKCj).
 
 ## Changelog
+
+**0.8.1 Changes:**
+
+* Summon Randomizer:
+  * Added Parents spawned from Ancestral Pods to summon randomizer
+  * Added Umbras to summon randomizer
+
+* Weak Point Randomizer:
+  * Fixed an issue where certain characters would lose weak points during the randomization process
+
+* Misc:
+  * Characters randomized into Equipment Drones can now spawn with any Elite Aspect, Fuel Array, and Elegy of Extinction (scrapped lunar equipment that spawns a Bazaar portal on use)
 
 **0.8.0 Changes:**
 
