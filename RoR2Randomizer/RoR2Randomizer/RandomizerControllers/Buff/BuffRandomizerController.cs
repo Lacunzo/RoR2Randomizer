@@ -16,7 +16,10 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
         static BuffRandomizerController _instance;
         public static BuffRandomizerController Instance => _instance;
 
+        static BuffDef[] _validBuffDefs;
+
         static BuffIndex[] _invincibilityBuffs;
+        static BuffIndex[] _eliteBuffsOrdered;
 
         static Dictionary<BuffIndex, DotController.DotIndex> _buffToDotIndex;
 
@@ -50,6 +53,10 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                 
                 _buffToDotIndex.Add(buffIndex, (DotController.DotIndex)i);
             }
+
+            _validBuffDefs = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None && !b.isHidden).ToArray();
+
+            _eliteBuffsOrdered = BuffCatalog.eliteBuffIndices.Where(bi => _validBuffDefs.Any(bd => bd.buffIndex == bi)).OrderBy(i => i).ToArray();
         }
 
         static bool shouldBeActive => NetworkServer.active && ConfigManager.BuffRandomizer.Enabled;
@@ -63,15 +70,26 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
         {
             if (shouldBeActive)
             {
-                IEnumerable<BuffDef> buffsToRandomize = BuffCatalog.buffDefs.Where(b => b && b.buffIndex != BuffIndex.None && !b.isHidden &&
-                   (!ConfigManager.BuffRandomizer.ExcludeInvincibility || Array.BinarySearch(_invincibilityBuffs, b.buffIndex) < 0));
-
-#if DEBUG
-                foreach (BuffDef excludedBuff in BuffCatalog.buffDefs.Except(buffsToRandomize))
+                IEnumerable<BuffDef> buffsToRandomize = _validBuffDefs.Where(b =>
                 {
-                    Log.Debug($"Buff randomizer: Excluded buff: {toLogString(excludedBuff)}");
-                }
+                    if (ConfigManager.BuffRandomizer.ExcludeInvincibility && Array.BinarySearch(_invincibilityBuffs, b.buffIndex) >= 0)
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding buff {b} due to: Invincibility buff randomization disabled");
 #endif
+                        return false;
+                    }
+
+                    if (ConfigManager.BuffRandomizer.ExcludeEliteBuffs && Array.BinarySearch(_eliteBuffsOrdered, b.buffIndex) >= 0)
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding buff {b} due to: Elite buff randomization disabled");
+#endif
+                        return false;
+                    }
+
+                    return true;
+                });
 
                 ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, Instance.RNG, b => b.buffIndex, static (key, value) =>
                 {
