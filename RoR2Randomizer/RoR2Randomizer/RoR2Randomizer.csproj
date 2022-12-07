@@ -14,12 +14,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>True</Optimize>
     <Deterministic>True</Deterministic>
-    <DefineConstants>$(DefineConstants)TRACE;DISABLE_SKILL_RANDOMIZER;DISABLE_HOLDOUT_ZONE_RANDOMIZER</DefineConstants>
+    <DefineConstants>$(DefineConstants)TRACE;DISABLE_SKILL_RANDOMIZER;DISABLE_HOLDOUT_ZONE_RANDOMIZER;DISABLE_ITEM_RANDOMIZER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <Deterministic>True</Deterministic>
-    <DefineConstants>$(DefineConstants)TRACE;DISABLE_SKILL_RANDOMIZER;DISABLE_HOLDOUT_ZONE_RANDOMIZER</DefineConstants>
+    <DefineConstants>$(DefineConstants)TRACE;DISABLE_SKILL_RANDOMIZER;DISABLE_HOLDOUT_ZONE_RANDOMIZER;DISABLE_ITEM_RANDOMIZER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
