@@ -211,7 +211,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        static void appendProjectileReplacement(ProjectileTypeIdentifier identifier)
+        static void appendProjectileReplacement(in ProjectileTypeIdentifier identifier)
         {
             if (!NetworkServer.active)
                 return;
@@ -285,7 +285,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             SingletonHelper.Unassign(ref _instance, this);
         }
 
-        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
+        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, in GenericFireProjectileArgs genericArgs)
         {
             const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceProjectileInstantiateFire)} ";
 
@@ -390,7 +390,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return identifier.IsValid && TryReplaceFire(identifier, bulletAttack.origin, Util.QuaternionSafeLookRotation(fireDirection), bulletAttack.damage, bulletAttack.force, bulletAttack.isCrit, new GenericFireProjectileArgs(bulletAttack));
         }
 
-        public static bool TryReplaceFire(FireProjectileInfo info, GameObject weapon)
+        public static bool TryReplaceFire(in FireProjectileInfo info, GameObject weapon)
         {
             if (!IsActive)
                 return false;
@@ -432,7 +432,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             });
         }
 
-        public static bool TryReplaceFire(BombArtifactManager.BombRequest spiteBombRequest)
+        public static bool TryReplaceFire(in BombArtifactManager.BombRequest spiteBombRequest)
         {
             if (!IsActive)
                 return false;
@@ -448,7 +448,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             });
         }
 
-        public static bool TryReplaceFire(ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
+        public static bool TryReplaceFire(in ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, in GenericFireProjectileArgs genericArgs)
         {
             if (!IsActive || _replacingTempDisabled)
                 return false;
@@ -514,7 +514,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return false;
         }
 
-        public static bool TryGetOriginalProjectileIdentifier(ProjectileTypeIdentifier replacement, out ProjectileTypeIdentifier original)
+        public static bool TryGetOriginalProjectileIdentifier(in ProjectileTypeIdentifier replacement, out ProjectileTypeIdentifier original)
         {
             if (IsActive)
             {
@@ -525,7 +525,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             return false;
         }
 
-        public static bool TryGetOverrideProjectileIdentifier(ProjectileTypeIdentifier original, out ProjectileTypeIdentifier replacement)
+        public static bool TryGetOverrideProjectileIdentifier(in ProjectileTypeIdentifier original, out ProjectileTypeIdentifier replacement)
         {
             if (IsActive)
             {
