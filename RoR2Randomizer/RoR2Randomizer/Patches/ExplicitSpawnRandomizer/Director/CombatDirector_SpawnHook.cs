@@ -8,7 +8,7 @@ using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
 using System;
 using UnityEngine;
 
-namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
+namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Director
 {
     [PatchClass]
     static class CombatDirector_SpawnHook
