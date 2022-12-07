@@ -2,6 +2,9 @@
 using RoR2Randomizer.RandomizerControllers.Boss;
 using RoR2Randomizer.RandomizerControllers.Buff;
 using RoR2Randomizer.RandomizerControllers.ExplicitSpawn;
+#if !DISABLE_ITEM_RANDOMIZER
+using RoR2Randomizer.RandomizerControllers.Item;
+#endif
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
 using RoR2Randomizer.RandomizerControllers.HoldoutZone;
 #endif
@@ -31,6 +34,9 @@ namespace RoR2Randomizer.Configuration
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
         public static HoldoutZoneRandomizerConfig HoldoutZoneRandomizer;
 #endif
+#if !DISABLE_ITEM_RANDOMIZER
+        public static ItemRandomizerConfig ItemRandomizer;
+#endif
 
         public static PerformanceConfig Performance;
 
@@ -54,6 +60,9 @@ namespace RoR2Randomizer.Configuration
             _allCategories.Add(ExplicitSpawnRandomizer = new ExplicitSpawnRandomizerConfig(file));
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
             _allCategories.Add(HoldoutZoneRandomizer = new HoldoutZoneRandomizerConfig(file));
+#endif
+#if !DISABLE_ITEM_RANDOMIZER
+            _allCategories.Add(ItemRandomizer = new ItemRandomizerConfig(file));
 #endif
 
             _allCategories.Sort((a, b) => a.CategoryName.CompareTo(b.CategoryName));
