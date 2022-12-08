@@ -90,10 +90,10 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 
                     return true;
                 });
-
+                
                 ReplacementDictionary<BuffIndex> dict = ReplacementDictionary<BuffIndex>.CreateFrom<BuffDef>(buffsToRandomize, Instance.RNG, b => b.buffIndex, static (key, value) =>
                 {
-                    if (!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs && key.isDebuff != value.isDebuff)
+                    if ((!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs || ConfigManager.BuffRandomizer.SwapBuffDebuffWeightMult == 0f) && key.isDebuff != value.isDebuff)
                     {
 #if DEBUG
                         Log.Debug($"{nameof(BuffRandomizerController)}: Not allowing replacement {toLogString(key)}->{toLogString(value)}, mixing buffs and debuffs is not enabled.");
