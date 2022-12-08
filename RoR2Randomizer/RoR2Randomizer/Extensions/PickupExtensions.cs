@@ -42,8 +42,8 @@ namespace RoR2Randomizer.Extensions
                         for (uint i = 0; i < slotCount; i++)
                         {
                             EquipmentState equipmentState = inventory.GetEquipment(i);
-                            if (equipmentState.equipmentDef && requireEmpty ? equipmentState.equipmentDef.equipmentIndex == EquipmentIndex.None
-                                                                            : equipmentState.equipmentDef.equipmentIndex != pickupDef.equipmentIndex)
+                            if (equipmentState.equipmentDef && (requireEmpty ? equipmentState.equipmentDef.equipmentIndex == EquipmentIndex.None
+                                                                             : equipmentState.equipmentDef.equipmentIndex != pickupDef.equipmentIndex))
                             {
                                 count--;
                                 inventory.SetEquipmentIndexForSlot(pickupDef.equipmentIndex, i);
