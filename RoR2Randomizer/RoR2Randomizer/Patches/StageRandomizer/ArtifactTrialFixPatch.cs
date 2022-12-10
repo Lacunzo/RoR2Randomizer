@@ -50,7 +50,7 @@ namespace RoR2Randomizer.Patches.StageRandomizer
             const string LOG_PREFIX = $"{nameof(ArtifactTrialFixPatch)}.{nameof(PortalDialerController_OpenArtifactPortalServer)} ";
 
             ILCursor c = new ILCursor(il);
-            if (c.TryGotoNext(x => x.MatchStfld<ArtifactTrialMissionController>(nameof(ArtifactTrialMissionController.trialArtifact))))
+            if (c.TryGotoNext(x => x.MatchStsfld<ArtifactTrialMissionController>(nameof(ArtifactTrialMissionController.trialArtifact))))
             {
                 c.EmitDelegate((ArtifactDef artifactDef) =>
                 {

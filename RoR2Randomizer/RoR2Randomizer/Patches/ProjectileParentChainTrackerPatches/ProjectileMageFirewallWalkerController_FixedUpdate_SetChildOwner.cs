@@ -28,7 +28,7 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 
             ILCursor[] foundCursors;
             while (c.TryFindNext(out foundCursors,
-                                 x => x.MatchLdfld<ProjectileMageFirewallController>(nameof(ProjectileMageFirewallController.walkerPrefab)),
+                                 x => x.MatchLdfld<ProjectileMageFirewallWalkerController>(nameof(ProjectileMageFirewallWalkerController.firePillarPrefab)),
                                  x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo<ProjectileManager>(_ => _.FireProjectile(default, default, default, default, default, default, default, default, default, default)))))
             {
                 ILCursor ilCursor = foundCursors[1];
