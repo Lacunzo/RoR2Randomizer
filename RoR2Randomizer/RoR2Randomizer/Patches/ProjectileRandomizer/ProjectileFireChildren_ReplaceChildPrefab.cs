@@ -84,7 +84,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                     }
                     else
                     {
-                        Log.Warning(LOG_PREFIX + "failed (1)");
+                        Log.Warning(LOG_PREFIX + "failed (2)");
                     }
 
                     ILCursor ret = c.Goto(label.Target);

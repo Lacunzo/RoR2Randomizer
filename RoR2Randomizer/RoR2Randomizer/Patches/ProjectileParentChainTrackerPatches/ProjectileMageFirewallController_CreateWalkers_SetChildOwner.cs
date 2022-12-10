@@ -20,7 +20,11 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 
         static void ProjectileMageFirewallController_CreateWalkers(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(ProjectileMageFirewallController_CreateWalkers_SetChildOwner)}.{nameof(ProjectileMageFirewallController_CreateWalkers)} ";
+
             ILCursor c = new ILCursor(il);
+
+            int patchesMade = 0;
 
             ILCursor[] foundCursors;
             while (c.TryFindNext(out foundCursors,
@@ -35,7 +39,20 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
                 });
 
                 c.Index = foundCursors[foundCursors.Length - 1].Index + 1;
+
+                patchesMade++;
             }
+
+            if (patchesMade == 0)
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"patched {patchesMade} locations");
+            }
+#endif
         }
     }
 }

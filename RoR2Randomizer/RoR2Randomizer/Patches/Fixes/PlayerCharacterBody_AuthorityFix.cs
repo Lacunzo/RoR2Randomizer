@@ -22,15 +22,31 @@ namespace RoR2Randomizer.Patches.Fixes
 
         static readonly ILHook NetworkIdentity_OnStartServer_ILHook = new ILHook(AccessTools.DeclaredMethod(typeof(NetworkIdentity), nameof(NetworkIdentity.OnStartServer)), static il =>
         {
+            const string LOG_PREFIX = $"{nameof(PlayerCharacterBody_AuthorityFix)}.{nameof(NetworkIdentity_OnStartServer_ILHook)} ";
+
             ILCursor c = new ILCursor(il);
 
+            int numPatches = 0;
             while (c.TryGotoNext(MoveType.After,
                                  x => x.MatchLdarg(0),
                                  x => x.MatchLdfld<NetworkIdentity>(nameof(NetworkIdentity.m_LocalPlayerAuthority))))
             {
                 c.Emit(OpCodes.Ldarg_0);
                 c.Emit(OpCodes.Call, SymbolExtensions.GetMethodInfo(() => NetworkIdentity_get_localPlayerAuthority(default, default)));
+
+                numPatches++;
             }
+
+            if (numPatches == 0)
+            {
+                Log.Warning(LOG_PREFIX + "no patch locations found");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"patched {numPatches} locations");
+            }
+#endif
         }, new ILHookConfig { ManualApply = true });
 
         static void Apply()

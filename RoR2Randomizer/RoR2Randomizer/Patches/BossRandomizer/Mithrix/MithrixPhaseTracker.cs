@@ -66,6 +66,8 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
         void BrotherEncounterPhaseBaseState_OnEnter(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(MithrixPhaseTracker)}.{nameof(BrotherEncounterPhaseBaseState_OnEnter)} ";
+
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchCallvirt<PhaseCounter>(nameof(PhaseCounter.GoToNextPhase))))
             {
@@ -77,6 +79,10 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
                 {
                     Phase.Value = (uint)instance.phase;
                 });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location");
             }
         }
     }

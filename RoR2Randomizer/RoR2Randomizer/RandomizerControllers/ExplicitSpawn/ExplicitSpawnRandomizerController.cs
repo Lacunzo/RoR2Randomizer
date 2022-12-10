@@ -248,12 +248,17 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public static ILContext.Manipulator GetSimpleDirectorSpawnRequestHook(BoolConfigValue isEnabledConfigValue)
         {
+            const string LOG_PREFIX = $"{nameof(ExplicitSpawnRandomizerController)}.{nameof(GetSimpleDirectorSpawnRequestHook)} ";
+
             return il =>
             {
                 ILCursor c = new ILCursor(il);
 
+                int numLocationsFound = 0;
                 while (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
                 {
+                    numLocationsFound++;
+
                     c.Emit(OpCodes.Dup);
                     c.EmitDelegate((DirectorSpawnRequest spawnRequest) =>
                     {
@@ -265,6 +270,17 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
                     c.Index++;
                 }
+
+                if (numLocationsFound == 0)
+                {
+                    Log.Warning(LOG_PREFIX + $"failed to find any patch locations for {nameof(DirectorCore.TrySpawnObject)}");
+                }
+#if DEBUG
+                else
+                {
+                    Log.Debug(LOG_PREFIX + $"found {numLocationsFound} patch locations for {nameof(DirectorCore.TrySpawnObject)}");
+                }
+#endif
             };
         }
     }

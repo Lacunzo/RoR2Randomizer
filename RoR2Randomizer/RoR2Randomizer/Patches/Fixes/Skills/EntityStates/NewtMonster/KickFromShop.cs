@@ -23,6 +23,8 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
 
         static void KickFromShop_FixedUpdate(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(Fixes)}.{nameof(Skills)}.{nameof(EntityStates)}.{nameof(NewtMonster)}.{nameof(KickFromShop)}.{nameof(KickFromShop_FixedUpdate)} ";
+
             ILCursor c = new ILCursor(il);
 
             // Fix NullRef in fixedupdate if "KickOutOfShop" does not exist in the scene
@@ -33,6 +35,10 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
                 c.Index += 2; // Move to before get_gameObject call
 
                 Shared.Try_get_gameObject(c);
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find KickOutOfShop NullRefFix patch location");
             }
 
             // Prevent Newt from becoming immune to damage if it's replacing a boss
@@ -61,6 +67,10 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.NewtMonster
                 });
 
                 c.Emit(OpCodes.And);
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location for disabling invulnerability for boss replacement");
             }
         }
     }

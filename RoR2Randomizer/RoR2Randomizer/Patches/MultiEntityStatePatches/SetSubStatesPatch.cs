@@ -23,6 +23,8 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 
         static void CharacterDeathBehavior_OnDeath(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(InitializeMultiStatePatch)}.{nameof(CharacterDeathBehavior_OnDeath)} ";
+
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchCall(SymbolExtensions.GetMethodInfo(() => EntityStateCatalog.InstantiateState(default(SerializableEntityStateType))))))
             {
@@ -32,6 +34,10 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate(tryInitializeMultiState);
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location");
             }
         }
 

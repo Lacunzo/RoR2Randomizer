@@ -32,12 +32,16 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void PlaceTurret_FixedUpdate(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(EngineerTurret_SpawnHook)}.{nameof(PlaceTurret_FixedUpdate)} ";
+
             ILCursor c = new ILCursor(il);
 
+            int numLocationsPatched = 0;
             while (c.TryGotoNext(MoveType.After,
                                  x => x.MatchLdfld<PlaceTurret>(nameof(PlaceTurret.turretMasterPrefab)),
                                  x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo(() => MasterCatalog.FindMasterIndex(default(GameObject))))))
             {
+                numLocationsPatched++;
                 c.EmitDelegate((MasterCatalog.MasterIndex original) =>
                 {
                     if (!ConfigManager.ExplicitSpawnRandomizer.RandomizeEngiTurrets)
@@ -47,10 +51,23 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     return replacement.isValid ? replacement : original;
                 });
             }
+
+            if (numLocationsPatched == 0)
+            {
+                Log.Warning($"{LOG_PREFIX}Failed to patch any locations for {nameof(PlaceTurret.FixedUpdate)}");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug($"{LOG_PREFIX}Patched {numLocationsPatched} locations for {nameof(PlaceTurret.FixedUpdate)}");
+            }
+#endif
         }
 
         static void CharacterBody_HandleConstructTurret(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(EngineerTurret_SpawnHook)}.{nameof(CharacterBody_HandleConstructTurret)} ";
+
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt<MasterSummon>(nameof(MasterSummon.Perform))))
@@ -64,18 +81,26 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     }
                 });
             }
+            else
+            {
+                Log.Warning($"{LOG_PREFIX}Failed to find patch the location");
+            }
         }
 
         static void PlaceTurret_GetPlacementInfo(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(EngineerTurret_SpawnHook)}.{nameof(PlaceTurret_GetPlacementInfo)} ";
+
             ILCursor c = new ILCursor(il);
 
             const float TURRET_RADUIS = 0.5f;
             const float TURRET_PLACE_DISTANCE = 2f;
 
+            int numLocationsPatched = 0;
             // Prevents player from falling into the ground after placing a turret
             while (c.TryGotoNext(MoveType.After, x => x.MatchLdcR4(TURRET_PLACE_DISTANCE)))
             {
+                numLocationsPatched++;
                 c.Emit(OpCodes.Ldarg_0);
                 c.EmitDelegate((float originalDistance, PlaceTurret instance) =>
                 {
@@ -88,7 +113,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                             {
                                 float result = radius + (TURRET_PLACE_DISTANCE - TURRET_RADUIS);
 #if DEBUG
-                                Log.Debug($"Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
+                                Log.Debug($"{LOG_PREFIX}Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
 #endif
                                 return Mathf.Max(originalDistance, result);
                             }
@@ -99,10 +124,23 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 });
             }
 
+            if (numLocationsPatched == 0)
+            {
+                Log.Warning($"{LOG_PREFIX}Failed to patch any locations for radius override in {nameof(PlaceTurret.GetPlacementInfo)}");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug($"{LOG_PREFIX}Patched {numLocationsPatched} locations for radius override in {nameof(PlaceTurret.GetPlacementInfo)}");
+            }
+#endif
+
             // A On hook doesn't work for this method, probably due to the return type being private?
             c.Index = 0;
+            numLocationsPatched = 0;
             while (c.TryGotoNext(x => x.MatchRet()))
             {
+                numLocationsPatched++;
                 c.EmitDelegate((PlaceTurret.PlacementInfo result) =>
                 {
                     if (ExplicitSpawnRandomizerController.IsActive && ConfigManager.ExplicitSpawnRandomizer.RandomizeEngiTurrets)
@@ -116,6 +154,17 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
                 c.Index++;
             }
+
+            if (numLocationsPatched == 0)
+            {
+                Log.Warning($"{LOG_PREFIX}Failed to patch any locations for turret rotation in {nameof(PlaceTurret.GetPlacementInfo)}");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug($"{LOG_PREFIX}Patched {numLocationsPatched} locations for turret rotation in {nameof(PlaceTurret.GetPlacementInfo)}");
+            }
+#endif
         }
     }
 }

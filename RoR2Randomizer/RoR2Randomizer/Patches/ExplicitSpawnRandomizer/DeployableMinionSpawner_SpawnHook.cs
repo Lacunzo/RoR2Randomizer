@@ -47,6 +47,10 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
                 });
             }
+            else
+            {
+                Log.Warning($"{LOG_PREFIX}Failed to find the patch location for {nameof(DirectorCore.TrySpawnObject)}");
+            }
         }
     }
 }

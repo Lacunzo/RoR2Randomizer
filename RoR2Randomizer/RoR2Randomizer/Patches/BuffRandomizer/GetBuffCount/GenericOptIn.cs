@@ -14,31 +14,32 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
         {
             static ILContext.Manipulator getGenericManipulator(params MethodBase[] patchMethods)
             {
+                const string LOG_PREFIX = $"{nameof(GetBuffIndex_BuffIndex_ReplacePatch)}+{nameof(GenericOptIn)}.{nameof(getGenericManipulator)} ";
+
                 return il =>
                 {
                     ILCursor c = new ILCursor(il);
 
                     foreach (MethodBase method in patchMethods)
                     {
-#if DEBUG
                         int numMatches = 0;
-#endif
-
                         while (c.TryGotoNext(x => x.MatchCallOrCallvirt(method)))
                         {
-#if DEBUG
-                            numMatches++;
-#endif
-
                             c.Emit(OpCodes.Call, enablePatch_MI);
                             c.Index++;
                             c.Emit(OpCodes.Call, disablePatch_MI);
+
+                            numMatches++;
                         }
 
-#if DEBUG
                         if (numMatches == 0)
                         {
-                            Log.Warning($"{nameof(getGenericManipulator)}: {il.Method.FullName} no match found for {method.FullDescription()}");
+                            Log.Warning(LOG_PREFIX + $": {il.Method.FullName} no match found for {method.FullDescription()}");
+                        }
+#if DEBUG
+                        else
+                        {
+                            Log.Debug(LOG_PREFIX + $": {il.Method.FullName} {numMatches} match(es) found for {method.FullDescription()}");
                         }
 #endif
 

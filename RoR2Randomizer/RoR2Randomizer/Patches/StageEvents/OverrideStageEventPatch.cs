@@ -47,6 +47,8 @@ namespace RoR2Randomizer.Patches.StageEvents
 
         static void ClassicStageInfo_RebuildCards(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(OverrideStageEventPatch)}.{nameof(ClassicStageInfo_RebuildCards)} ";
+
             ILCursor c = new ILCursor(il);
 
             static DirectorCardCategorySelection getCardSelectionPrefab(DirectorCardCategorySelection selected)
@@ -65,6 +67,10 @@ namespace RoR2Randomizer.Patches.StageEvents
 
                 ilCursor.EmitDelegate(getCardSelectionPrefab);
             }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location (0)");
+            }
 
             c.Index = 0;
             if (c.TryFindNext(out foundCursors,
@@ -72,6 +78,10 @@ namespace RoR2Randomizer.Patches.StageEvents
                               x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo(() => GameObject.Instantiate<DirectorCardCategorySelection>(default)))))
             {
                 foundCursors[1].EmitDelegate(getCardSelectionPrefab);
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location (1)");
             }
         }
     }

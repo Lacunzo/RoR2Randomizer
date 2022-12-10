@@ -46,6 +46,8 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Aurelionite
 
         void GoldshoresBossfight_SpawnBoss(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(AurelioniteFightTracker)}.{nameof(GoldshoresBossfight_SpawnBoss)} ";
+
             ILCursor c = new ILCursor(il);
 
             if (c.TryFindNext(out ILCursor[] cursors,
@@ -71,7 +73,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Aurelionite
             }
             else
             {
-                Log.Warning($"ILPatch {nameof(AurelioniteFightTracker)}.{nameof(GoldshoresBossfight_SpawnBoss)} failed to find patch location");
+                Log.Warning(LOG_PREFIX + "failed to find patch location");
             }
         }
 

@@ -51,7 +51,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Director
 
             if (patchCount == 0)
             {
-                Log.Warning(LOG_PREFIX + "no patch location found");
+                Log.Warning(LOG_PREFIX + "no patch locations found");
             }
 #if DEBUG
             else

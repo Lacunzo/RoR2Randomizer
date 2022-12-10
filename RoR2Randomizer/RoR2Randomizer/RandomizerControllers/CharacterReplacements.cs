@@ -502,11 +502,14 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static ILContext.Manipulator FixMasterIndexReferences(Func<bool> patchEnabled, params string[] names)
         {
+            const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(FixMasterIndexReferences)} ";
+
             return il =>
             {
                 ILCursor c = new ILCursor(il);
 
                 MemberReference member = null;
+                int patchCount = 0;
                 while (c.TryGotoNext(x => x.MatchGetMemberValue(out member)))
                 {
                     c.Index++;
@@ -524,7 +527,7 @@ namespace RoR2Randomizer.RandomizerControllers
                         }
                         else
                         {
-                            Log.Warning($"{nameof(CharacterReplacements)}.{nameof(FixMasterIndexReferences)} unimplemented member type of {member.GetType().FullName}");
+                            Log.Warning(LOG_PREFIX + $"unimplemented member type of {member.GetType().FullName}");
                         }
 
                         if (valueType != null)
@@ -546,6 +549,8 @@ namespace RoR2Randomizer.RandomizerControllers
                             if (valueType.Is(typeof(MasterCatalog.MasterIndex)))
                             {
                                 c.EmitDelegate(replacefunc);
+
+                                patchCount++;
                             }
                             else if (valueType.Is(typeof(int)))
                             {
@@ -553,13 +558,26 @@ namespace RoR2Randomizer.RandomizerControllers
                                 {
                                     return (int)replacefunc((MasterCatalog.MasterIndex)original);
                                 });
+
+                                patchCount++;
                             }
                             else
                             {
-                                Log.Warning($"{nameof(CharacterReplacements)}.{nameof(FixMasterIndexReferences)} unimplemented value type of {valueType.FullName}");
+                                Log.Warning(LOG_PREFIX + $"unimplemented value type of {valueType.FullName}");
                             }
                         }
                     }
+                }
+
+                if (patchCount > 0)
+                {
+#if DEBUG
+                    Log.Debug(LOG_PREFIX + $"[{string.Join(", ", names)}] patched {patchCount} locations");
+#endif
+                }
+                else
+                {
+                    Log.Warning(LOG_PREFIX + $"[{string.Join(", ", names)}] patched 0 locations");
                 }
             };
         }

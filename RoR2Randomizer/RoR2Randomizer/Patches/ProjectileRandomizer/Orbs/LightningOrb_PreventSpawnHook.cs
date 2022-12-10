@@ -19,7 +19,11 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.Orbs
 
         static void LightningOrb_OnArrival(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(LightningOrb_PreventSpawnHook)}.{nameof(LightningOrb_OnArrival)} ";
+
             ILCursor c = new ILCursor(il);
+
+            int numPatchesMade = 0;
 
             while (c.TryGotoNext(x => x.MatchCallOrCallvirt<OrbManager>(nameof(OrbManager.AddOrb))))
             {
@@ -34,7 +38,20 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.Orbs
                 {
                     OrbManager_AddOrbHook.PatchDisabledCount--;
                 });
+
+                numPatchesMade++;
             }
+
+            if (numPatchesMade == 0)
+            {
+                Log.Warning(LOG_PREFIX + "found no patch locations");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"found {numPatchesMade} patch locations");
+            }
+#endif
         }
     }
 }

@@ -26,6 +26,8 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
 
         static void CharacterMaster_OnInventoryChanged(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(Heretic_TransformBodyHook)}.{nameof(CharacterMaster_OnInventoryChanged)} ";
+
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -45,6 +47,10 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
 
                     return bodyName;
                 });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + $"failed to find the patch location for {nameof(CharacterMaster.TransformBody)}");
             }
 
             c.Index = 0;
@@ -75,6 +81,10 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Heretic
                 });
 
                 cursor.Emit(OpCodes.Brtrue, label);
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + $"failed to find the patch location for {nameof(BodyCatalog.FindBodyIndex)}");
             }
         }
 

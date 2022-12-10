@@ -22,9 +22,13 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
             static void VoidSurvivorController_FixedUpdate(ILContext il)
             {
+                const string LOG_PREFIX = $"{nameof(GetBuffIndex_BuffIndex_ReplacePatch)}+{nameof(VoidFiendOptInFix)}.{nameof(VoidSurvivorController_FixedUpdate)} ";
+
                 ILCursor c = new ILCursor(il);
 
                 ILCursor[] foundCursors;
+
+                int patchCount = 0;
                 while (c.TryFindNext(out foundCursors,
                                      x => x.MatchLdfld<VoidSurvivorController>(nameof(VoidSurvivorController.corruptedBuffDef)),
                                      x => x.MatchCallOrCallvirt(SymbolExtensions.GetMethodInfo<CharacterBody>(_ => _.HasBuff(default(BuffDef))))))
@@ -36,7 +40,20 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                     last.Emit(OpCodes.Call, disablePatch_MI);
 
                     c.Index = last.Index;
+
+                    patchCount++;
                 }
+
+                if (patchCount == 0)
+                {
+                    Log.Warning(LOG_PREFIX + "no patch locations found");
+                }
+#if DEBUG
+                else
+                {
+                    Log.Debug(LOG_PREFIX + $"{patchCount} patch locations found");
+                }
+#endif
             }
         }
     }

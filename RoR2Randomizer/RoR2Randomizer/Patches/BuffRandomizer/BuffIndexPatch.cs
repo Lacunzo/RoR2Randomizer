@@ -1,4 +1,5 @@
-﻿using Mono.Cecil;
+﻿using HarmonyLib;
+using Mono.Cecil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RoR2;
@@ -71,19 +72,47 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
             ILCursor c = new ILCursor(il);
 
+            int patchCount = 0;
             while (c.TryGotoNext(x => x.MatchStfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
             {
                 c.EmitDelegate(simpleReplaceBuffIndex);
 
                 c.Index++;
+
+                patchCount++;
             }
 
+            if (patchCount == 0)
+            {
+                Log.Warning(LOG_PREFIX + "buffIndex stfld: no patch locations found");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"buffIndex stfld: {patchCount} patch locations found");
+            }
+#endif
+
             c.Index = 0;
+            patchCount = 0;
             while (c.TryGotoNext(x => x.MatchLdfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
             {
                 c.Index++;
                 c.EmitDelegate(simpleReplaceBuffIndex);
+
+                patchCount++;
             }
+
+            if (patchCount == 0)
+            {
+                Log.Warning(LOG_PREFIX + "buffIndex ldfld: no patch locations found");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"buffIndex ldfld: {patchCount} patch locations found");
+            }
+#endif
 
             HashSet<MethodInfo> localFunctionsToHook = new HashSet<MethodInfo>();
             c.Index = 0;
@@ -101,33 +130,72 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 }
             }
 
+            if (localFunctionsToHook.Count == 0)
+            {
+                Log.Warning(LOG_PREFIX + "could not find any local functions to hook");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"found {localFunctionsToHook.Count} local functions to hook");
+            }
+#endif
+
             if (CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches == null)
             {
                 CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches = new ILHook[localFunctionsToHook.Count];
-                using (HashSet<MethodInfo>.Enumerator enumerator = localFunctionsToHook.GetEnumerator())
+
+                ILHookConfig hookConfig = new ILHookConfig { ManualApply = false };
+
+                int index = 0;
+                foreach (MethodInfo localFunctions in localFunctionsToHook)
                 {
-                    ILHookConfig hookConfig = new ILHookConfig { ManualApply = false };
-                    for (int i = 0; enumerator.MoveNext(); i++)
+                    CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches[index] = new ILHook(localFunctions, il =>
                     {
-                        CharacterBody_AddTimedBuff_BuffDef_float_localFunctionPatches[i] = new ILHook(enumerator.Current, static il =>
+                        ILCursor c = new ILCursor(il);
+
+                        int patchCount = 0;
+                        while (c.TryGotoNext(x => x.MatchStfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
                         {
-                            ILCursor c = new ILCursor(il);
+                            c.EmitDelegate(simpleReplaceBuffIndex);
 
-                            while (c.TryGotoNext(x => x.MatchStfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
-                            {
-                                c.EmitDelegate(simpleReplaceBuffIndex);
+                            c.Index++;
 
-                                c.Index++;
-                            }
+                            patchCount++;
+                        }
 
-                            c.Index = 0;
-                            while (c.TryGotoNext(x => x.MatchLdfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
-                            {
-                                c.Index++;
-                                c.EmitDelegate(simpleReplaceBuffIndex);
-                            }
-                        }, hookConfig);
-                    }
+                        if (patchCount == 0)
+                        {
+                            Log.Warning(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex stfld: no patch locations found");
+                        }
+#if DEBUG
+                        else
+                        {
+                            Log.Debug(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex stfld: {patchCount} patch locations found");
+                        }
+#endif
+
+                        c.Index = 0;
+                        patchCount = 0;
+                        while (c.TryGotoNext(x => x.MatchLdfld<CharacterBody.TimedBuff>(nameof(CharacterBody.TimedBuff.buffIndex))))
+                        {
+                            c.Index++;
+                            c.EmitDelegate(simpleReplaceBuffIndex);
+
+                            patchCount++;
+                        }
+
+                        if (patchCount == 0)
+                        {
+                            Log.Warning(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex ldfld: no patch locations found");
+                        }
+#if DEBUG
+                        else
+                        {
+                            Log.Debug(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex ldfld: {patchCount} patch locations found");
+                        }
+#endif
+                    }, hookConfig);
                 }
             }
         }

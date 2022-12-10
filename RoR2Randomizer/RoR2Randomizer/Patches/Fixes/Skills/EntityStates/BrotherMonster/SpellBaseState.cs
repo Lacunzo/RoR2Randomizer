@@ -28,6 +28,8 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
         // Fix nullref if HammerRenderer doesn't exist
         static void SpellBaseState_OnEnter(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(Fixes)}.{nameof(Skills)}.{nameof(EntityStates)}.{nameof(BrotherMonster)}.{nameof(SpellBaseState)}.{nameof(SpellBaseState_OnEnter)} ";
+
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchLdstr("HammerRenderer"),
@@ -37,10 +39,16 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
                 c.Index += 2; // Move to before get_gameObject call
                 Shared.Try_get_gameObject(c);
             }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location");
+            }
         }
 
         static void SpellBaseState_InitItemStealer(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(Fixes)}.{nameof(Skills)}.{nameof(EntityStates)}.{nameof(BrotherMonster)}.{nameof(SpellBaseState)}.{nameof(SpellBaseState_InitItemStealer)} ";
+
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallvirt(SymbolExtensions.GetMethodInfo<GameObject>(_ => _.GetComponent<ReturnStolenItemsOnGettingHit>()))))
@@ -62,6 +70,10 @@ namespace RoR2Randomizer.Patches.Fixes.Skills.EntityStates.BrotherMonster
 
                     return returnItems;
                 });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location");
             }
         }
     }

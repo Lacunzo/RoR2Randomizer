@@ -47,6 +47,8 @@ namespace RoR2Randomizer.Patches.StageRandomizer
 
         static void PortalDialerController_OpenArtifactPortalServer(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(ArtifactTrialFixPatch)}.{nameof(PortalDialerController_OpenArtifactPortalServer)} ";
+
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchStfld<ArtifactTrialMissionController>(nameof(ArtifactTrialMissionController.trialArtifact))))
             {
@@ -67,6 +69,10 @@ namespace RoR2Randomizer.Patches.StageRandomizer
 
                     return artifactDef;
                 });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "unable to find patch location");
             }
         }
     }

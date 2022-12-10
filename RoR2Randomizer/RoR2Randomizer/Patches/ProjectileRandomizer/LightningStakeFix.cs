@@ -39,6 +39,8 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
         static void GlobalEventManager_OnHitAll(ILContext il)
         {
+            const string LOG_PREFIX = $"{nameof(LightningStakeFix)}.{nameof(GlobalEventManager_OnHitAll)} ";
+
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -65,7 +67,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                                          ProjectileManager_InitializeProjectile_SetOwnerPatch.BulletOwnerNodeOfNextProjectile.IsChildOf(lightningStakeReplacement)))
                                     {
 #if DEBUG
-                                        Log.Debug($"Prevented infinite projectile loop ({projectileController.name} is child of {lightningStakeReplacement})");
+                                        Log.Debug(LOG_PREFIX + $"Prevented infinite projectile loop ({projectileController.name} is child of {lightningStakeReplacement})");
 #endif
 
                                         return false;
@@ -77,6 +79,10 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
                     return hasBuff;
                 });
+            }
+            else
+            {
+                Log.Warning(LOG_PREFIX + "failed to find patch location");
             }
         }
     }

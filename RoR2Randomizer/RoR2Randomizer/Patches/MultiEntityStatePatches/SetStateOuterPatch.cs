@@ -37,7 +37,11 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 
         static void setOuterHook(ILContext il)
         {
+            string LOG_PREFIX = $"{nameof(SetStateOuterPatch)}.{nameof(setOuterHook)} ({il?.Method?.Name ?? "null"}) ";
+
             ILCursor c = new ILCursor(il);
+
+            int numPatches = 0;
             while (c.TryGotoNext(x => x.MatchStfld<EntityState>(nameof(EntityState.outer))))
             {
                 // Store EntityStateMachine value in a field to temporarily remove it from the stack
@@ -57,7 +61,20 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
                         multiState.OnOuterStateMachineAssigned();
                     }
                 });
+
+                numPatches++;
             }
+
+            if (numPatches == 0)
+            {
+                Log.Warning(LOG_PREFIX + "no patch locations found");
+            }
+#if DEBUG
+            else
+            {
+                Log.Debug(LOG_PREFIX + $"patched {numPatches} locations");
+            }
+#endif
         }
     }
 }
