@@ -121,31 +121,13 @@ namespace RoR2Randomizer.RandomizerControllers
             Inventory inventory = _master.inventory;
             if (inventory)
             {
+                giveAdaptiveArmorFromOriginalMaster(inventory);
+
                 GivePickupsOnStart givePickupsOnStart = _master.GetComponent<GivePickupsOnStart>();
-
-                CharacterMaster originalMaster = originalMasterPrefab;
-                if (originalMaster)
-                {
-                    GivePickupsOnStart originalGivePickupsOnStart = originalMaster.GetComponent<GivePickupsOnStart>();
-
-                    ItemIndex adaptiveArmorItemIndex = RoR2Content.Items.AdaptiveArmor.itemIndex;
-                    if (originalGivePickupsOnStart && originalGivePickupsOnStart.HasItems(adaptiveArmorItemIndex, out int originalAdaptiveArmorCount))
-                    {
-                        inventory.GiveItem(adaptiveArmorItemIndex, originalAdaptiveArmorCount);
-                    }
-                }
 
                 if (_body.bodyIndex == BodyCatalog.FindBodyIndex("EquipmentDroneBody"))
                 {
-                    if ((!givePickupsOnStart || !givePickupsOnStart.HasAnyEquipment()) && inventory.GetEquipmentIndex() == EquipmentIndex.None)
-                    {
-                        EquipmentIndex equipment = CharacterReplacements.AvailableDroneEquipments.GetRandomOrDefault(RoR2Application.rng, EquipmentIndex.None);
-                        inventory.SetEquipmentIndex(equipment);
-
-#if DEBUG
-                        Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(_body.baseNameToken)}");
-#endif
-                    }
+                    giveDroneEquipment(inventory, givePickupsOnStart);
                 }
                 else if (_body.bodyIndex == BodyCatalog.FindBodyIndex("DroneCommanderBody")) // Col. Droneman
                 {
@@ -160,6 +142,34 @@ namespace RoR2Randomizer.RandomizerControllers
             }
 
             tryOverrideBodySubtitle();
+        }
+
+        void giveDroneEquipment(Inventory inventory, GivePickupsOnStart droneGivePickupsOnStart)
+        {
+            if ((!droneGivePickupsOnStart || !droneGivePickupsOnStart.HasAnyEquipment()) && inventory.GetEquipmentIndex() == EquipmentIndex.None)
+            {
+                EquipmentIndex equipment = CharacterReplacements.AvailableDroneEquipments.GetRandomOrDefault(RoR2Application.rng, EquipmentIndex.None);
+                inventory.SetEquipmentIndex(equipment);
+
+#if DEBUG
+                Log.Debug($"Gave {Language.GetString(EquipmentCatalog.GetEquipmentDef(equipment).nameToken)} to {Language.GetString(_body.baseNameToken)}");
+#endif
+            }
+        }
+
+        void giveAdaptiveArmorFromOriginalMaster(Inventory inventory)
+        {
+            CharacterMaster originalMaster = originalMasterPrefab;
+            if (originalMaster)
+            {
+                GivePickupsOnStart originalGivePickupsOnStart = originalMaster.GetComponent<GivePickupsOnStart>();
+
+                ItemIndex adaptiveArmorItemIndex = RoR2Content.Items.AdaptiveArmor.itemIndex;
+                if (originalGivePickupsOnStart && originalGivePickupsOnStart.HasItems(adaptiveArmorItemIndex, out int originalAdaptiveArmorCount))
+                {
+                    inventory.GiveItem(adaptiveArmorItemIndex, originalAdaptiveArmorCount);
+                }
+            }
         }
 
         protected virtual void initializeClient()
