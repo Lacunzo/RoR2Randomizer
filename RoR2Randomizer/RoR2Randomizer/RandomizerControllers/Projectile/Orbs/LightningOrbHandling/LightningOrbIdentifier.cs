@@ -10,7 +10,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandl
     {
         public static readonly LightningOrbIdentifier Invalid = new LightningOrbIdentifier { Index = -1 };
 
-        public int Index { get; set; }
+        public int Index { readonly get; set; }
 
         public readonly LightningOrb.LightningType LightningType;
         public readonly uint DefaultNumBounces;
@@ -50,7 +50,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandl
             return LightningType == lightningOrb.lightningType;
         }
 
-        public readonly bool Equals(LightningOrbIdentifier other, bool compareIndex)
+        public readonly bool Equals(in LightningOrbIdentifier other, bool compareIndex)
         {
             if (compareIndex)
             {
@@ -67,12 +67,12 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandl
             return obj is LightningOrbIdentifier other && Equals(other, true);
         }
 
-        public static bool operator ==(LightningOrbIdentifier a, LightningOrbIdentifier b)
+        public static bool operator ==(in LightningOrbIdentifier a, in LightningOrbIdentifier b)
         {
             return a.Equals(b, true);
         }
 
-        public static bool operator !=(LightningOrbIdentifier a, LightningOrbIdentifier b)
+        public static bool operator !=(in LightningOrbIdentifier a, in LightningOrbIdentifier b)
         {
             return !(a == b);
         }
@@ -101,7 +101,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandl
             return $"{LightningType} ({Index})";
         }
 
-        public static implicit operator ProjectileTypeIdentifier(LightningOrbIdentifier lightningOrb)
+        public static implicit operator ProjectileTypeIdentifier(in LightningOrbIdentifier lightningOrb)
         {
             return new ProjectileTypeIdentifier(ProjectileType.LightningOrb, lightningOrb.Index);
         }

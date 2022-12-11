@@ -8,7 +8,7 @@
 
         bool Matches(T value);
 
-        bool Equals(TIdentifier other, bool compareIndex);
+        bool Equals(in TIdentifier other, bool compareIndex);
 
         T CreateInstance();
     }

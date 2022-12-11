@@ -12,7 +12,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
     {
         public static readonly DamageOrbIdentifier Invalid = new DamageOrbIdentifier() { Index = -1 };
 
-        public int Index { get; set; }
+        public int Index { readonly get; set; }
 
         public readonly EffectIndex OrbEffectIndex;
         public readonly SerializableSystemType OrbType;
@@ -46,7 +46,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
             writer.WriteSerializableType(OrbType);
         }
 
-        public readonly bool Equals(DamageOrbIdentifier other, bool compareIndex)
+        public readonly bool Equals(in DamageOrbIdentifier other, bool compareIndex)
         {
             if (compareIndex)
             {
@@ -79,7 +79,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
             return instance;
         }
 
-        public static implicit operator ProjectileTypeIdentifier(DamageOrbIdentifier damageOrbIdentifier)
+        public static implicit operator ProjectileTypeIdentifier(in DamageOrbIdentifier damageOrbIdentifier)
         {
             return new ProjectileTypeIdentifier(ProjectileType.DamageOrb, damageOrbIdentifier.Index);
         }

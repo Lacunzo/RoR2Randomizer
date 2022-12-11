@@ -70,12 +70,12 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             writer.Write(IsSpawnState);
         }
 
-        public static bool operator ==(SpawnPodPrefabData a, SpawnPodPrefabData b)
+        public static bool operator ==(in SpawnPodPrefabData a, in SpawnPodPrefabData b)
         {
             return EqualityComparer.Equals(a, b);
         }
 
-        public static bool operator !=(SpawnPodPrefabData a, SpawnPodPrefabData b)
+        public static bool operator !=(in SpawnPodPrefabData a, in SpawnPodPrefabData b)
         {
             return !(a == b);
         }

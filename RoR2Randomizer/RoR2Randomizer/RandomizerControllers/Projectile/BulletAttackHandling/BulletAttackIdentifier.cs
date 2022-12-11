@@ -15,7 +15,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 
         public readonly BulletAttackFlags Flags;
 
-        public int Index { get; set; }
+        public int Index { readonly get; set; }
 
         public readonly bool IsValid => Index != -1;
 
@@ -45,7 +45,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
             return bulletAttack != null && EffectCatalog.FindEffectIndexFromPrefab(bulletAttack.tracerEffectPrefab) == TracerEffectIndex && EffectCatalog.FindEffectIndexFromPrefab(bulletAttack.hitEffectPrefab) == HitEffectIndex && bulletAttack.damageType == DamageType;
         }
 
-        public readonly bool Equals(BulletAttackIdentifier other, bool compareIndex)
+        public readonly bool Equals(in BulletAttackIdentifier other, bool compareIndex)
         {
             return compareIndex ? Index == other.Index : TracerEffectIndex == other.TracerEffectIndex &&
                                                          HitEffectIndex == other.HitEffectIndex &&
@@ -75,7 +75,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
             return $"{nameof(Index)}={Index}, {nameof(TracerEffectIndex)}={TracerEffectIndex}, {nameof(HitEffectIndex)}={HitEffectIndex}, {nameof(DamageType)}={DamageType}, {nameof(Flags)}={Flags}";
         }
 
-        public static implicit operator ProjectileTypeIdentifier(BulletAttackIdentifier bulletAttack)
+        public static implicit operator ProjectileTypeIdentifier(in BulletAttackIdentifier bulletAttack)
         {
             return new ProjectileTypeIdentifier(ProjectileType.Bullet, bulletAttack.Index);
         }
