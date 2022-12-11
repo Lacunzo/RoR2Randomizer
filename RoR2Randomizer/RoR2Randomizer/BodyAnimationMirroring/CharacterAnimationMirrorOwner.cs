@@ -19,12 +19,10 @@ namespace RoR2Randomizer.BodyAnimationMirroring
             {
                 _mirrorModel = value;
 
-                /*
                 foreach (BoneMarker boneMarker in _boneMarkers)
                 {
                     boneMarker.ReturnToOriginalTransform(0f);
                 }
-                */
 
                 foreach (var boneMatch in findAllMatchingBones(value))
                 {
