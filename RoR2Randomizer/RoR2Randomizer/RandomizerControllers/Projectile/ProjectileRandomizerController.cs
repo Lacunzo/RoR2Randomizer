@@ -392,6 +392,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryReplaceFire(in FireProjectileInfo info, GameObject weapon)
         {
+            const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceFire)}({nameof(FireProjectileInfo)}&, {nameof(GameObject)}) ";
+
             if (!IsActive)
                 return false;
 
@@ -410,8 +412,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     }
                     else
                     {
-                    targetHurtBox = hurtBoxGroup.hurtBoxes.GetRandomOrDefault(RoR2Application.rng);
-                }
+                        targetHurtBox = hurtBoxGroup.hurtBoxes.GetRandomOrDefault(RoR2Application.rng);
+                    }
                 }
                 else
                 {
@@ -427,6 +429,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     {
                         targetHurtBox = body.mainHurtBox;
                     }
+                }
+
+                if (!targetHurtBox)
+                {
+                    Log.Warning(LOG_PREFIX + $"projectile has target GO ({info.target.name}), but no HurtBox reference could be found");
                 }
             }
 
