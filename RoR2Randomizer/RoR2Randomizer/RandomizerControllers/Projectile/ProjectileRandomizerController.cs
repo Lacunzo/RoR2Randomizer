@@ -404,7 +404,14 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 }
                 else if (info.target.TryGetComponent<HurtBoxGroup>(out HurtBoxGroup hurtBoxGroup))
                 {
+                    if (hurtBoxGroup.mainHurtBox)
+                    {
+                        targetHurtBox = hurtBoxGroup.mainHurtBox;
+                    }
+                    else
+                    {
                     targetHurtBox = hurtBoxGroup.hurtBoxes.GetRandomOrDefault(RoR2Application.rng);
+                }
                 }
                 else
                 {
