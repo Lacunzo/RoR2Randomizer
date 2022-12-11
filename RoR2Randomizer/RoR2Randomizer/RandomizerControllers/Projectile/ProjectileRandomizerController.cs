@@ -285,7 +285,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             SingletonHelper.Unassign(ref _instance, this);
         }
 
-        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, in GenericFireProjectileArgs genericArgs)
+        public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
             const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceProjectileInstantiateFire)} ";
 
@@ -448,7 +448,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             });
         }
 
-        public static bool TryReplaceFire(in ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, in GenericFireProjectileArgs genericArgs)
+        public static bool TryReplaceFire(in ProjectileTypeIdentifier identifier, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
             if (!IsActive || _replacingTempDisabled)
                 return false;
