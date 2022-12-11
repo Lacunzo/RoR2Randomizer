@@ -19,7 +19,10 @@ namespace RoR2Randomizer.Patches.SurvivorPodRandomizer
 
         static void CharacterBody_onBodyAwakeGlobal(CharacterBody body)
         {
-            SurvivorPodRandomizerController.TryOverrideIntroAnimation(body);
+            if (Stage.instance && Stage.instance.usePod)
+            {
+                SurvivorPodRandomizerController.TryOverrideIntroAnimation(body);
+            }
         }
     }
 }
