@@ -50,7 +50,7 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 #if DEBUG
             else
             {
-                Log.Warning(LOG_PREFIX + $"found {numPatchesMade} patch locations");
+                Log.Debug(LOG_PREFIX + $"found {numPatchesMade} patch locations");
             }
 #endif
         }
