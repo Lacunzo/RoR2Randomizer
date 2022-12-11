@@ -1,6 +1,6 @@
 ﻿using EntityStates;
 using RoR2;
-using System;
+using RoR2Randomizer.BodyAnimationMirroring;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -90,12 +90,49 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             return EqualityComparer.GetHashCode(this);
         }
 
-        public void OverrideIntroAnimationOnBody(CharacterBody body)
+        public readonly void OverrideIntroAnimationOnBody(CharacterBody body)
         {
             if (IsSpawnState)
             {
-                body.preferredInitialStateType = SpawnState;
+                SerializableEntityStateType spawnState = SpawnState;
+
+                body.preferredInitialStateType = spawnState;
                 body.preferredPodPrefab = null;
+
+                if (TargetBodyIndex != body.bodyIndex)
+                {
+                    ModelLocator modelLocator = body.modelLocator;
+                    if (modelLocator)
+                    {
+                        BodyIndex mirrorBodyIndex = TargetBodyIndex;
+                        void setupModel(Transform model)
+                        {
+                            if (model)
+                            {
+                                CharacterAnimationMirrorOwner owner = CharacterAnimationMirrorOwner.SetupForModelTransform(model, mirrorBodyIndex);
+
+                                RandomizedIntroAnimationTracker introAnimationTracker = body.gameObject.AddComponent<RandomizedIntroAnimationTracker>();
+                                introAnimationTracker.IntroState = spawnState;
+                                introAnimationTracker.AnimationMirrorController = owner;
+                            }
+
+                            if (modelLocator)
+                            {
+                                modelLocator.onModelChanged -= setupModel;
+                            }
+                        }
+
+                        Transform modelTransform = modelLocator.modelTransform;
+                        if (modelTransform)
+                        {
+                            setupModel(modelTransform);
+                        }
+                        else
+                        {
+                            modelLocator.onModelChanged += setupModel;
+                        }
+                    }
+                }
             }
             else
             {
