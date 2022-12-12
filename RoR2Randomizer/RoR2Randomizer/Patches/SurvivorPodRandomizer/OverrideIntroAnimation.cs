@@ -19,7 +19,9 @@ namespace RoR2Randomizer.Patches.SurvivorPodRandomizer
 
         static void CharacterBody_onBodyAwakeGlobal(CharacterBody body)
         {
-            if (Stage.instance && Stage.instance.usePod)
+            if (Stage.instance && Stage.instance.usePod &&
+                // Stage.usePod is sometimes incorrect for 2nd stage on clients, but Run.spawnWithPod seems to be more accurate
+                Run.instance && Run.instance.spawnWithPod)
             {
                 SurvivorPodRandomizerController.TryOverrideIntroAnimation(body);
             }
