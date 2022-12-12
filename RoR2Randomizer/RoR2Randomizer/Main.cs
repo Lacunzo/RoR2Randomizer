@@ -23,7 +23,7 @@ namespace RoR2Randomizer
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "Gorakh";
         public const string PluginName = "RoR2Randomizer";
-        public const string PluginVersion = "0.8.1";
+        public const string PluginVersion = "0.8.2";
 
         public static Main Instance { get; private set; }
 

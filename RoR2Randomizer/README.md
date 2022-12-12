@@ -38,6 +38,17 @@ Questions, Bug Reports, Feedback? Please create a GitHub issue or post in the #f
 
 ## Changelog
 
+**0.8.2 Changes:**
+
+* Status Effect Randomizer:
+  * Added option to disable randomization of status effects associated with an elite aspect
+
+* Summon Randomizer:
+  * Fixed Void Fields displaying the wrong names and icons of the enemies if Director Randomizer was enabled.
+
+* Survivor Intro Animation Randomizer:
+  * Made character spawn animations play on the characters properly. ie other survivors will play Acrid's animations instead of just floating in the air for a few seconds. This should also theoretically work for other modded characters, though this is untested.
+
 **0.8.1 Changes:**
 
 * Summon Randomizer:
