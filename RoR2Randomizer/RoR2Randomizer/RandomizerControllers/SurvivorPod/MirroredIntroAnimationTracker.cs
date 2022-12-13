@@ -88,7 +88,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
         {
             _body = GetComponent<CharacterBody>();
 
-            const float LONG_TWEEN_TIME_CHANCE = 1f;
+            const float LONG_TWEEN_TIME_CHANCE = 0.05f;
             if (RoR2Application.rng.nextNormalizedFloat <= LONG_TWEEN_TIME_CHANCE)
             {
                 // For the funny
