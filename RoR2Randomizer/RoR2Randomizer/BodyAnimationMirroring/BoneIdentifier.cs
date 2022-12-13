@@ -31,12 +31,12 @@ namespace RoR2Randomizer.BodyAnimationMirroring
             _boneName = boneName;
         }
 
-        public override bool Equals(object obj)
+        public override readonly bool Equals(object obj)
         {
             return obj is BoneIdentifier identifier && Equals(identifier);
         }
 
-        public bool Equals(BoneIdentifier other)
+        public readonly bool Equals(BoneIdentifier other)
         {
             if (_isID != other._isID)
             {
@@ -52,7 +52,7 @@ namespace RoR2Randomizer.BodyAnimationMirroring
             }
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             int hashCode = -813282265;
             hashCode = (hashCode * -1521134295) + _isID.GetHashCode();
@@ -69,12 +69,12 @@ namespace RoR2Randomizer.BodyAnimationMirroring
             return hashCode;
         }
 
-        public static bool operator ==(BoneIdentifier left, BoneIdentifier right)
+        public static bool operator ==(in BoneIdentifier left, in BoneIdentifier right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(BoneIdentifier left, BoneIdentifier right)
+        public static bool operator !=(in BoneIdentifier left, in BoneIdentifier right)
         {
             return !(left == right);
         }

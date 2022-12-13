@@ -55,7 +55,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
             return new DamageOrbIdentifier(damageOrb);
         }
 
-        protected override NetworkMessageBase getSyncIdentifierNeededMessage(DamageOrbIdentifier identifier)
+        protected override NetworkMessageBase getSyncIdentifierNeededMessage(in DamageOrbIdentifier identifier)
         {
             return new SyncDamageOrbIndexNeeded(identifier);
         }

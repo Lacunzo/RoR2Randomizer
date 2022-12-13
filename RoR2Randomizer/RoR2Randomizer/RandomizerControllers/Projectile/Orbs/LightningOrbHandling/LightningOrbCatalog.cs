@@ -64,7 +64,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandl
             return new LightningOrbIdentifier(lightningOrb);
         }
 
-        protected override NetworkMessageBase getSyncIdentifierNeededMessage(LightningOrbIdentifier identifier)
+        protected override NetworkMessageBase getSyncIdentifierNeededMessage(in LightningOrbIdentifier identifier)
         {
             return new SyncLightningOrbIndexNeeded(identifier);
         }

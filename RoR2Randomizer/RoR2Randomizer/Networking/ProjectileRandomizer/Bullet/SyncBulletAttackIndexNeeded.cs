@@ -15,7 +15,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Bullet
         {
         }
 
-        public SyncBulletAttackIndexNeeded(BulletAttackIdentifier required)
+        public SyncBulletAttackIndexNeeded(in BulletAttackIdentifier required)
         {
             _required = required;
         }

@@ -230,7 +230,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        static void BulletAttackCatalog_OnIdentifierAppendedServer(BulletAttackIdentifier identifier)
+        static void BulletAttackCatalog_OnIdentifierAppendedServer(in BulletAttackIdentifier identifier)
         {
             if (Run.instance && NetworkServer.active)
             {
@@ -238,7 +238,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        static void DamageOrbCatalog_OnIdentifierAppended(DamageOrbIdentifier identifier)
+        static void DamageOrbCatalog_OnIdentifierAppended(in DamageOrbIdentifier identifier)
         {
             if (Run.instance && NetworkServer.active)
             {
@@ -246,7 +246,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
         }
 
-        static void LightningOrbCatalog_OnIdentifierAppended(LightningOrbIdentifier identifier)
+        static void LightningOrbCatalog_OnIdentifierAppended(in LightningOrbIdentifier identifier)
         {
             if (Run.instance && NetworkServer.active)
             {

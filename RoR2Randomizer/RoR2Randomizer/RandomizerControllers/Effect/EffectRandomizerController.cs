@@ -44,7 +44,7 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             yield return new SyncEffectReplacements(_effectReplacements);
         }
 
-        void setEffectReplacementsFromServerEvent(IndexReplacementsCollection replacements)
+        void setEffectReplacementsFromServerEvent(in IndexReplacementsCollection replacements)
         {
             if (NetworkServer.active || !NetworkClient.active)
                 return;

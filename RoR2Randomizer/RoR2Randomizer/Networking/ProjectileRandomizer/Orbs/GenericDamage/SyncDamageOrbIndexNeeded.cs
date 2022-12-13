@@ -15,7 +15,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.GenericDamage
         {
         }
 
-        public SyncDamageOrbIndexNeeded(DamageOrbIdentifier required)
+        public SyncDamageOrbIndexNeeded(in DamageOrbIdentifier required)
         {
             _required = required;
         }

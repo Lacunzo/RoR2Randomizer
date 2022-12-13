@@ -267,7 +267,7 @@ namespace RoR2Randomizer.RandomizerControllers
             }
         }
 
-        static void onMasterReplacementsReceivedFromServer(IndexReplacementsCollection masterIndexReplacements)
+        static void onMasterReplacementsReceivedFromServer(in IndexReplacementsCollection masterIndexReplacements)
         {
 #if DEBUG
             Log.Debug("Received master index replacements from server");

@@ -14,7 +14,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
 {
     public sealed class SyncEffectReplacements : ChunkedNetworkMessage
     {
-        public delegate void OnReceiveDelegate(IndexReplacementsCollection effectReplacements);
+        public delegate void OnReceiveDelegate(in IndexReplacementsCollection effectReplacements);
         public static event OnReceiveDelegate OnReceive;
 
         IndexReplacementsCollection _effectReplacements;
@@ -23,7 +23,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
         {
         }
 
-        public SyncEffectReplacements(IndexReplacementsCollection effectReplacements)
+        public SyncEffectReplacements(in IndexReplacementsCollection effectReplacements)
         {
             _effectReplacements = effectReplacements;
         }

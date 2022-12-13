@@ -7,7 +7,7 @@ namespace RoR2Randomizer.Networking.CharacterReplacements
 {
     public sealed class SyncCharacterMasterReplacements : ChunkedNetworkMessage
     {
-        public delegate void OnReceivedDelegate(IndexReplacementsCollection masterReplacements);
+        public delegate void OnReceivedDelegate(in IndexReplacementsCollection masterReplacements);
         public static event OnReceivedDelegate OnReceive;
 
         IndexReplacementsCollection _masterReplacements;
@@ -16,7 +16,7 @@ namespace RoR2Randomizer.Networking.CharacterReplacements
         {
         }
 
-        public SyncCharacterMasterReplacements(IndexReplacementsCollection masterReplacements)
+        public SyncCharacterMasterReplacements(in IndexReplacementsCollection masterReplacements)
         {
             _masterReplacements = masterReplacements;
         }

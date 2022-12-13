@@ -174,7 +174,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
             return new BulletAttackIdentifier(bulletAttack, BulletAttackFlags.None);
         }
 
-        protected override NetworkMessageBase getSyncIdentifierNeededMessage(BulletAttackIdentifier identifier)
+        protected override NetworkMessageBase getSyncIdentifierNeededMessage(in BulletAttackIdentifier identifier)
         {
             return new SyncBulletAttackIndexNeeded(identifier);
         }

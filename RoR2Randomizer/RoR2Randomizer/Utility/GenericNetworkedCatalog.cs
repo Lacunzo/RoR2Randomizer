@@ -62,7 +62,7 @@ namespace RoR2Randomizer.Utility
             return identifier;
         }
 
-        protected abstract NetworkMessageBase getSyncIdentifierNeededMessage(TIdentifier identifier);
+        protected abstract NetworkMessageBase getSyncIdentifierNeededMessage(in TIdentifier identifier);
 
         public virtual bool SendMessages => true;
 

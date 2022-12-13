@@ -10,7 +10,9 @@ namespace RoR2Randomizer.Utility
     {
         static readonly string LOG_PREFIX_TYPE = $"{nameof(GenericCatalog<TObjects, TIdentifier>)}<{typeof(TObjects).Name}, {typeof(TIdentifier).Name}>";
 
-        public event Action<TIdentifier> OnIdentifierAppended;
+        public delegate void IdentifierAppendedDelegate(in TIdentifier identifier);
+
+        public event IdentifierAppendedDelegate OnIdentifierAppended;
 
         protected int _identifiersCount = 0;
         protected TIdentifier[] _identifiers = new TIdentifier[20];
