@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RoR2Randomizer.BodyAnimationMirroring
 {
@@ -8,6 +7,14 @@ namespace RoR2Randomizer.BodyAnimationMirroring
         public Transform Target;
 
         new Transform transform;
+
+        Vector3 _originalLocalPosition;
+        Quaternion _originalLocalRotation;
+
+        bool _isAnimated;
+
+        Vector3 _localPositionLastFrame;
+        Quaternion _localRotationLastFrame;
 
         bool _isResetting;
         float _resetDuration;
@@ -28,6 +35,9 @@ namespace RoR2Randomizer.BodyAnimationMirroring
         void Awake()
         {
             transform = base.transform;
+
+            _localPositionLastFrame = _originalLocalPosition = transform.localPosition;
+            _localRotationLastFrame = _originalLocalRotation = transform.localRotation;
         }
 
         void LateUpdate()
@@ -42,11 +52,39 @@ namespace RoR2Randomizer.BodyAnimationMirroring
                 return;
             }
 
+            if (transform.localPosition != _localPositionLastFrame || transform.localRotation != _localRotationLastFrame)
+            {
+                _isAnimated = true;
+            }
+            else
+            {
+                _isAnimated = false;
+            }
+
             if (_isResetting)
             {
-                float resetFraction = _resetDuration / _resetTimer;
-                transform.position = Vector3.Lerp(Target.position, transform.position, resetFraction);
-                transform.rotation = Quaternion.Lerp(Target.rotation, transform.rotation, resetFraction);
+                float resetFraction = _resetTimer / _resetDuration;
+
+                Vector3 originalPosition;
+                Quaternion originalRotation;
+                if (_isAnimated)
+                {
+                    originalPosition = transform.position;
+                    originalRotation = transform.rotation;
+                }
+                else
+                {
+                    originalPosition = transform.TransformPoint(_originalLocalPosition);
+
+                    Transform parent = transform.parent;
+
+                    Quaternion parentRotation = parent ? parent.rotation : Quaternion.identity;
+
+                    originalRotation = parentRotation * _originalLocalRotation;
+                }
+
+                transform.position = Vector3.Lerp(Target.position, originalPosition, resetFraction);
+                transform.rotation = Quaternion.Lerp(Target.rotation, originalRotation, resetFraction);
 
                 if (resetFraction >= 1f)
                 {
@@ -65,6 +103,18 @@ namespace RoR2Randomizer.BodyAnimationMirroring
             if (_isResetting)
             {
                 _resetTimer += Time.deltaTime;
+            }
+
+            _localPositionLastFrame = transform.localPosition;
+            _localRotationLastFrame = transform.localRotation;
+        }
+
+        void OnDestroy()
+        {
+            if (transform)
+            {
+                transform.localPosition = _originalLocalPosition;
+                transform.localRotation = _originalLocalRotation;
             }
         }
     }

@@ -104,6 +104,9 @@ namespace RoR2Randomizer.BodyAnimationMirroring
 
         public void StopMirroring(float tweenDuration)
         {
+            if (_isWaitingToDestroy)
+                return;
+
             if (tweenDuration <= 0f)
             {
                 Destroy(this);

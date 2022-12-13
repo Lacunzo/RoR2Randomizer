@@ -58,6 +58,9 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
         static bool shouldBeActive => (NetworkServer.active && ConfigManager.Misc.SurvivorPodRandomizerEnabled) || (NetworkClient.active && _hasReceivedPodReplacementsFromServer);
         public override bool IsRandomizerEnabled => shouldBeActive;
 
+        static ulong _clearOverrideIntroBodiesListCallbackHandle;
+        static readonly HashSet<CharacterBody> _bodiesToOverrideIntroAnimationForOncePodReplacementsReceived = new HashSet<CharacterBody>();
+
         protected override bool isNetworked => true;
         protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
@@ -73,6 +76,13 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             {
                 _overrideSpawnPodPrefabs.Value = overrideSpawnPods;
                 _hasReceivedPodReplacementsFromServer.Value = true;
+
+                foreach (CharacterBody body in _bodiesToOverrideIntroAnimationForOncePodReplacementsReceived)
+                {
+                    TryOverrideIntroAnimation(body);
+                }
+
+                _bodiesToOverrideIntroAnimationForOncePodReplacementsReceived.Clear();
             }
         }
 
@@ -81,6 +91,11 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             base.Awake();
 
             SyncSurvivorPodReplacements.OnReceive += SyncSurvivorPodReplacements_OnReceive;
+
+            _clearOverrideIntroBodiesListCallbackHandle = RunSpecificCallbacksManager.AddEntry(null, static _ =>
+            {
+                _bodiesToOverrideIntroAnimationForOncePodReplacementsReceived.Clear();
+            }, 0);
 
             SingletonHelper.Assign(ref _instance, this);
         }
@@ -92,6 +107,8 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             _overrideSpawnPodPrefabs.Dispose();
             _hasReceivedPodReplacementsFromServer.Dispose();
 
+            RunSpecificCallbacksManager.RemoveEntry(_clearOverrideIntroBodiesListCallbackHandle);
+
             SyncSurvivorPodReplacements.OnReceive -= SyncSurvivorPodReplacements_OnReceive;
 
             SingletonHelper.Unassign(ref _instance, this);
@@ -99,9 +116,16 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         public static void TryOverrideIntroAnimation(CharacterBody body)
         {
-            if (shouldBeActive && _overrideSpawnPodPrefabs.HasValue && _overrideSpawnPodPrefabs.Value.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
+            if (shouldBeActive)
             {
-                replacementPod.OverrideIntroAnimationOnBody(body);
+                if (_overrideSpawnPodPrefabs.HasValue && _overrideSpawnPodPrefabs.Value.TryGetValue(body.bodyIndex, out SpawnPodPrefabData replacementPod))
+                {
+                    replacementPod.OverrideIntroAnimationOnBody(body);
+                }
+            }
+            else if (!NetworkServer.active && NetworkClient.active && !_hasReceivedPodReplacementsFromServer)
+            {
+                _bodiesToOverrideIntroAnimationForOncePodReplacementsReceived.Add(body);
             }
         }
     }

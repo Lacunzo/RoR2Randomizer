@@ -101,37 +101,9 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
                 if (TargetBodyIndex != body.bodyIndex)
                 {
-                    ModelLocator modelLocator = body.modelLocator;
-                    if (modelLocator)
-                    {
-                        BodyIndex mirrorBodyIndex = TargetBodyIndex;
-                        void setupModel(Transform model)
-                        {
-                            if (model)
-                            {
-                                CharacterAnimationMirrorOwner owner = CharacterAnimationMirrorOwner.SetupForModelTransform(model, mirrorBodyIndex);
-
-                                RandomizedIntroAnimationTracker introAnimationTracker = body.gameObject.AddComponent<RandomizedIntroAnimationTracker>();
-                                introAnimationTracker.IntroState = spawnState;
-                                introAnimationTracker.AnimationMirrorController = owner;
-                            }
-
-                            if (modelLocator)
-                            {
-                                modelLocator.onModelChanged -= setupModel;
-                            }
-                        }
-
-                        Transform modelTransform = modelLocator.modelTransform;
-                        if (modelTransform)
-                        {
-                            setupModel(modelTransform);
-                        }
-                        else
-                        {
-                            modelLocator.onModelChanged += setupModel;
-                        }
-                    }
+                    MirroredIntroAnimationTracker introAnimationTracker = body.gameObject.AddComponent<MirroredIntroAnimationTracker>();
+                    introAnimationTracker.IntroState = spawnState;
+                    introAnimationTracker.Network_mirrorBodyIndex = TargetBodyIndex;
                 }
             }
             else
