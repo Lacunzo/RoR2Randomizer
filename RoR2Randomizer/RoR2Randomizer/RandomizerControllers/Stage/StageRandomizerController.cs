@@ -259,7 +259,7 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                 return _stageIndexReplacements.Value.TryGetReplacement(original, out replacement);
             }
 
-            replacement = default;
+            replacement = SceneIndex.Invalid;
             return false;
         }
 
