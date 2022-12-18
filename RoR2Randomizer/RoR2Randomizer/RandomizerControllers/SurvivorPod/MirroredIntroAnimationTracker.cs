@@ -109,16 +109,9 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
             const string BODY_STATE_MACHINE_NAME = "Body";
             _bodyEntityStateMachine = EntityStateMachine.FindByCustomName(gameObject, BODY_STATE_MACHINE_NAME);
-            if (isServer)
+            if (!_bodyEntityStateMachine)
             {
-                if (_bodyEntityStateMachine)
-                {
-                    checkHasEnteredIntroState();
-                }
-                else
-                {
-                    Log.Warning(LOG_PREFIX + $"{name} has no state machine with the name {BODY_STATE_MACHINE_NAME}");
-                }
+                Log.Warning(LOG_PREFIX + $"{name} has no state machine with the name {BODY_STATE_MACHINE_NAME}");
             }
         }
 
@@ -175,7 +168,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
                     AnimationMirrorController.StopMirroring(_tweenTime);
                 }
             }
-            else if (mirrorBodyIndex != BodyIndex.None)
+            else if (newIntroState >= State.WaitingForIntro && mirrorBodyIndex != BodyIndex.None)
             {
                 updateMirrorController();
             }
