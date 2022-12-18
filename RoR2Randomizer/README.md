@@ -38,6 +38,14 @@ Questions, Bug Reports, Feedback? Please create a GitHub issue or post in the #f
 
 ## Changelog
 
+**0.8.3 Changes:**
+
+* Survivor Intro Animation Randomizer:
+  * Fixed client players sometimes getting their animation set overriden when starting the second stage.
+
+* Misc:
+  * Implemented R2API split assemblies
+
 **0.8.2 Changes:**
 
 * Status Effect Randomizer:
