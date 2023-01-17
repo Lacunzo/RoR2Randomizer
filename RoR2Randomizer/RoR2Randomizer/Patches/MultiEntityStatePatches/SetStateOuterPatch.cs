@@ -37,7 +37,7 @@ namespace RoR2Randomizer.Patches.MultiEntityStatePatches
 
         static void setOuterHook(ILContext il)
         {
-            string LOG_PREFIX = $"{nameof(SetStateOuterPatch)}.{nameof(setOuterHook)} ({il?.Method?.Name ?? "null"}) ";
+            string LOG_PREFIX = $"({il?.Method?.Name ?? "null"}) ";
 
             ILCursor c = new ILCursor(il);
 

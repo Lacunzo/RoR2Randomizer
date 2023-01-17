@@ -22,8 +22,6 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 
         static void ProjectileFireChildren_Update(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileFireChildren_Update_SetChildOwner)}.{nameof(ProjectileFireChildren_Update)} ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -45,7 +43,7 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

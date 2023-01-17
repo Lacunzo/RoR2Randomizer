@@ -20,7 +20,7 @@ namespace RoR2Randomizer.ModCompatibility
             }
             else
             {
-                Log.Warning($"{nameof(RiskOfOptionsCompat)} LoadImage failed");
+                Log.Warning("LoadImage failed");
             }
 
             return null;

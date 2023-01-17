@@ -85,14 +85,14 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
             if (NetworkServer.active)
             {
 #if DEBUG
-                Log.Debug($"Received {nameof(SyncProjectileReplacements)} as server, skipping");
+                Log.Debug($"Received as server, skipping");
 #endif
 
                 return;
             }
 
 #if DEBUG
-            Log.Debug($"Received {nameof(SyncProjectileReplacements)} as client, applying replacements");
+            Log.Debug($"Received as client, applying replacements");
 #endif
 
             if (_isAppendedReplacements)
@@ -100,7 +100,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer
                 if (_latestAppendedServerVersionReceived.HasValue && _appendedServerVersion <= _latestAppendedServerVersionReceived.Value)
                 {
 #if DEBUG
-                    Log.Debug($"Discarding {nameof(SyncProjectileReplacements)} due to newer version already received {nameof(_appendedServerVersion)}={_appendedServerVersion}, {nameof(_latestAppendedServerVersionReceived)}={_latestAppendedServerVersionReceived}");
+                    Log.Debug($"Discarding due to newer version already received {nameof(_appendedServerVersion)}={_appendedServerVersion}, {nameof(_latestAppendedServerVersionReceived)}={_latestAppendedServerVersionReceived}");
 #endif
                     return;
                 }

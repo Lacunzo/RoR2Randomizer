@@ -20,8 +20,6 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 
         static void ProjectileMageFirewallWalkerController_FixedUpdate(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileMageFirewallWalkerController_FixedUpdate_SetChildOwner)}.{nameof(ProjectileMageFirewallWalkerController_FixedUpdate)} ";
-
             ILCursor c = new ILCursor(il);
 
             int numPatchesMade = 0;
@@ -45,12 +43,12 @@ namespace RoR2Randomizer.Patches.ProjectileParentChainTrackerPatches
 
             if (numPatchesMade == 0)
             {
-                Log.Warning(LOG_PREFIX + "found no patch locations");
+                Log.Warning("found no patch locations");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"found {numPatchesMade} patch locations");
+                Log.Debug($"found {numPatchesMade} patch locations");
             }
 #endif
         }

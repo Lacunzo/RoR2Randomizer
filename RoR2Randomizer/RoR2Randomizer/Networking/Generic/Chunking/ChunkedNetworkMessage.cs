@@ -31,8 +31,6 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
 
             public void HandleHeader(ChunkedMessageHeader header)
             {
-                const string LOG_PREFIX = $"{nameof(ChunkedNetworkMessage)}+{nameof(ConstructingMessage)}.{nameof(HandleHeader)} ";
-
                 if (_collectedMessageData == null)
                 {
                     _collectedMessageData = new byte[header.MessageCount][];
@@ -55,7 +53,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                     typeName = "???";
                 }
 
-                Log.Debug(LOG_PREFIX + $"({typeName}) received header");
+                Log.Debug($"({typeName}) received header");
 #endif
 
                 refreshMessages();
@@ -63,8 +61,6 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
 
             public void CollectChunk(MessageChunk chunk)
             {
-                const string LOG_PREFIX = $"{nameof(ChunkedNetworkMessage)}+{nameof(ConstructingMessage)}.{nameof(CollectChunk)} ";
-
                 if (_collectedMessageData == null)
                 {
                     _collectedMessageData = new byte[chunk.Header.ChunkIndex + 1][];
@@ -87,7 +83,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                     typeName = "???";
                 }
 
-                Log.Debug(LOG_PREFIX + $"({typeName}) received {chunk.Data.Length} bytes in chunk {chunk.Header.ChunkIndex + 1}/{_collectedMessageData.Length}");
+                Log.Debug($"({typeName}) received {chunk.Data.Length} bytes in chunk {chunk.Header.ChunkIndex + 1}/{_collectedMessageData.Length}");
 #endif
 
                 refreshMessages();
@@ -103,8 +99,6 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
 
             void onFullMessageReceived()
             {
-                const string LOG_PREFIX = $"{nameof(ChunkedNetworkMessage)}+{nameof(ConstructingMessage)}.{nameof(onFullMessageReceived)} ";
-
                 object message;
                 try
                 {
@@ -113,7 +107,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                 }
                 catch (Exception e)
                 {
-                    Log.Warning(LOG_PREFIX + $"exception while creating message instance: {e}");
+                    Log.Warning($"exception while creating message instance: {e}");
                     message = null;
                 }
 
@@ -127,10 +121,8 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
 
             void receiveMessage(object message)
             {
-                const string LOG_PREFIX = $"{nameof(ChunkedNetworkMessage)}+{nameof(ConstructingMessage)}.{nameof(receiveMessage)} ";
-
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"{message.GetType().Name}");
+                Log.Debug($"{message.GetType().Name}");
 #endif
 
                 if (message is INetMessage netMessage)
@@ -138,7 +130,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                     byte[] completeMessageData = new byte[_collectedMessageData.Sum(static m => m.Length)];
 
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"complete message length: {completeMessageData.Length} bytes");
+                    Log.Debug($"complete message length: {completeMessageData.Length} bytes");
 #endif
 
                     int currentIndex = 0;
@@ -154,7 +146,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + $"message is not {nameof(INetMessage)} ({message})");
+                    Log.Warning($"message is not {nameof(INetMessage)} ({message})");
                 }
             }
         }
@@ -195,8 +187,6 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
 
         bool trySendChunked(Action<NetworkMessageBase> sendMessageFunc)
         {
-            const string LOG_PREFIX = $"{nameof(ChunkedNetworkMessage)}.{nameof(trySendChunked)} ";
-
             NetworkWriter writer = new NetworkWriter();
             Serialize(writer);
 
@@ -210,7 +200,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
 
                 ChunkedMessageHeader chunkHeaderMessage = new ChunkedMessageHeader(messageID, chunkCount, (SerializableSystemType)GetType());
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"({GetType().Name}) sending header");
+                Log.Debug($"({GetType().Name}) sending header");
 #endif
                 sendMessageFunc(chunkHeaderMessage);
 
@@ -218,7 +208,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                 {
                     MessageChunk chunkMessage = new MessageChunk(new MessageChunkHeader(messageID, i), messageBytes, i * MAX_PACKET_SIZE, MAX_PACKET_SIZE);
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"({GetType().Name}) sending chunk {i + 1}/{chunkCount}");
+                    Log.Debug($"({GetType().Name}) sending chunk {i + 1}/{chunkCount}");
 #endif
                     sendMessageFunc(chunkMessage);
                 }

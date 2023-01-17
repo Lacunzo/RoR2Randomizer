@@ -25,8 +25,6 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
 
         static void BulletAttack_DefaultHitCallbackImplementation(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(BulletAttack_NetMessageHook)}.{nameof(BulletAttack_DefaultHitCallbackImplementation)} ";
-
             const int MESSAGE_ID = 53;
 
             ILCursor c = new ILCursor(il);
@@ -53,15 +51,13 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find hook location");
+                Log.Warning("unable to find hook location");
             }
         }
 
         static NetworkReader _currentReader;
         static void BulletAttack_HandleBulletDamage(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(BulletAttack_NetMessageHook)}.{nameof(BulletAttack_HandleBulletDamage)} ";
-
             ILCursor c = new ILCursor(il);
 
             // Just assumes there is only one ReadBoolean, not really a safe assumption, but it works for now, a more accurate hook can be made if it turns out to be a problem :P
@@ -96,12 +92,12 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + "unable to find ret");
+                    Log.Warning("unable to find ret");
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find hook location");
+                Log.Warning("unable to find hook location");
             }
         }
     }

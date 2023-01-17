@@ -25,7 +25,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer
             set
             {
                 if (_overrideSpawnPrefabFunc != null && value != null)
-                    Log.Warning($"Assigning {nameof(GenericScriptedSpawnHook)}.{nameof(OverrideSpawnPrefabFunc)} while there is an existing hook, existing will be removed");
+                    Log.Warning($"Assignined while there is an existing hook, existing will be removed");
 
                 _overrideSpawnPrefabFunc = value;
             }

@@ -91,7 +91,7 @@ namespace RoR2Randomizer.Utility
             }
             else
             {
-                Log.Warning($"{nameof(RunSpecificCallbacksManager)}: Attempted to remove entry with handle {callbackHandle}, but it was not found in the list");
+                Log.Warning($"Attempted to remove entry with handle {callbackHandle}, but it was not found in the list");
             }
         }
     }

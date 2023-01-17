@@ -21,8 +21,6 @@ namespace RoR2Randomizer.Utility
 
         public override TIdentifier GetIdentifier(TObject obj)
         {
-            string LOG_PREFIX = $"{LOG_PREFIX_TYPE}.{nameof(GetIdentifier)} ";
-
             TIdentifier identifier = base.GetIdentifier(obj);
             if (!identifier.IsValid)
             {
@@ -32,7 +30,7 @@ namespace RoR2Randomizer.Utility
                     appendIdentifier(ref identifier, false);
 
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"Created {typeof(TIdentifier).Name} '{identifier}'");
+                    Log.Debug(LOG_PREFIX_TYPE + $"Created {typeof(TIdentifier).Name} '{identifier}'");
 #endif
 
                     if (!NetworkServer.dontListen)
@@ -51,7 +49,7 @@ namespace RoR2Randomizer.Utility
                         }
                         else
                         {
-                            Log.Warning(LOG_PREFIX + $"catalog is networked, but {nameof(syncIdentifierNeededMessage)} is null");
+                            Log.Warning(LOG_PREFIX_TYPE + $"catalog is networked, but {nameof(syncIdentifierNeededMessage)} is null");
                         }
                     }
 
@@ -70,14 +68,10 @@ namespace RoR2Randomizer.Utility
 
         protected void SyncCatalog_OnReceive(TIdentifier[] identifiers, int identifiersCount)
         {
-#if DEBUG
-            string LOG_PREFIX = $"{LOG_PREFIX_TYPE}.{nameof(SyncCatalog_OnReceive)} ";
-#endif
-
             if (!NetworkServer.active && NetworkClient.active)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"from server");
+                Log.Debug(LOG_PREFIX_TYPE + $"from server");
 #endif
 
                 _identifiersCount = identifiersCount;
@@ -89,14 +83,10 @@ namespace RoR2Randomizer.Utility
 
         protected void SyncIndexNeeded_OnReceive(TIdentifier required)
         {
-#if DEBUG
-            string LOG_PREFIX = $"{LOG_PREFIX_TYPE}.{nameof(SyncIndexNeeded_OnReceive)} ";
-#endif
-
             if (NetworkServer.active)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"from client with identifier: {required}");
+                Log.Debug(LOG_PREFIX_TYPE + $"from client with identifier: {required}");
 #endif
 
                 appendIdentifier(ref required, true);

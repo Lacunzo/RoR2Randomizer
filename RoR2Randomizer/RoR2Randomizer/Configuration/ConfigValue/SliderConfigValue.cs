@@ -42,7 +42,7 @@ namespace RoR2Randomizer.Configuration.ConfigValue
                     option = new RiskOfOptions.Options.StepSliderOption((ConfigEntry<float>)(object)Entry, new RiskOfOptions.OptionConfigs.StepSliderConfig { min = _min, max = _max, formatString = _format, increment = _increment });
                     break;
                 default:
-                    Log.Warning($"{nameof(SliderConfigValue<T>)}<{typeof(T).Name}>.CreateRiskOfOptionsEntry(): Slider type {_type} is not implemented!");
+                    Log.Warning($"({typeof(T).Name}) Slider type {_type} is not implemented!");
                     return;
             }
 

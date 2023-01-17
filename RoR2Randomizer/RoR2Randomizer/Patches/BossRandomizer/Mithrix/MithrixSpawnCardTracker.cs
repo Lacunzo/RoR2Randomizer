@@ -42,8 +42,6 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
         static void Phase4_OnEnter(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(MithrixSpawnCardTracker)}.{nameof(Phase4_OnEnter)} ";
-
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchCall<BrotherEncounterPhaseBaseState>(nameof(BrotherEncounterPhaseBaseState.BeginEncounter))))
             {
@@ -58,7 +56,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

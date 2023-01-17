@@ -86,10 +86,8 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
         static void refillLocalInstances(int amount)
         {
-            const string LOG_PREFIX = $"{nameof(OrbTargetDummyObjectMarker)}.{nameof(refillLocalInstances)} ";
-
 #if DEBUG
-            Log.Debug(LOG_PREFIX + $"{nameof(amount)}={amount}");
+            Log.Debug($"{nameof(amount)}={amount}");
 #endif
 
             if (amount <= 0)
@@ -108,14 +106,14 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
             else if (NetworkClient.active)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"asking server (client)");
+                Log.Debug($"asking server (client)");
 #endif
 
                 LocalUser localUser = LocalUserManager.GetFirstLocalUser();
                 if (localUser != null)
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"asking server ({nameof(localUser)})");
+                    Log.Debug($"asking server ({nameof(localUser)})");
 #endif
 
                     NetworkUser networkUser = localUser.currentNetworkUser;
@@ -135,7 +133,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
                             if (!networkUser)
                                 yield break;
 #if DEBUG
-                            Log.Debug(LOG_PREFIX + $"asking server ({nameof(networkUser)} + sending event) id: {networkUser.id.HasValidValue()} (waited {Time.time - timeStarted:F2} seconds)");
+                            Log.Debug($"asking server ({nameof(networkUser)} + sending event) id: {networkUser.id.HasValidValue()} (waited {Time.time - timeStarted:F2} seconds)");
 #endif
 
                             new ClientRequestOrbTargetMarkerObjects(amount, networkUser.id).SendTo(NetworkDestination.Server);
@@ -149,12 +147,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
         static void ClientRequestDamageOrbTargetMarkerObjects_Reply_OnReceived(OrbTargetDummyObjectMarker[] newTargetObjects)
         {
-            const string LOG_PREFIX = $"{nameof(OrbTargetDummyObjectMarker)}.{nameof(ClientRequestDamageOrbTargetMarkerObjects_Reply_OnReceived)} ";
-
             foreach (OrbTargetDummyObjectMarker targetObj in newTargetObjects.Where(static o => o))
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"received orb marker: {targetObj.GetComponent<NetworkIdentity>().netId}");
+                Log.Debug($"received orb marker: {targetObj.GetComponent<NetworkIdentity>().netId}");
 #endif
 
                 _availableLocalInstances.Push(targetObj);

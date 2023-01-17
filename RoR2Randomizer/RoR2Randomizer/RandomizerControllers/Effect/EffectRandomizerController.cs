@@ -79,7 +79,7 @@ namespace RoR2Randomizer.RandomizerControllers.Effect
             if (shouldBeEnabled && _effectReplacements.Value.TryGetReplacement(index, out EffectIndex replacement))
             {
 #if DEBUG
-                Log.Debug($"Effect randomizer: replaced effect {EffectCatalog.GetEffectDef(index).prefabName} ({(int)index}) -> {EffectCatalog.GetEffectDef(replacement).prefabName} ({(int)replacement})");
+                Log.Debug($"replaced effect {EffectCatalog.GetEffectDef(index).prefabName} ({(int)index}) -> {EffectCatalog.GetEffectDef(replacement).prefabName} ({(int)replacement})");
                 
 #endif
                 index = replacement;

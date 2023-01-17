@@ -36,13 +36,13 @@ namespace RoR2Randomizer.Networking.CharacterReplacements
             if (NetworkServer.active)
             {
 #if DEBUG
-                Log.Debug($"Received {nameof(SyncCharacterMasterReplacements)} as server, skipping");
+                Log.Debug($"Received as server, skipping");
 #endif
             }
             else if (NetworkClient.active)
             {
 #if DEBUG
-                Log.Debug($"Received {nameof(SyncCharacterMasterReplacements)} as client, applying replacements");
+                Log.Debug($"Received as client, applying replacements");
 #endif
 
                 OnReceive?.Invoke(_masterReplacements);

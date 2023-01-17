@@ -101,7 +101,7 @@ namespace RoR2Randomizer.Networking.SniperWeakPointRandomizer
         protected override void onReceivedObjectResolved(GameObject obj)
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncSniperWeakPointReplacements)}: HurtBox root resolved ({obj})");
+            Log.Debug($"HurtBox root resolved ({obj})");
 #endif
 
             if (!obj.TryGetComponent(out ModelLocator modelLocator))

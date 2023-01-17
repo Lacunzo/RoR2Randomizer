@@ -48,7 +48,7 @@ namespace RoR2Randomizer.Utility
                 }
                 else
                 {
-                    Log.Warning($"{nameof(ReplacementDictionary<T>)}<{typeof(T).Name}>.Create<{typeof(TSrc).Name}>: No valid replacement exists for key '{key}'. It will be excluded from the resulting dictionary");
+                    Log.Warning($"({nameof(T)}={typeof(T).Name}, {nameof(TSrc)}={typeof(TSrc).Name}) No valid replacement exists for key '{key}'. It will be excluded from the resulting dictionary");
                     valuesList.Remove(key);
                 }
             }

@@ -105,13 +105,11 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         void Start()
         {
-            const string LOG_PREFIX = $"{nameof(MirroredIntroAnimationTracker)}.{nameof(Start)} ";
-
             const string BODY_STATE_MACHINE_NAME = "Body";
             _bodyEntityStateMachine = EntityStateMachine.FindByCustomName(gameObject, BODY_STATE_MACHINE_NAME);
             if (!_bodyEntityStateMachine)
             {
-                Log.Warning(LOG_PREFIX + $"{name} has no state machine with the name {BODY_STATE_MACHINE_NAME}");
+                Log.Warning($"{name} has no state machine with the name {BODY_STATE_MACHINE_NAME}");
             }
         }
 
@@ -257,8 +255,6 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         public override void OnDeserialize(NetworkReader reader, bool initialState)
         {
-            const string LOG_PREFIX = $"{nameof(MirroredIntroAnimationTracker)}.{nameof(OnDeserialize)} ";
-
             if (initialState)
             {
                 _mirrorBodyIndex = reader.ReadPackedIndex32();
@@ -266,7 +262,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
                 _tweenTime = reader.ReadSingle();
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"({nameof(initialState)}) received tween time {_tweenTime}");
+                Log.Debug($"({nameof(initialState)}) received tween time {_tweenTime}");
 #endif
 
                 return;
@@ -289,7 +285,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
                 _tweenTime = reader.ReadSingle();
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"received tween time {_tweenTime}");
+                Log.Debug($"received tween time {_tweenTime}");
 #endif
             }
         }

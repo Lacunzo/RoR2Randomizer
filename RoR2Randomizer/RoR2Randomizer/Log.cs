@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using RoR2Randomizer.Utility;
+using System.Runtime.CompilerServices;
 
 namespace RoR2Randomizer
 {
@@ -12,8 +13,22 @@ namespace RoR2Randomizer
             _logSource = logSource;
         }
 
+        static string getLogPrefix(string callerPath, string callerMemberName, int callerLineNumber)
+        {
+            const string MOD_NAME = "RoR2Randomizer";
+
+            int modNameLastPathIndex = callerPath.LastIndexOf(MOD_NAME);
+            if (modNameLastPathIndex >= 0)
+            {
+                callerPath = callerPath.Substring(modNameLastPathIndex + MOD_NAME.Length + 1);
+            }
+
+            return $"{callerPath}:{callerLineNumber} ({callerMemberName}) ";
+        }
+
 #if DEBUG
-        internal static void Debug(string data)
+        internal static void Debug(string data, [CallerFilePath] string callerPath = "", [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = -1) => Debug_NoCallerPrefix(getLogPrefix(callerPath, callerMemberName, callerLineNumber) + data);
+        internal static void Debug_NoCallerPrefix(string data)
         {
             _logSource.LogDebug(data);
 
@@ -21,7 +36,8 @@ namespace RoR2Randomizer
         }
 #endif
 
-        internal static void Error(string data)
+        internal static void Error(string data, [CallerFilePath] string callerPath = "", [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = -1) => Error_NoCallerPrefix(getLogPrefix(callerPath, callerMemberName, callerLineNumber) + data);
+        internal static void Error_NoCallerPrefix(string data)
         {
             _logSource.LogError(data);
 
@@ -30,7 +46,8 @@ namespace RoR2Randomizer
 #endif
         }
 
-        internal static void Fatal(string data)
+        internal static void Fatal(string data, [CallerFilePath] string callerPath = "", [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = -1) => Fatal_NoCallerPrefix(getLogPrefix(callerPath, callerMemberName, callerLineNumber) + data);
+        internal static void Fatal_NoCallerPrefix(string data)
         {
             _logSource.LogFatal(data);
 
@@ -39,7 +56,8 @@ namespace RoR2Randomizer
 #endif
         }
 
-        internal static void Info(string data)
+        internal static void Info(string data, [CallerFilePath] string callerPath = "", [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = -1) => Info_NoCallerPrefix(getLogPrefix(callerPath, callerMemberName, callerLineNumber) + data);
+        internal static void Info_NoCallerPrefix(string data)
         {
             _logSource.LogInfo(data);
 
@@ -48,7 +66,8 @@ namespace RoR2Randomizer
 #endif
         }
 
-        internal static void Message(string data)
+        internal static void Message(string data, [CallerFilePath] string callerPath = "", [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = -1) => Message_NoCallerPrefix(getLogPrefix(callerPath, callerMemberName, callerLineNumber) + data);
+        internal static void Message_NoCallerPrefix(string data)
         {
             _logSource.LogMessage(data);
 
@@ -57,7 +76,8 @@ namespace RoR2Randomizer
 #endif
         }
 
-        internal static void Warning(string data)
+        internal static void Warning(string data, [CallerFilePath] string callerPath = "", [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = -1) => Warning_NoCallerPrefix(getLogPrefix(callerPath, callerMemberName, callerLineNumber) + data);
+        internal static void Warning_NoCallerPrefix(string data)
         {
             _logSource.LogWarning(data);
 

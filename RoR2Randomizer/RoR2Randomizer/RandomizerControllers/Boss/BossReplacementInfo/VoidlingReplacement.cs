@@ -106,7 +106,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
                 }
                 else
                 {
-                    Log.Warning($"{nameof(VoidlingReplacement)}.{nameof(bodyResolved)} Zone type '{zoneType.FullName}' not accounted for!");
+                    Log.Warning($"Zone type '{zoneType.FullName}' not accounted for!");
                 }
 
                 fogDamage.initialSafeZones = new BaseZoneBehavior[] { baseZone };

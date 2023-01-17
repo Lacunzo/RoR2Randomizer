@@ -16,7 +16,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
         {
             if (_patchEnabled)
             {
-                Log.Warning($"{nameof(GetBuffIndex_BuffIndex_ReplacePatch)} enabling patch: Already enabled!");
+                Log.Warning("Already enabled!");
             }
 
             _patchEnabled = true;
@@ -27,7 +27,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
         {
             if (!_patchEnabled)
             {
-                Log.Warning($"{nameof(GetBuffIndex_BuffIndex_ReplacePatch)} disabling patch: Already disabled!");
+                Log.Warning("Already disabled!");
             }
 
             _patchEnabled = false;

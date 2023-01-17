@@ -29,8 +29,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void GlobalEventManager_OnCharacterDeath(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(GlobalOnDeath_SpawnHook)}.{nameof(GlobalEventManager_OnCharacterDeath)} ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] findCursors;
@@ -57,7 +55,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find Malachite Urchin spawn patch location");
+                Log.Warning("unable to find Malachite Urchin spawn patch location");
             }
 
             // Soul wisp
@@ -84,12 +82,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             if (patchCount > 0)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for Soul Wisp spawn hook");
+                Log.Debug($"patched {patchCount} locations for Soul Wisp spawn hook");
 #endif
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find Soul Wisp spawn patch location");
+                Log.Warning("unable to find Soul Wisp spawn patch location");
             }
 
             // Healing Core
@@ -115,12 +113,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             if (patchCount > 0)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for Healing Core spawn hook");
+                Log.Debug($"patched {patchCount} locations for Healing Core spawn hook");
 #endif
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find Healing Core spawn patch location");
+                Log.Warning("unable to find Healing Core spawn patch location");
             }
 
             // Void Infestor (From killing void elite)
@@ -147,7 +145,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find Void Infestor spawn patch location");
+                Log.Warning("unable to find Void Infestor spawn patch location");
             }
 
             c.Index = 0;
@@ -194,12 +192,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             if (patchCount > 0)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for NetworkServer.Spawn register replacement hook");
+                Log.Debug($"patched {patchCount} locations for NetworkServer.Spawn register replacement hook");
 #endif
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location for NetworkServer.Spawn register replacement hook");
+                Log.Warning("unable to find patch location for NetworkServer.Spawn register replacement hook");
             }
 
             c.Index = 0;
@@ -245,12 +243,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             if (patchCount > 0)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations for MasterSummon.Perform register replacement hook");
+                Log.Debug($"patched {patchCount} locations for MasterSummon.Perform register replacement hook");
 #endif
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location for MasterSummon.Perform register replacement hook");
+                Log.Warning("unable to find patch location for MasterSummon.Perform register replacement hook");
             }
         }
     }

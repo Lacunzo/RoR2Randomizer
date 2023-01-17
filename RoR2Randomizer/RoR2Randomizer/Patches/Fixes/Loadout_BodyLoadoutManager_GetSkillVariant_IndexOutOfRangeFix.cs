@@ -20,8 +20,6 @@ namespace RoR2Randomizer.Patches.Fixes
 
         static void BodyLoadoutManager_GetSkillVariant(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(Loadout_BodyLoadoutManager_GetSkillVariant_IndexOutOfRangeFix)}.{nameof(BodyLoadoutManager_GetSkillVariant)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchLdelemU4()))
@@ -33,7 +31,7 @@ namespace RoR2Randomizer.Patches.Fixes
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

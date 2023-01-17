@@ -31,8 +31,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void BeetleGlandBodyBehavior_FixedUpdate(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(QueenGlandBeetleGuards_SpawnHook)}.{nameof(BeetleGlandBodyBehavior_FixedUpdate)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
@@ -57,7 +55,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                                     BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned_ILHook = new ILHook(invokeList[0].Method, BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned);
 
 #if DEBUG
-                                    Log.Debug(LOG_PREFIX + "Apply OnGuardMasterSpawned_ILHook");
+                                    Log.Debug("Apply OnGuardMasterSpawned_ILHook");
 #endif
                                 }
                             }
@@ -67,14 +65,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "failed to find patch location");
+                Log.Warning("failed to find patch location");
             }
         }
 
         static void BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(QueenGlandBeetleGuards_SpawnHook)}.{nameof(BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned)} ";
-
             ILCursor c = new ILCursor(il);
 
             c.Emit(OpCodes.Ldarg_1);
@@ -110,12 +106,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
             if (patchLocationsFound == 0)
             {
-                Log.Warning(LOG_PREFIX + "failed to find any patch locations in BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned");
+                Log.Warning("failed to find any patch locations in BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"found {patchLocationsFound} patch locations in BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned");
+                Log.Debug($"found {patchLocationsFound} patch locations in BeetleGlandBodyBehavior_FixedUpdate_OnGuardMasterSpawned");
             }
 #endif
         }

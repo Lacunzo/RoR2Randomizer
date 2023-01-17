@@ -48,10 +48,8 @@ namespace RoR2Randomizer.Networking.SurvivorPodRandomizer
 
         public override void OnReceived()
         {
-            const string LOG_PREFIX = $"{nameof(SyncSurvivorPodReplacements)}.{nameof(OnReceived)} ";
-
 #if DEBUG
-            Log.Debug(LOG_PREFIX + $"isServer={NetworkServer.active} isClient={NetworkClient.active}");
+            Log.Debug($"isServer={NetworkServer.active} isClient={NetworkClient.active}");
 #endif
 
             OnReceive?.Invoke(_overrideSpawnPods);

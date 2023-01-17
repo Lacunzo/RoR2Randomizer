@@ -23,8 +23,6 @@ namespace RoR2Randomizer.Patches.CharacterLimiting
 
         static void GummyCloneProjectile_SpawnGummyClone(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterLimiting)}.{nameof(Goobo)}.{nameof(GummyCloneProjectile_SpawnGummyClone)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
@@ -58,7 +56,7 @@ namespace RoR2Randomizer.Patches.CharacterLimiting
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

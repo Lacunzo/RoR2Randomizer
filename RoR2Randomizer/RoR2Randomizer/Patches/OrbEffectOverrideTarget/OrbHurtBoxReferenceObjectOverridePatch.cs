@@ -52,8 +52,6 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
 
         static void IL_GenericOrb_Begin(ILContext il)
         {
-            const string LOG_PREFIX = $"Patch {nameof(OrbHurtBoxReferenceObjectOverridePatch)}.{nameof(IL_GenericOrb_Begin)} ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -84,13 +82,13 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
                     }
                     else
                     {
-                        Log.Warning(LOG_PREFIX + $"failed to find {nameof(EffectData.SetHurtBoxReference)} call");
+                        Log.Warning($"failed to find {nameof(EffectData.SetHurtBoxReference)} call");
                     }
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + $"failed to find {nameof(EffectData)} local index");
+                Log.Warning($"failed to find {nameof(EffectData)} local index");
             }
 
             if (c.TryGotoNext(x => x.MatchRet()))
@@ -103,7 +101,7 @@ namespace RoR2Randomizer.Patches.OrbEffectOverrideTarget
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "failed to end of method");
+                Log.Warning("failed to end of method");
             }
         }
     }

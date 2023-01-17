@@ -25,8 +25,6 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
         static void DotController_RemoveAllDots(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(VoidFiendCleanseCorruptFix)}.{nameof(DotController_RemoveAllDots)} ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -91,12 +89,12 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + $"{nameof(OpCodes.Brfalse)} operand is not {nameof(ILLabel)}");
+                    Log.Warning($"{nameof(OpCodes.Brfalse)} operand is not {nameof(ILLabel)}");
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

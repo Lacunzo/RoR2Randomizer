@@ -21,8 +21,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void DeployableMinionSpawner_SpawnMinion(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(DeployableMinionSpawner_SpawnHook)}.{nameof(DeployableMinionSpawner_SpawnMinion)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
@@ -40,7 +38,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
                             break;
                         default:
-                            Log.Warning(LOG_PREFIX + $"unhandled deployable slot {instance.deployableSlot}");
+                            Log.Warning($"unhandled deployable slot {instance.deployableSlot}");
                             break;
                     }
 
@@ -49,7 +47,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             }
             else
             {
-                Log.Warning($"{LOG_PREFIX}Failed to find the patch location for {nameof(DirectorCore.TrySpawnObject)}");
+                Log.Warning($"Failed to find the patch location for {nameof(DirectorCore.TrySpawnObject)}");
             }
         }
     }

@@ -133,10 +133,9 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
 
         public override void OnReceived()
         {
-            const string LOG_PREFIX = $"{nameof(SpawnRandomizedOrbMessage)}.{nameof(OnReceived)} ";
             if (!NetworkServer.active)
             {
-                Log.Warning(LOG_PREFIX + "called on client");
+                Log.Warning("called on client");
                 return;
             }
 
@@ -157,8 +156,6 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
 
         void spawnOrb()
         {
-            const string LOG_PREFIX = $"{nameof(SpawnRandomizedOrbMessage)}.{nameof(spawnOrb)} ";
-
             Orb orb;
             switch (_orbIdentifier.Type)
             {
@@ -166,7 +163,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                     DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.Instance.GetIdentifier(_orbIdentifier.Index);
                     if (!damageOrbIdentifier.IsValid)
                     {
-                        Log.Warning(LOG_PREFIX + $"invalid damage orb at index {_orbIdentifier.Index}");
+                        Log.Warning($"invalid damage orb at index {_orbIdentifier.Index}");
                         return;
                     }
 
@@ -186,7 +183,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                     LightningOrbIdentifier lightningOrbIdentifier = LightningOrbCatalog.Instance.GetIdentifier(_orbIdentifier.Index);
                     if (!lightningOrbIdentifier.IsValid)
                     {
-                        Log.Warning(LOG_PREFIX + $"invalid lightning orb at index {_orbIdentifier.Index}");
+                        Log.Warning($"invalid lightning orb at index {_orbIdentifier.Index}");
                         return;
                     }
 
@@ -201,7 +198,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                     orb = lightningOrb;
                     break;
                 default:
-                    Log.Warning(LOG_PREFIX + $"unhandled orb type {_orbIdentifier.Type}");
+                    Log.Warning($"unhandled orb type {_orbIdentifier.Type}");
                     return;
             }
 
@@ -220,7 +217,7 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
             {
                 if (!_overrideTargetPosition.HasValue)
                 {
-                    Log.Warning(LOG_PREFIX + $"both {nameof(_genericArgs)}.{nameof(_genericArgs.Target)} and {nameof(_overrideTargetPosition)} null");
+                    Log.Warning($"both {nameof(_genericArgs)}.{nameof(_genericArgs.Target)} and {nameof(_overrideTargetPosition)} null");
                 }
                 else
                 {

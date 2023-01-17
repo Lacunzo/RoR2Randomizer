@@ -35,8 +35,6 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
         static void ProjectileFireChildren_Update_IL(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileFireChildren_ReplaceChildPrefab)}.{nameof(ProjectileFireChildren_Update_IL)} (patch) ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -84,7 +82,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                     }
                     else
                     {
-                        Log.Warning(LOG_PREFIX + "failed (2)");
+                        Log.Warning("failed (2)");
                     }
 
                     ILCursor ret = c.Goto(label.Target);
@@ -99,12 +97,12 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + "failed (1)");
+                    Log.Warning("failed (1)");
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "failed (0)");
+                Log.Warning("failed (0)");
             }
         }
     }

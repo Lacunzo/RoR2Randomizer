@@ -66,12 +66,10 @@ namespace RoR2Randomizer.RandomizerControllers
 
             _masterIndicesToRandomize = MasterCatalog.masterPrefabs.Where(master =>
             {
-                const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(Init)} ";
-
                 if (!master)
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"excluding null master");
+                    Log.Debug("excluding null master");
 #endif
 
                     return false;
@@ -80,7 +78,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 if (!master.TryGetComponent<CharacterMaster>(out CharacterMaster masterComponent))
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no {nameof(CharacterMaster)} component");
+                    Log.Debug($"excluding master {master.name}: no {nameof(CharacterMaster)} component");
 #endif
 
                     return false;
@@ -89,7 +87,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 if (!masterComponent.bodyPrefab)
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)}");
+                    Log.Debug($"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)}");
 #endif
 
                     return false;
@@ -98,7 +96,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 if (!masterComponent.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)} {nameof(CharacterBody)} component");
+                    Log.Debug($"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)} {nameof(CharacterBody)} component");
 #endif
 
                     return false;
@@ -108,7 +106,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 if (!body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator) || !(modelTransform = modelLocator.modelTransform))
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: no model");
+                    Log.Debug($"excluding master {master.name}: no model");
 #endif
 
                     return false;
@@ -117,7 +115,7 @@ namespace RoR2Randomizer.RandomizerControllers
                 if (modelTransform.childCount == 0)
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"excluding master {master.name}: empty model");
+                    Log.Debug($"excluding master {master.name}: empty model");
 #endif
 
                     return false;
@@ -133,7 +131,7 @@ namespace RoR2Randomizer.RandomizerControllers
                     case "VoidRaidCrabJointMaster": // Balls
                     case "VoidRaidCrabMaster": // Beta voidling, half invisible
 #if DEBUG
-                        Log.Debug(LOG_PREFIX + $"excluding master {master.name}: blacklist");
+                        Log.Debug($"excluding master {master.name}: blacklist");
 #endif
                         return false;
                 }
@@ -440,8 +438,6 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static MasterCatalog.MasterIndex GetReplacementForMasterIndex(MasterCatalog.MasterIndex original)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(GetReplacementForMasterIndex)} ";
-
             if (original.isValid && IsEnabled)
             {
 #if DEBUG
@@ -470,7 +466,7 @@ namespace RoR2Randomizer.RandomizerControllers
                         case CharacterReplacementMode.Gup:
                             if (!Caches.Masters.Gup.isValid)
                             {
-                                Log.Error(LOG_PREFIX + $"{nameof(CharacterReplacementMode.Gup)} mode enabled, but master index is invalid!");
+                                Log.Error($"{nameof(CharacterReplacementMode.Gup)} mode enabled, but master index is invalid!");
                                 return MasterCatalog.MasterIndex.none;
                             }
 
@@ -502,8 +498,6 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static ILContext.Manipulator FixMasterIndexReferences(Func<bool> patchEnabled, params string[] names)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(FixMasterIndexReferences)} ";
-
             return il =>
             {
                 ILCursor c = new ILCursor(il);
@@ -527,7 +521,7 @@ namespace RoR2Randomizer.RandomizerControllers
                         }
                         else
                         {
-                            Log.Warning(LOG_PREFIX + $"unimplemented member type of {member.GetType().FullName}");
+                            Log.Warning($"unimplemented member type of {member.GetType().FullName}");
                         }
 
                         if (valueType != null)
@@ -563,7 +557,7 @@ namespace RoR2Randomizer.RandomizerControllers
                             }
                             else
                             {
-                                Log.Warning(LOG_PREFIX + $"unimplemented value type of {valueType.FullName}");
+                                Log.Warning($"unimplemented value type of {valueType.FullName}");
                             }
                         }
                     }
@@ -572,12 +566,12 @@ namespace RoR2Randomizer.RandomizerControllers
                 if (patchCount > 0)
                 {
 #if DEBUG
-                    Log.Debug(LOG_PREFIX + $"[{string.Join(", ", names)}] patched {patchCount} locations");
+                    Log.Debug($"[{string.Join(", ", names)}] patched {patchCount} locations");
 #endif
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + $"[{string.Join(", ", names)}] patched 0 locations");
+                    Log.Warning($"[{string.Join(", ", names)}] patched 0 locations");
                 }
             };
         }
@@ -586,12 +580,10 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static void TryReplaceDirectorSpawnRequest(DirectorSpawnRequest spawnRequest, OnDirectorSpawnReplacedCallback onDirectorSpawnReplaced)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterReplacements)}.{nameof(TryReplaceDirectorSpawnRequest)} ";
-
             if (spawnRequest == null)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"Not replacing due to: null {nameof(spawnRequest)}");
+                Log.Debug($"Not replacing due to: null {nameof(spawnRequest)}");
 #endif
                 return;
             }
@@ -600,7 +592,7 @@ namespace RoR2Randomizer.RandomizerControllers
             if (spawnCard == null)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"Not replacing due to: null {nameof(spawnCard)}");
+                Log.Debug($"Not replacing due to: null {nameof(spawnCard)}");
 #endif
                 return;
             }
@@ -609,7 +601,7 @@ namespace RoR2Randomizer.RandomizerControllers
             if (!replacementMasterIndex.isValid)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"Not replacing due to: invalid replacement MasterIndex");
+                Log.Debug("Not replacing due to: invalid replacement MasterIndex");
 #endif
                 return;
             }
@@ -618,7 +610,7 @@ namespace RoR2Randomizer.RandomizerControllers
             if (!replacementMasterPrefab)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"Not replacing due to: invalid replacement prefab");
+                Log.Debug("Not replacing due to: invalid replacement prefab");
 #endif
                 return;
             }

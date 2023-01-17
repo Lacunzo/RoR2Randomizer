@@ -17,15 +17,13 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
         [SystemInitializer]
         static void Init()
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileSpawnMaster_SpawnHook)}.{nameof(Init)} ";
-
             AsyncOperationHandle<CharacterSpawnCard> cscMinorConstructOnKillRequest = Addressables.LoadAssetAsync<CharacterSpawnCard>("RoR2/DLC1/MajorAndMinorConstruct/cscMinorConstructOnKill.asset");
             cscMinorConstructOnKillRequest.Completed += static handle =>
             {
                 _cscMinorConstructOnKill = handle.Result;
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"loaded {_cscMinorConstructOnKill}");
+                Log.Debug($"loaded {_cscMinorConstructOnKill}");
 #endif
             };
         }
@@ -42,8 +40,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void ProjectileSpawnMaster_SpawnMaster(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileSpawnMaster_SpawnHook)}.{nameof(ProjectileSpawnMaster_SpawnMaster)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
@@ -56,7 +52,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     if (!instance.spawnCard)
                     {
 #if DEBUG
-                        Log.Debug(LOG_PREFIX + "spawncard is null");
+                        Log.Debug("spawncard is null");
 #endif
                     }
                     else if (instance.spawnCard == _cscMinorConstructOnKill)
@@ -68,7 +64,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                     }
                     else
                     {
-                        Log.Warning(LOG_PREFIX + $"unhandled spawncard {instance.spawnCard}");
+                        Log.Warning($"unhandled spawncard {instance.spawnCard}");
                     }
 
                     ExplicitSpawnRandomizerController.TryReplaceDirectorSpawnRequest(spawnRequest);
@@ -76,7 +72,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "failed to find any patch locations");
+                Log.Warning("failed to find any patch locations");
             }
         }
     }

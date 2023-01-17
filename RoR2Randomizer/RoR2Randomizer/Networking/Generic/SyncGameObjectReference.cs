@@ -28,8 +28,6 @@ namespace RoR2Randomizer.Networking.Generic
         {
             static IEnumerator baseTask(GameObject obj, CoroutineOut<NetworkInstanceId?> netId)
             {
-                const string LOG_PREFIX = $"{nameof(SyncGameObjectReference)}.{nameof(waitForNetIdInitialized)} ";
-
 #if DEBUG
                 float timeStarted = Time.unscaledTime;
 #endif
@@ -43,7 +41,7 @@ namespace RoR2Randomizer.Networking.Generic
                     yield break;
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"waited {Time.unscaledTime - timeStarted:F2} seconds for object {obj} enabled");
+                Log.Debug($"waited {Time.unscaledTime - timeStarted:F2} seconds for object {obj} enabled");
 #endif
 
                 NetworkIdentity netIdentity = null;
@@ -66,7 +64,7 @@ namespace RoR2Randomizer.Networking.Generic
                 netId.Result = netIdentity.netId;
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"waited {Time.unscaledTime - timeStarted:F2} seconds for object {obj} net init");
+                Log.Debug($"waited {Time.unscaledTime - timeStarted:F2} seconds for object {obj} net init");
 #endif
             }
 
@@ -125,7 +123,7 @@ namespace RoR2Randomizer.Networking.Generic
                     yield return 0;
                 }
 #if DEBUG
-                Log.Debug($"{nameof(SyncGameObjectReference)} waited {Time.unscaledTime - timeStarted:F2} seconds for object ({resolvedObject.Result})");
+                Log.Debug($"waited {Time.unscaledTime - timeStarted:F2} seconds for object ({resolvedObject.Result})");
 #endif
             }
 
@@ -152,19 +150,19 @@ namespace RoR2Randomizer.Networking.Generic
         public override void OnReceived()
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncGameObjectReference)} received");
+            Log.Debug($"{nameof(_objectId)}={_objectId}");
 #endif
 
             if (shouldHandleEvent)
             {
                 if (_objectId.IsEmpty())
                 {
-                    Log.Warning($"{nameof(SyncGameObjectReference)} recieved empty object id, aborting");
+                    Log.Warning($"recieved empty object id, aborting");
                     return;
                 }
 
 #if DEBUG
-                Log.Debug($"{nameof(SyncGameObjectReference)} handling event");
+                Log.Debug($"handling event");
 #endif
 
                 Main.Instance.StartCoroutine(waitForObjectResolved());
@@ -172,7 +170,7 @@ namespace RoR2Randomizer.Networking.Generic
 #if DEBUG
             else
             {
-                Log.Debug($"{nameof(SyncGameObjectReference)} should not handle event");
+                Log.Debug($"should not handle event");
             }
 #endif
         }

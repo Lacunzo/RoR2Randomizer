@@ -20,8 +20,6 @@ namespace RoR2Randomizer.Patches.StageRandomizer
 
         static void Run_Start(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(InitializeStageReplacementsPatch)}.{nameof(Run_Start)} ";
-
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchCallvirt<NetworkManager>(nameof(NetworkManager.ServerChangeScene))))
             {
@@ -30,7 +28,7 @@ namespace RoR2Randomizer.Patches.StageRandomizer
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

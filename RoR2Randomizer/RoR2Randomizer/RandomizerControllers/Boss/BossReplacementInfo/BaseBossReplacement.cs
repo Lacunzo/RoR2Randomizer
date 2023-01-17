@@ -47,7 +47,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
 #if DEBUG
                     if (oldValue != healthComponent.globalDeathEventChanceCoefficient)
                     {
-                        Log.Debug($"{nameof(BaseBossReplacement)}: overriding {nameof(HealthComponent.globalDeathEventChanceCoefficient)} for {replacementType} replacement {_master.name} ({oldValue} -> {healthComponent.globalDeathEventChanceCoefficient})");
+                        Log.Debug($"overriding {nameof(HealthComponent.globalDeathEventChanceCoefficient)} for {replacementType} replacement {_master.name} ({oldValue} -> {healthComponent.globalDeathEventChanceCoefficient})");
                     }
 #endif
                 }
@@ -57,7 +57,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss.BossReplacementInfo
         protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
 #if DEBUG
-            Log.Debug($"Sending {nameof(SyncBossReplacementCharacter)} to clients");
+            Log.Debug($"Sending to clients");
 #endif
 
             yield return new SyncBossReplacementCharacter(_master.gameObject, replacementType, sendOriginalCharacterMasterIndex ? originalMasterPrefab?.masterIndex : null);

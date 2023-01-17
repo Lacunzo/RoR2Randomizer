@@ -31,10 +31,10 @@ namespace RoR2Randomizer.Patches
                 _cleanupMethod = type.GetMethod(CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS) ?? type.GetMethod(ALT_CLEANUP_METHOD_NAME, PATCH_METHOD_FLAGS);
 
                 if (_applyMethod == null)
-                    Log.Error($"Patch class {type.FullName} does not have a {APPLY_METHOD_NAME} or {ALT_APPLY_METHOD_NAME} method");
+                    Log.Error_NoCallerPrefix($"Patch class {type.FullName} does not have a {APPLY_METHOD_NAME} or {ALT_APPLY_METHOD_NAME} method");
 
                 if (_cleanupMethod == null)
-                    Log.Error($"Patch class {type.FullName} does not have a {CLEANUP_METHOD_NAME} or {ALT_CLEANUP_METHOD_NAME} method");
+                    Log.Error_NoCallerPrefix($"Patch class {type.FullName} does not have a {CLEANUP_METHOD_NAME} or {ALT_CLEANUP_METHOD_NAME} method");
             }
 
             public void Apply()
@@ -44,7 +44,7 @@ namespace RoR2Randomizer.Patches
                     _applyMethod.Invoke(null, Array.Empty<object>());
 
 #if DEBUG
-                    Log.Debug($"Applied patch class '{_applyMethod.DeclaringType.FullName}'");
+                    Log.Debug_NoCallerPrefix($"Applied patch class '{_applyMethod.DeclaringType.FullName}'");
 #endif
                 }
             }
@@ -56,7 +56,7 @@ namespace RoR2Randomizer.Patches
                     _cleanupMethod.Invoke(null, Array.Empty<object>());
 
 #if DEBUG
-                    Log.Debug($"Cleaned up patch class '{_cleanupMethod.DeclaringType.FullName}'");
+                    Log.Debug_NoCallerPrefix($"Cleaned up patch class '{_cleanupMethod.DeclaringType.FullName}'");
 #endif
                 }
             }

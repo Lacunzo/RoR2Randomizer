@@ -22,8 +22,6 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
             static void VoidSurvivorController_FixedUpdate(ILContext il)
             {
-                const string LOG_PREFIX = $"{nameof(GetBuffIndex_BuffIndex_ReplacePatch)}+{nameof(VoidFiendOptInFix)}.{nameof(VoidSurvivorController_FixedUpdate)} ";
-
                 ILCursor c = new ILCursor(il);
 
                 ILCursor[] foundCursors;
@@ -46,12 +44,12 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
                 if (patchCount == 0)
                 {
-                    Log.Warning(LOG_PREFIX + "no patch locations found");
+                    Log.Warning("no patch locations found");
                 }
 #if DEBUG
                 else
                 {
-                    Log.Debug(LOG_PREFIX + $"{patchCount} patch locations found");
+                    Log.Debug($"{patchCount} patch locations found");
                 }
 #endif
             }

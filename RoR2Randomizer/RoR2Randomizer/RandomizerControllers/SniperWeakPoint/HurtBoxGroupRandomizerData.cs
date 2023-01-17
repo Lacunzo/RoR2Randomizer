@@ -22,8 +22,6 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
         void Awake()
         {
-            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(Awake)} ";
-
             _group = GetComponent<HurtBoxGroup>();
 
             if (TryGetComponent(out CharacterModel characterModel))
@@ -32,7 +30,7 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "could not find owner body");
+                Log.Warning("could not find owner body");
             }
         }
 
@@ -53,19 +51,17 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
         public void Initialize(bool[] originalIsSniperTargetValues, bool?[] overrideIsSniperTargetValues)
         {
-            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(Initialize)} ";
-
             if (_isInitialized)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + "already initialized!");
+                Log.Debug("already initialized!");
 #endif
                 return;
             }
 
             if (!_group || _group.hurtBoxes == null)
             {
-                Log.Warning(LOG_PREFIX + "unable to initialize: invalid group reference");
+                Log.Warning("unable to initialize: invalid group reference");
                 return;
             }
 
@@ -101,17 +97,15 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
         void setupHurtboxesClient()
         {
-            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(setupHurtboxesClient)} ";
-
             if (!_group || _group.hurtBoxes == null)
             {
-                Log.Warning(LOG_PREFIX + $"invalid {nameof(_group)} reference");
+                Log.Warning($"invalid {nameof(_group)} reference");
                 return;
             }
 
             if (OriginalIsSniperTargetValues.Length != _group.hurtBoxes.Length)
             {
-                Log.Warning(LOG_PREFIX + $"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
+                Log.Warning($"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
             }
 
             for (int i = 0; i < _group.hurtBoxes.Length; i++)
@@ -151,20 +145,18 @@ namespace RoR2Randomizer.RandomizerControllers.SniperWeakPoint
 
         public IEnumerable<NetworkMessageBase> GetNetMessages()
         {
-            const string LOG_PREFIX = $"{nameof(HurtBoxGroupRandomizerData)}.{nameof(GetNetMessages)} ";
-
             if (OwnerBody && _group)
             {
                 if (OriginalIsSniperTargetValues.Length != _group.hurtBoxes.Length)
                 {
-                    Log.Warning(LOG_PREFIX + $"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
+                    Log.Warning($"mismatched group sizes! {nameof(OriginalIsSniperTargetValues)}.Length={OriginalIsSniperTargetValues.Length} {nameof(_group)}.hurtBoxes.Length={_group.hurtBoxes.Length}");
                 }
                 
                 yield return new SyncSniperWeakPointReplacements(OwnerBody, _group.hurtBoxes.Where((h, i) => h.isSniperTarget != ArrayUtils.GetSafe(OriginalIsSniperTargetValues, i)), _group.hurtBoxes.Length);
             }
             else
             {
-                Log.Warning(LOG_PREFIX + $"{nameof(OwnerBody)} or {_group} is null or destroyed!");
+                Log.Warning($"{nameof(OwnerBody)} or {_group} is null or destroyed!");
             }
         }
     }

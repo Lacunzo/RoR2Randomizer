@@ -13,8 +13,6 @@ namespace RoR2Randomizer.BodyAnimationMirroring
 
         protected IEnumerable<(BoneMarker originalBone, BoneMarker matchingBone)> findAllMatchingBones(CharacterAnimationMirrorBase other)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterAnimationMirrorBase)}.{nameof(findAllMatchingBones)} ";
-
             foreach (BoneMarker originalBone in _boneMarkers)
             {
                 foreach (BoneMarker otherBone in other._boneMarkers)
@@ -22,7 +20,7 @@ namespace RoR2Randomizer.BodyAnimationMirroring
                     if (originalBone.Identifier == otherBone.Identifier)
                     {
 #if DEBUG
-                        Log.Debug(LOG_PREFIX + $"found match {originalBone.name} -> {otherBone.name}");
+                        Log.Debug($"found match {originalBone.name} -> {otherBone.name}");
 #endif
 
                         yield return (originalBone, otherBone);
@@ -33,8 +31,6 @@ namespace RoR2Randomizer.BodyAnimationMirroring
 
         protected virtual void Awake()
         {
-            const string LOG_PREFIX = $"{nameof(CharacterAnimationMirrorOwner)}.{nameof(Awake)} ";
-
             Animator = GetComponent<Animator>();
             if (Animator)
             {
@@ -47,7 +43,7 @@ namespace RoR2Randomizer.BodyAnimationMirroring
                         boneMarker.Identifier = i;
 
 #if DEBUG
-                        Log.Debug(LOG_PREFIX + $"found bone with ID {i} ({boneTransform.name})");
+                        Log.Debug($"found bone with ID {i} ({boneTransform.name})");
 #endif
 
                         _boneMarkers.Add(boneMarker);
@@ -63,11 +59,9 @@ namespace RoR2Randomizer.BodyAnimationMirroring
 
         void setupBones(CharacterModel characterModel)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterAnimationMirrorOwner)}.{nameof(setupBones)} ";
-
             if (characterModel.baseRendererInfos == null)
             {
-                Log.Error(LOG_PREFIX + $"{nameof(CharacterModel.baseRendererInfos)} is null");
+                Log.Error($"{nameof(CharacterModel.baseRendererInfos)} is null");
                 return;
             }
 

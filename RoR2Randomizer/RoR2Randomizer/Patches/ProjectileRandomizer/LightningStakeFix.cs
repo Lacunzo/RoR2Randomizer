@@ -17,13 +17,11 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
         [SystemInitializer(typeof(ProjectileCatalog))]
         static void Init()
         {
-            const string LOG_PREFIX = $"{nameof(LightningStakeFix)}.{nameof(Init)} ";
-
             const string LIGHTNING_STAKE_PROJECTILE_NAME = "LightningStake";
             _lightningStakeProjectileIdentifier = new ProjectileTypeIdentifier(ProjectileType.OrdinaryProjectile, ProjectileCatalog.FindProjectileIndex(LIGHTNING_STAKE_PROJECTILE_NAME));
             if (!_lightningStakeProjectileIdentifier.IsValid)
             {
-                Log.Warning(LOG_PREFIX + $"Unable to find projectile index for {LIGHTNING_STAKE_PROJECTILE_NAME}");
+                Log.Warning($"Unable to find projectile index for {LIGHTNING_STAKE_PROJECTILE_NAME}");
             }
         }
 
@@ -39,8 +37,6 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
         static void GlobalEventManager_OnHitAll(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(LightningStakeFix)}.{nameof(GlobalEventManager_OnHitAll)} ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -67,7 +63,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
                                          ProjectileManager_InitializeProjectile_SetOwnerPatch.BulletOwnerNodeOfNextProjectile.IsChildOf(lightningStakeReplacement)))
                                     {
 #if DEBUG
-                                        Log.Debug(LOG_PREFIX + $"Prevented infinite projectile loop ({projectileController.name} is child of {lightningStakeReplacement})");
+                                        Log.Debug($"Prevented infinite projectile loop ({projectileController.name} is child of {lightningStakeReplacement})");
 #endif
 
                                         return false;
@@ -82,7 +78,7 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "failed to find patch location");
+                Log.Warning("failed to find patch location");
             }
         }
     }

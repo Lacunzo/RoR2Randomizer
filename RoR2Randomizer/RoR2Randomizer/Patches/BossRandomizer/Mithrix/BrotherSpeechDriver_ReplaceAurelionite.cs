@@ -28,7 +28,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
         static void replaceAurelioniteIndexPatch(ILContext il)
         {
-            string LOG_PREFIX = $"{nameof(BrotherSpeechDriver_ReplaceAurelionite)}.{nameof(replaceAurelioniteIndexPatch)} ({il?.Method?.FullName ?? "null"}) ";
+            string LOG_PREFIX = $"({il?.Method?.FullName ?? "null"}) ";
 
             ILCursor c = new ILCursor(il);
 

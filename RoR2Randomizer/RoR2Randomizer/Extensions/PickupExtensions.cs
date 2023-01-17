@@ -8,8 +8,6 @@ namespace RoR2Randomizer.Extensions
     {
         public static void TryGrantTo(this PickupDef pickupDef, CharacterMaster master, int count = 1)
         {
-            const string LOG_PREFIX = $"{nameof(PickupExtensions)}.{nameof(TryGrantTo)} ";
-
             if (pickupDef == null || !master || count <= 0)
                 return;
 
@@ -87,7 +85,7 @@ namespace RoR2Randomizer.Extensions
             }
             else
             {
-                Log.Warning(LOG_PREFIX + $"pickup {pickupDef} not implemented");
+                Log.Warning($"pickup {pickupDef} not implemented");
                 return;
             }
 
@@ -99,8 +97,6 @@ namespace RoR2Randomizer.Extensions
 
         public static int GetPickupCount(this CharacterMaster master, PickupDef pickupDef)
         {
-            const string LOG_PREFIX = $"{nameof(PickupExtensions)}.{nameof(GetPickupCount)} ";
-
             if (pickupDef == null || !master)
                 return 0;
 
@@ -109,8 +105,6 @@ namespace RoR2Randomizer.Extensions
 
         public static void TryDeductFrom(this PickupDef pickupDef, CharacterMaster master, int count = 1)
         {
-            const string LOG_PREFIX = $"{nameof(PickupExtensions)}.{nameof(TryDeductFrom)} ";
-
             if (pickupDef == null || !master || count <= 0)
                 return;
 
@@ -169,14 +163,14 @@ namespace RoR2Randomizer.Extensions
                         }
                         else
                         {
-                            Log.Warning(LOG_PREFIX + $"{nameof(MiscPickupDef)} {miscPickupDef} is not implemented");
+                            Log.Warning($"{nameof(MiscPickupDef)} {miscPickupDef} is not implemented");
                         }
                     }
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + $"pickup {pickupDef} not implemented");
+                Log.Warning($"pickup {pickupDef} not implemented");
             }
         }
     }

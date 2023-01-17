@@ -28,8 +28,6 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
         [SystemInitializer(typeof(Caches.Scene), typeof(SceneCatalog))]
         static void Init()
         {
-            const string LOG_PREFIX = $"{nameof(StageRandomizerController)}.{nameof(Init)} ";
-
             _stages = SceneCatalog.allStageSceneDefs
                                   .Where(s => !Caches.Scene.IsSimulacrumStage(s))
                                   // These are not normal stages, but will be included anyway

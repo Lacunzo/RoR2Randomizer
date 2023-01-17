@@ -34,8 +34,6 @@ namespace RoR2Randomizer.Patches.BossRandomizer.AlloyWorshipUnit
 
         void Listening_FixedUpdate(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(AlloyWorshipUnitFightTracker)}.{nameof(Listening_FixedUpdate)} ";
-
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<ScriptedCombatEncounter>(nameof(ScriptedCombatEncounter.BeginEncounter))))
             {
@@ -65,7 +63,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.AlloyWorshipUnit
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

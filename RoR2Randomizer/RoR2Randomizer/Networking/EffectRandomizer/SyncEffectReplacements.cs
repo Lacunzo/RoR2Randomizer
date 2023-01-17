@@ -41,7 +41,7 @@ namespace RoR2Randomizer.Networking.EffectRandomizer
         public override void OnReceived()
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncEffectReplacements)} received isServer={NetworkServer.active}, isClient={NetworkClient.active}");
+            Log.Debug($"isServer={NetworkServer.active}, isClient={NetworkClient.active}");
 #endif
 
             OnReceive?.Invoke(_effectReplacements);

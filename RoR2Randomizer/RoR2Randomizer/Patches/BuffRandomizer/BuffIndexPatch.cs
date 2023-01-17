@@ -58,8 +58,6 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
         static void IL_CharacterBody_AddTimedBuff_BuffDef_float(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(BuffIndexPatch)}.{nameof(IL_CharacterBody_AddTimedBuff_BuffDef_float)} ";
-
             static BuffIndex simpleReplaceBuffIndex(BuffIndex original)
             {
                 if (SkipPatchCount == 0 && BuffRandomizerController.IsActive)
@@ -84,12 +82,12 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
             if (patchCount == 0)
             {
-                Log.Warning(LOG_PREFIX + "buffIndex stfld: no patch locations found");
+                Log.Warning("buffIndex stfld: no patch locations found");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"buffIndex stfld: {patchCount} patch locations found");
+                Log.Debug($"buffIndex stfld: {patchCount} patch locations found");
             }
 #endif
 
@@ -105,12 +103,12 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
             if (patchCount == 0)
             {
-                Log.Warning(LOG_PREFIX + "buffIndex ldfld: no patch locations found");
+                Log.Warning("buffIndex ldfld: no patch locations found");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"buffIndex ldfld: {patchCount} patch locations found");
+                Log.Debug($"buffIndex ldfld: {patchCount} patch locations found");
             }
 #endif
 
@@ -126,18 +124,18 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + $"unable to find method {methodRef.Name}");
+                    Log.Warning($"unable to find method {methodRef.Name}");
                 }
             }
 
             if (localFunctionsToHook.Count == 0)
             {
-                Log.Warning(LOG_PREFIX + "could not find any local functions to hook");
+                Log.Warning("could not find any local functions to hook");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"found {localFunctionsToHook.Count} local functions to hook");
+                Log.Debug($"found {localFunctionsToHook.Count} local functions to hook");
             }
 #endif
 
@@ -166,12 +164,12 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
                         if (patchCount == 0)
                         {
-                            Log.Warning(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex stfld: no patch locations found");
+                            Log.Warning($"{localFunctions.FullDescription()} buffIndex stfld: no patch locations found");
                         }
 #if DEBUG
                         else
                         {
-                            Log.Debug(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex stfld: {patchCount} patch locations found");
+                            Log.Debug($"{localFunctions.FullDescription()} buffIndex stfld: {patchCount} patch locations found");
                         }
 #endif
 
@@ -187,12 +185,12 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
 
                         if (patchCount == 0)
                         {
-                            Log.Warning(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex ldfld: no patch locations found");
+                            Log.Warning($"{localFunctions.FullDescription()} buffIndex ldfld: no patch locations found");
                         }
 #if DEBUG
                         else
                         {
-                            Log.Debug(LOG_PREFIX + $"{localFunctions.FullDescription()} buffIndex ldfld: {patchCount} patch locations found");
+                            Log.Debug($"{localFunctions.FullDescription()} buffIndex ldfld: {patchCount} patch locations found");
                         }
 #endif
                     }, hookConfig);
@@ -214,7 +212,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                     if (diff > 0)
                     {
 #if DEBUG
-                        Log.Debug($"Buff randomizer: Applying dot {dot}");
+                        Log.Debug($"Applying dot {dot}");
 #endif
 
                         GameObject attacker = self.gameObject;

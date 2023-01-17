@@ -19,8 +19,6 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
             public Entry(string itemPickupToken, BodyIndex searchIndex, BoolConfigValue isEnabledConfigValue)
             {
-                const string LOG_PREFIX = $"{nameof(ItemDescriptionNameReplacementManager)}+{nameof(Entry)}..ctor ";
-
                 ItemPickupToken = itemPickupToken;
                 SearchIndex = searchIndex;
 
@@ -31,7 +29,7 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + $"null body prefab for search index {searchIndex}");
+                    Log.Warning($"null body prefab for search index {searchIndex}");
                     SearchToken = "UNKNOWN";
                 }
 

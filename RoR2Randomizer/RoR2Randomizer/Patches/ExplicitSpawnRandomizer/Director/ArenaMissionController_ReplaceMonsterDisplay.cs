@@ -25,8 +25,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Director
 
         static void ArenaMissionController_AddMonsterType(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(ArenaMissionController_ReplaceMonsterDisplay)}.{nameof(ArenaMissionController_AddMonsterType)} ";
-
             ILCursor c = new ILCursor(il);
 
             int patchCount = 0;
@@ -51,12 +49,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Director
 
             if (patchCount == 0)
             {
-                Log.Warning(LOG_PREFIX + "no patch locations found");
+                Log.Warning("no patch locations found");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations");
+                Log.Debug($"patched {patchCount} locations");
             }
 #endif
         }

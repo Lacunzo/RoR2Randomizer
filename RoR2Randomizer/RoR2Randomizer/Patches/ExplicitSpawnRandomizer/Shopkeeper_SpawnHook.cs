@@ -49,7 +49,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             GameObject storeHolder = GameObject.Find(STORE_HOLDER_OBJECT_NAME);
             if (!storeHolder)
             {
-                Log.Warning($"{nameof(Shopkeeper_SpawnHook)}.{nameof(onSceneLoaded)} could not find {STORE_HOLDER_OBJECT_NAME}");
+                Log.Warning($"could not find {STORE_HOLDER_OBJECT_NAME}");
                 return;
             }
 

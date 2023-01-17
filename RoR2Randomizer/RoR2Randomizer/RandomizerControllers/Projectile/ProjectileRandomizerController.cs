@@ -41,7 +41,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                       && (!projectileFireChildren.childProjectilePrefab || projectileFireChildren.childProjectilePrefab == null))
                                      {
 #if DEBUG                            
-                                         Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
+                                         Log.Debug($"Excluding {projectile.name} due to invalid {nameof(ProjectileFireChildren)} setup");
 #endif
 
                                          return false;
@@ -80,7 +80,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                                          // Excluded because it seems like a huge pain getting it to work, might look into it in the future.
                                          case "LunarSunProjectile":
 #if DEBUG                            
-                                             Log.Debug($"Projectile Randomizer: Excluding {projectile.name} due to being in blacklist");
+                                             Log.Debug($"Excluding {projectile.name} due to being in blacklist");
 #endif                               
                                              return false;
                                      }
@@ -93,7 +93,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
                                      if (projectileFireChildren)
                                      {
-                                         Log.Debug($"Projectile Randomizer: {projectile.name} is {nameof(ProjectileFireChildren)}");
+                                         Log.Debug($"{projectile.name} is {nameof(ProjectileFireChildren)}");
                                      }
 #endif
 
@@ -127,7 +127,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 #if DEBUG
                     if (isInstaKill)
                     {
-                        Log.Debug($"Projectile Randomizer: Excluding projectile identifier {i} from all identifiers due to instakill projectiles not allowed");
+                        Log.Debug($"Excluding projectile identifier {i} from all identifiers due to instakill projectiles not allowed");
                     }
 #endif
                     return !isInstaKill;
@@ -287,8 +287,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryReplaceProjectileInstantiateFire(ref GameObject projectilePrefab, out GameObject originalPrefab, Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceProjectileInstantiateFire)} ";
-
             originalPrefab = projectilePrefab;
 
             if (TryGetOverrideProjectileIdentifier(ProjectileTypeIdentifier.FromProjectilePrefab(projectilePrefab), out ProjectileTypeIdentifier replacement))
@@ -313,8 +311,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
         {
             if (!IsActive)
                 return false;
-
-            const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceFire)}({nameof(Orb)}) ";
 
             ProjectileTypeIdentifier identifier = ProjectileTypeIdentifier.Invalid;
 
@@ -379,7 +375,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
             }
 
 #if DEBUG
-            Log.Debug(LOG_PREFIX + $"unhandled Orb type {orb?.GetType()?.FullName ?? "null"}");
+            Log.Debug($"unhandled Orb type {orb?.GetType()?.FullName ?? "null"}");
 #endif
             return false;
         }
@@ -392,8 +388,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public static bool TryReplaceFire(in FireProjectileInfo info, GameObject weapon)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileRandomizerController)}.{nameof(TryReplaceFire)}({nameof(FireProjectileInfo)}&, {nameof(GameObject)}) ";
-
             if (!IsActive)
                 return false;
 
@@ -433,7 +427,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
                 if (!targetHurtBox)
                 {
-                    Log.Warning(LOG_PREFIX + $"projectile has target GO ({info.target.name}), but no HurtBox reference could be found");
+                    Log.Warning($"projectile has target GO ({info.target.name}), but no HurtBox reference could be found");
                 }
             }
 
@@ -551,7 +545,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     (_appendedProjectileReplacements.HasValue && _appendedProjectileReplacements.Value.TryGetValue(original, out replacement)))
                 {
 #if DEBUG
-                    Log.Debug($"Projectile Randomizer: Replaced projectile {original} -> {replacement}");
+                    Log.Debug($"Replaced projectile {original} -> {replacement}");
 #endif
 
                     return true;

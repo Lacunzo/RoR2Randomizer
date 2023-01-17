@@ -96,7 +96,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
                     if ((!ConfigManager.BuffRandomizer.MixBuffsAndDebuffs || ConfigManager.BuffRandomizer.SwapBuffDebuffWeightMult == 0f) && key.isDebuff != value.isDebuff)
                     {
 #if DEBUG
-                        Log.Debug($"{nameof(BuffRandomizerController)}: Not allowing replacement {toLogString(key)}->{toLogString(value)}, mixing buffs and debuffs is not enabled.");
+                        Log.Debug($"Not allowing replacement {toLogString(key)}->{toLogString(value)}, mixing buffs and debuffs is not enabled.");
 #endif
 
                         return false;
@@ -175,7 +175,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 
                 if (changed)
                 {
-                    Log.Debug($"Buff Randomizer debug buff {toLogString(_debugIndex)}");
+                    Log.Debug($"debug buff {toLogString(_debugIndex)}");
                 }
             }
         }
@@ -244,7 +244,7 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
 #if DEBUG
                     if (SuppressBuffReplacementLogCount == 0)
                     {
-                        Log.Debug($"Buff Randomizer: Replaced {toLogString(original)} -> {toLogString(replacement)}");
+                        Log.Debug($"Replaced {toLogString(original)} -> {toLogString(replacement)}");
                     }
 #endif
 

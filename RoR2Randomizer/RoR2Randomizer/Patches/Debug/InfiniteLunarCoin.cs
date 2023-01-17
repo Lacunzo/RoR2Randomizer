@@ -13,7 +13,7 @@ namespace RoR2Randomizer.Patches.Debug
         public static void ToggleEnabled()
         {
             _enabled = !_enabled;
-            Log.Debug($"Infinite Lunar Coins {(_enabled ? "Enabled" : "Disabled")}");
+            Log.Debug_NoCallerPrefix($"Infinite Lunar Coins {(_enabled ? "Enabled" : "Disabled")}");
         }
 
         static bool _enabled;
@@ -68,7 +68,7 @@ namespace RoR2Randomizer.Patches.Debug
                 foreach (Hook hook in _lunarCoinDelegateHooks)
                 {
                     hook?.Apply();
-        }
+                }
             }
         }
 

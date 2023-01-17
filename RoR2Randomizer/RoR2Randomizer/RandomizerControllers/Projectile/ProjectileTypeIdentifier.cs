@@ -37,8 +37,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         static DamageType? getDamageType(ProjectileType type, int index)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileTypeIdentifier)}.{nameof(getDamageType)} ";
-
             switch (type)
             {
                 case ProjectileType.OrdinaryProjectile:
@@ -76,7 +74,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                 case ProjectileType.SpiteBomb:
                     break;
                 default:
-                    Log.Warning(LOG_PREFIX + $"unhandled {nameof(ProjectileType)} {type}");
+                    Log.Warning($"unhandled {nameof(ProjectileType)} {type}");
                     break;
             }
 
@@ -115,8 +113,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
 
         public readonly void Fire(Vector3 origin, Quaternion rotation, float damage, float force, bool isCrit, GenericFireProjectileArgs genericArgs)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileTypeIdentifier)}.{nameof(Fire)} ";
-
             genericArgs.ModifyArgs(ref origin);
 
 #if DEBUG
@@ -148,7 +144,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     BulletAttackIdentifier bulletIdentifier = BulletAttackCatalog.Instance.GetIdentifier(Index);
                     if (!bulletIdentifier.IsValid)
                     {
-                        Log.Warning(LOG_PREFIX + $"invalid bullet attack at index {Index}");
+                        Log.Warning($"invalid bullet attack at index {Index}");
                         break;
                     }
 
@@ -169,7 +165,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     {
                         bulletAttack.maxDistance = genericArgs.MaxDistance;
 #if DEBUG
-                        Log.Debug(LOG_PREFIX + $"bullet {nameof(bulletAttack.maxDistance)}={bulletAttack.maxDistance}");
+                        Log.Debug($"bullet {nameof(bulletAttack.maxDistance)}={bulletAttack.maxDistance}");
 #endif
                     }
                     
@@ -186,7 +182,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     new SpawnRandomizedSpiteBombMessage(damage, origin, genericArgs).SendTo(NetworkDestination.Server);
                     break;
                 default:
-                    Log.Warning(LOG_PREFIX + $"unhandled type {Type}");
+                    Log.Warning($"unhandled type {Type}");
                     break;
             }
         }

@@ -19,8 +19,6 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.Orbs
 
         static void LightningOrb_OnArrival(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(LightningOrb_PreventSpawnHook)}.{nameof(LightningOrb_OnArrival)} ";
-
             ILCursor c = new ILCursor(il);
 
             int numPatchesMade = 0;
@@ -44,12 +42,12 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.Orbs
 
             if (numPatchesMade == 0)
             {
-                Log.Warning(LOG_PREFIX + "found no patch locations");
+                Log.Warning("found no patch locations");
             }
 #if DEBUG
             else
             {
-                Log.Debug(LOG_PREFIX + $"found {numPatchesMade} patch locations");
+                Log.Debug($"found {numPatchesMade} patch locations");
             }
 #endif
         }

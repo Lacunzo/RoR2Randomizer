@@ -36,8 +36,6 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         static LanguageAPI.LanguageOverlay[] replaceHereticNames(string replacementBodyNameToken)
         {
-            const string LOG_PREFIX = $"{nameof(HereticNameInDialogueOverrideManager)}.{nameof(replaceHereticNames)} ";
-
             Language[] languages = Language.GetAllLanguages().ToArray();
 
             LanguageAPI.LanguageOverlay[] result = new LanguageAPI.LanguageOverlay[languages.Length];

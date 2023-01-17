@@ -25,8 +25,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void EquipmentSlot_FireDroneBackup(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(EquipmentSlot_FireDroneBackup_SpawnHook)}.{nameof(EquipmentSlot_FireDroneBackup)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryFindNext(out ILCursor[] foundCursors,
@@ -61,12 +59,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + "Failed to patch the summoning of the drone");
+                    Log.Warning("Failed to patch the summoning of the drone");
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "Failed to patch the loading of the drone prefab");
+                Log.Warning("Failed to patch the loading of the drone prefab");
             }
         }
     }

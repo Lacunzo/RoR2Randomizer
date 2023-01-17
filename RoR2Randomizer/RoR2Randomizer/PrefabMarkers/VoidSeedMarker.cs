@@ -21,8 +21,6 @@ namespace RoR2Randomizer.PrefabMarkers
         [SystemInitializer]
         static void Init()
         {
-            const string LOG_PREFIX = $"{nameof(VoidSeedMarker)}.{nameof(Init)} ";
-
             AsyncOperationHandle<GameObject> voidSeedPrefabAssetRequest = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidCamp/VoidCamp.prefab");
             voidSeedPrefabAssetRequest.Completed += static operationHandle =>
             {
@@ -40,12 +38,12 @@ namespace RoR2Randomizer.PrefabMarkers
                         voidSeedMarker._type = markerType;
 
 #if DEBUG
-                        Log.Debug(LOG_PREFIX + $"added marker {markerType} to {operationHandle.Result.name}/{childName}");
+                        Log.Debug($"added marker {markerType} to {operationHandle.Result.name}/{childName}");
 #endif
                     }
                     else
                     {
-                        Log.Warning(LOG_PREFIX + $"unable to find child {childName}");
+                        Log.Warning($"unable to find child {childName}");
                     }
                 }
 

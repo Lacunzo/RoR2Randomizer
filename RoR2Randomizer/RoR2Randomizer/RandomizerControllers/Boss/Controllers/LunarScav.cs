@@ -60,7 +60,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
 
                                         if (originalMasterPrefabs.Length != multiSpawn.masterPrefabs.Length)
                                         {
-                                            Log.Warning($"LunarScavRandomizer: original master prefabs and card prefabs have different sizes");
+                                            Log.Warning($"original master prefabs and card prefabs have different sizes");
                                             return;
                                         }
 
@@ -75,7 +75,7 @@ namespace RoR2Randomizer.RandomizerControllers.Boss
                                 }
                                 else
                                 {
-                                    Log.Warning($"LunarScavRandomizer: {nameof(SpawnCard)} is not a {nameof(MultiCharacterSpawnCard)}");
+                                    Log.Warning($"{nameof(SpawnCard)} is not a {nameof(MultiCharacterSpawnCard)}");
                                 }
                             }
                         };

@@ -45,12 +45,10 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.SpiteBomb
 
         public override void OnReceived()
         {
-            const string LOG_PREFIX = $"{nameof(SpawnRandomizedSpiteBombMessage)}.{nameof(OnReceived)} ";
-
             if (!NetworkServer.active)
             {
 #if DEBUG
-                Log.Warning(LOG_PREFIX + "received on client");
+                Log.Warning("received on client");
 #endif
                 return;
             }

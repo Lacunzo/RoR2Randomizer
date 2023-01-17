@@ -23,7 +23,7 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
 
         static void replaceHereticIndexPatch(ILContext il)
         {
-            string LOG_PREFIX = $"{nameof(BrotherSpeechDriver_ReplaceHeretic)}.{nameof(replaceHereticIndexPatch)} ({il?.Method?.FullName ?? "null"}) ";
+            string LOG_PREFIX = $"({il?.Method?.FullName ?? "null"}) ";
 
             ILCursor c = new ILCursor(il);
 
@@ -49,12 +49,12 @@ namespace RoR2Randomizer.Patches.BossRandomizer.Mithrix
             if (patchCount > 0)
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"patched {patchCount} locations");
+                Log.Debug($"patched {patchCount} locations");
 #endif
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "patched 0 locations");
+                Log.Warning("patched 0 locations");
             }
         }
     }

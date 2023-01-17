@@ -25,8 +25,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Director
 
         static void CombatDirector_Spawn(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(CombatDirector_SpawnHook)}.{nameof(CombatDirector_Spawn)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(x => x.MatchCallOrCallvirt<DirectorCore>(nameof(DirectorCore.TrySpawnObject))))
@@ -79,7 +77,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer.Director
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

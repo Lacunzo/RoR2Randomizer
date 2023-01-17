@@ -12,7 +12,7 @@ namespace RoR2Randomizer.Patches.Debug
         public static void ToggleEnabled()
         {
             _enabled = !_enabled;
-            Log.Debug($"No Skill Colldown {(_enabled ? "Enabled" : "Disabled")}");
+            Log.Debug_NoCallerPrefix($"No Skill Colldown {(_enabled ? "Enabled" : "Disabled")}");
         }
 
         static bool _enabled;

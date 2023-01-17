@@ -30,8 +30,6 @@ namespace RoR2Randomizer.Patches.CharacterLimiting
 
         static void CharacterBody_HandleConstructTurret(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(CharacterLimiting)}.{nameof(EngiAsTurret)}.{nameof(CharacterBody_HandleConstructTurret)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt<MasterSummon>(nameof(MasterSummon.Perform))))
@@ -64,7 +62,7 @@ namespace RoR2Randomizer.Patches.CharacterLimiting
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find patch location");
+                Log.Warning("unable to find patch location");
             }
         }
     }

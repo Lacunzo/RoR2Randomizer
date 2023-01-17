@@ -8,7 +8,7 @@ namespace RoR2Randomizer.Utility
 {
     public abstract class GenericCatalog<TObjects, TIdentifier> : IEnumerable<TIdentifier> where TIdentifier : ICatalogIdentifier<TObjects, TIdentifier>
     {
-        static readonly string LOG_PREFIX_TYPE = $"{nameof(GenericCatalog<TObjects, TIdentifier>)}<{typeof(TObjects).Name}, {typeof(TIdentifier).Name}>";
+        static readonly string LOG_PREFIX_TYPE = $"({nameof(TObjects)}={typeof(TObjects).Name}, {nameof(TIdentifier)}={typeof(TIdentifier).Name}) ";
 
         public delegate void IdentifierAppendedDelegate(in TIdentifier identifier);
 
@@ -33,10 +33,6 @@ namespace RoR2Randomizer.Utility
 
         protected void appendIdentifier(ref TIdentifier identifier, bool checkExisting)
         {
-#if DEBUG
-            string LOG_PREFIX = $"{LOG_PREFIX_TYPE}.{nameof(appendIdentifier)} ";
-#endif
-
             if (checkExisting)
             {
                 for (int i = 0; i < _identifiersCount; i++)
@@ -44,7 +40,7 @@ namespace RoR2Randomizer.Utility
                     if (_identifiers[i].Equals(identifier, false))
                     {
 #if DEBUG
-                        Log.Warning(LOG_PREFIX + $"duplicate attack identifier {identifier}");
+                        Log.Warning(LOG_PREFIX_TYPE + $"duplicate attack identifier {identifier}");
 #endif
 
                         return;
@@ -55,7 +51,7 @@ namespace RoR2Randomizer.Utility
             identifier.Index = _identifiersCount;
 
 #if DEBUG
-            Log.Debug(LOG_PREFIX + $"appended {identifier}");
+            Log.Debug(LOG_PREFIX_TYPE + $"appended {identifier}");
 #endif
 
             ArrayUtils.ArrayAppend(ref _identifiers, ref _identifiersCount, identifier);

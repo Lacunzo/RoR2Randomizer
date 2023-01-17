@@ -20,8 +20,6 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer
 
         static void ProjectileExplosion_FireChild(On.RoR2.Projectile.ProjectileExplosion.orig_FireChild orig, ProjectileExplosion self)
         {
-            const string LOG_PREFIX = $"{nameof(ProjectileExplosion_ReplaceChildPrefab)}.{nameof(ProjectileExplosion_FireChild)} ";
-
             ref GameObject projectilePrefab = ref self.childrenProjectilePrefab;
 
             ProjectileManager_InitializeProjectile_SetOwnerPatch.OwnerOfNextProjectile = self.gameObject;

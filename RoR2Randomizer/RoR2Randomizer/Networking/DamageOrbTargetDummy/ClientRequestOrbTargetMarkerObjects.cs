@@ -40,11 +40,9 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
 
         public override void OnReceived()
         {
-            const string LOG_PREFIX = $"{nameof(ClientRequestOrbTargetMarkerObjects)}.{nameof(OnReceived)} ";
-
             if (!NetworkServer.active)
             {
-                Log.Error(LOG_PREFIX + "called on client");
+                Log.Error("called on client");
                 return;
             }
 
@@ -58,17 +56,17 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + $"could not find {nameof(NetworkUser)} with id {_requesterID}");
+                    Log.Warning($"could not find {nameof(NetworkUser)} with id {_requesterID}");
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "no valid requester ID");
+                Log.Warning("no valid requester ID");
             }
 
             if (requesterConnection == null)
             {
-                Log.Warning(LOG_PREFIX + "unable to find requester connection");
+                Log.Warning("unable to find requester connection");
                 return;
             }
 
@@ -86,13 +84,13 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
                 if (requesterConnection == null)
                 {
 #if DEBUG
-                    Log.Warning(LOG_PREFIX + "connection null in coroutine");
+                    Log.Warning($"{nameof(requesterConnection)} null in coroutine");
 #endif
                     yield break;
                 }
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"waited {Time.time - timeStarted:F2} seconds for connection ready");
+                Log.Debug($"waited {Time.time - timeStarted:F2} seconds for connection ready");
 #endif
 
                 GameObject[] objects = new GameObject[_newObjectCount];
@@ -170,10 +168,8 @@ namespace RoR2Randomizer.Networking.DamageOrbTargetDummy
 
             public override void OnReceived()
             {
-                const string LOG_PREFIX = $"{nameof(ClientRequestOrbTargetMarkerObjects)}+{nameof(Reply)}.{nameof(OnReceived)} ";
-
 #if DEBUG
-                Log.Debug(LOG_PREFIX);
+                Log.Debug($"{nameof(_objectIDs)}=[{string.Join(", ", _objectIDs)}]");
 #endif
 
                 Main.Instance.StartCoroutine(waitForAllObjectsResolvedAndInvokeEvent(_objectIDs));

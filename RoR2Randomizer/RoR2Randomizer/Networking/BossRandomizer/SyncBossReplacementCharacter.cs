@@ -23,7 +23,7 @@ namespace RoR2Randomizer.Networking.BossRandomizer
             _replacementType = replacementType;
             if (!replacementType.IsValid())
             {
-                Log.Warning($"{nameof(SyncBossReplacementCharacter)} is about to sync a boss replacement with an invalid boss type of {replacementType}! {nameof(masterObject)}: {masterObject}");
+                Log.Warning($"about to sync a boss replacement with an invalid boss type of {replacementType}! {nameof(masterObject)}={masterObject}");
             }
 
             _originalMasterIndex = originalMasterIndex;
@@ -48,7 +48,7 @@ namespace RoR2Randomizer.Networking.BossRandomizer
         protected override void onReceivedObjectResolved(GameObject obj)
         {
 #if DEBUG
-            Log.Debug($"{nameof(SyncBossReplacementCharacter)} object resolved: obj: {obj}, _replacementType: {_replacementType}");
+            Log.Debug($"{nameof(obj)}={obj}, {nameof(_replacementType)}={_replacementType}");
 #endif
 
             OnReceive?.Invoke(obj, _replacementType, _originalMasterIndex);

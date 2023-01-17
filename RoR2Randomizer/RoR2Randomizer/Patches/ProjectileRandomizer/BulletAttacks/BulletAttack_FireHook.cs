@@ -19,12 +19,10 @@ namespace RoR2Randomizer.Patches.ProjectileRandomizer.BulletAttacks
 
         static void BulletAttack_FireSingle(On.RoR2.BulletAttack.orig_FireSingle orig, BulletAttack self, Vector3 normal, int muzzleIndex)
         {
-            const string LOG_PREFIX = $"{nameof(BulletAttack_FireHook)}.{nameof(BulletAttack_FireSingle)} ";
-
             if (ProjectileRandomizerController.TryReplaceFire(self, normal))
             {
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"direction: {normal}");
+                Log.Debug($"{nameof(normal)}={normal}");
 #endif
 
                 return;

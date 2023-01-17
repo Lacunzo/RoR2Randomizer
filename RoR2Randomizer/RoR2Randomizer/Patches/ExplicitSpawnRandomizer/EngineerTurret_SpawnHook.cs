@@ -32,8 +32,6 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
         static void PlaceTurret_FixedUpdate(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(EngineerTurret_SpawnHook)}.{nameof(PlaceTurret_FixedUpdate)} ";
-
             ILCursor c = new ILCursor(il);
 
             int numLocationsPatched = 0;
@@ -54,20 +52,18 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
             if (numLocationsPatched == 0)
             {
-                Log.Warning($"{LOG_PREFIX}Failed to patch any locations for {nameof(PlaceTurret.FixedUpdate)}");
+                Log.Warning($"Failed to patch any locations for {nameof(PlaceTurret.FixedUpdate)}");
             }
 #if DEBUG
             else
             {
-                Log.Debug($"{LOG_PREFIX}Patched {numLocationsPatched} locations for {nameof(PlaceTurret.FixedUpdate)}");
+                Log.Debug($"Patched {numLocationsPatched} locations for {nameof(PlaceTurret.FixedUpdate)}");
             }
 #endif
         }
 
         static void CharacterBody_HandleConstructTurret(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(EngineerTurret_SpawnHook)}.{nameof(CharacterBody_HandleConstructTurret)} ";
-
             ILCursor c = new ILCursor(il);
 
             if (c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt<MasterSummon>(nameof(MasterSummon.Perform))))
@@ -83,14 +79,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
             }
             else
             {
-                Log.Warning($"{LOG_PREFIX}Failed to find patch the location");
+                Log.Warning($"Failed to find patch the location");
             }
         }
 
         static void PlaceTurret_GetPlacementInfo(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(EngineerTurret_SpawnHook)}.{nameof(PlaceTurret_GetPlacementInfo)} ";
-
             ILCursor c = new ILCursor(il);
 
             const float TURRET_RADUIS = 0.5f;
@@ -113,7 +107,7 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
                             {
                                 float result = radius + (TURRET_PLACE_DISTANCE - TURRET_RADUIS);
 #if DEBUG
-                                Log.Debug($"{LOG_PREFIX}Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
+                                Log.Debug($"Override radius: {TURRET_PLACE_DISTANCE} -> {result}");
 #endif
                                 return Mathf.Max(originalDistance, result);
                             }
@@ -126,12 +120,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
             if (numLocationsPatched == 0)
             {
-                Log.Warning($"{LOG_PREFIX}Failed to patch any locations for radius override in {nameof(PlaceTurret.GetPlacementInfo)}");
+                Log.Warning($"Failed to patch any locations for radius override in {nameof(PlaceTurret.GetPlacementInfo)}");
             }
 #if DEBUG
             else
             {
-                Log.Debug($"{LOG_PREFIX}Patched {numLocationsPatched} locations for radius override in {nameof(PlaceTurret.GetPlacementInfo)}");
+                Log.Debug($"Patched {numLocationsPatched} locations for radius override in {nameof(PlaceTurret.GetPlacementInfo)}");
             }
 #endif
 
@@ -157,12 +151,12 @@ namespace RoR2Randomizer.Patches.ExplicitSpawnRandomizer
 
             if (numLocationsPatched == 0)
             {
-                Log.Warning($"{LOG_PREFIX}Failed to patch any locations for turret rotation in {nameof(PlaceTurret.GetPlacementInfo)}");
+                Log.Warning($"Failed to patch any locations for turret rotation in {nameof(PlaceTurret.GetPlacementInfo)}");
             }
 #if DEBUG
             else
             {
-                Log.Debug($"{LOG_PREFIX}Patched {numLocationsPatched} locations for turret rotation in {nameof(PlaceTurret.GetPlacementInfo)}");
+                Log.Debug($"Patched {numLocationsPatched} locations for turret rotation in {nameof(PlaceTurret.GetPlacementInfo)}");
             }
 #endif
         }

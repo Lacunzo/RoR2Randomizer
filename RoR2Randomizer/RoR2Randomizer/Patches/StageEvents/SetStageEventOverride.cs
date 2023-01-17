@@ -13,15 +13,13 @@ namespace RoR2Randomizer.Patches.StageEvents
 
         static SetStageEventOverride()
         {
-            const string LOG_PREFIX = $"{nameof(SetStageEventOverride)}..cctor ";
-
             AsyncOperationHandle<FamilyDirectorCardCategorySelection> gupFamilyAssetRequest = Addressables.LoadAssetAsync<FamilyDirectorCardCategorySelection>("RoR2/Base/Common/dccsGupFamily.asset");
             gupFamilyAssetRequest.Completed += static (AsyncOperationHandle<FamilyDirectorCardCategorySelection> handle) =>
             {
                 _gupFamilySelection = handle.Result;
 
 #if DEBUG
-                Log.Debug(LOG_PREFIX + $"Loaded {_gupFamilySelection}");
+                Log.Debug($"Loaded {_gupFamilySelection}");
 #endif
             };
         }
@@ -38,8 +36,6 @@ namespace RoR2Randomizer.Patches.StageEvents
 
         static void ClassicStageInfo_Awake(On.RoR2.ClassicStageInfo.orig_Awake orig, ClassicStageInfo self)
         {
-            const string LOG_PREFIX = $"{nameof(SetStageEventOverride)}.{nameof(ClassicStageInfo_Awake)} ";
-
             OverrideStageEventPatch.ForcedCategorySelection = null;
 
             if (NetworkServer.active)
@@ -48,7 +44,7 @@ namespace RoR2Randomizer.Patches.StageEvents
                 {
                     if (!_gupFamilySelection)
                     {
-                        Log.Warning(LOG_PREFIX + $" Gup mode is enabled, but {nameof(_gupFamilySelection)} is not loaded!");
+                        Log.Warning($"Gup mode is enabled, but {nameof(_gupFamilySelection)} is not loaded!");
                     }
                     else
                     {

@@ -49,7 +49,7 @@ namespace RoR2Randomizer
             new ContentPackManager().Init();
 
             stopwatch.Stop();
-            Log.Info($"Initialized in {stopwatch.Elapsed.TotalSeconds:F1} seconds");
+            Log.Info_NoCallerPrefix($"Initialized in {stopwatch.Elapsed.TotalSeconds:F1} seconds");
         }
 
         void OnDestroy()

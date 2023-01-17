@@ -70,13 +70,13 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                             }
                             else
                             {
-                                Log.Warning($"{nameof(DotRandomizerPatch)} {nameof(DotController_InflictDot_refInflictDotInfo)} victim object has no body ({inflictDotInfo.victimObject})");
+                                Log.Warning("victim object has no body ({inflictDotInfo.victimObject})");
                             }
                         }
                     }
                     else
                     {
-                        Log.Warning($"{nameof(DotRandomizerPatch)} {nameof(DotController_InflictDot_refInflictDotInfo)} victim object has no health component ({inflictDotInfo.victimObject})");
+                        Log.Warning("victim object has no health component ({inflictDotInfo.victimObject})");
                     }
 
                     return;

@@ -17,12 +17,10 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         public SpawnPodPrefabData(BodyIndex bodyIndex)
         {
-            const string LOG_PREFIX = $"{nameof(SpawnPodPrefabData)}..ctor({nameof(BodyIndex)} {nameof(bodyIndex)}) ";
-
             CharacterBody bodyPrefab = BodyCatalog.GetBodyPrefabBodyComponent(bodyIndex);
             if (!bodyPrefab)
             {
-                Log.Error(LOG_PREFIX + $"null body prefab at index {bodyIndex}!");
+                Log.Error($"null body prefab at index {bodyIndex}!");
                 TargetBodyIndex = BodyIndex.None;
                 return;
             }
@@ -42,8 +40,6 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
 
         public SpawnPodPrefabData(NetworkReader reader)
         {
-            const string LOG_PREFIX = $"{nameof(SpawnPodPrefabData)}..ctor({nameof(NetworkReader)} {nameof(reader)}) ";
-
             TargetBodyIndex = reader.ReadBodyIndex();
 
             CharacterBody bodyPrefab = BodyCatalog.GetBodyPrefabBodyComponent(TargetBodyIndex);
@@ -60,7 +56,7 @@ namespace RoR2Randomizer.RandomizerControllers.SurvivorPod
             }
             else
             {
-                Log.Error(LOG_PREFIX + $"null body prefab at index {TargetBodyIndex}!");
+                Log.Error($"null body prefab at index {TargetBodyIndex}!");
             }
         }
 
