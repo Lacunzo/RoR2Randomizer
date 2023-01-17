@@ -16,6 +16,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
         // The threshold for when new objects should be requested
         const int MIN_ALLOWED_LOCAL_OBJECTS = 15;
 
+        static bool _availableLocalInstancesRefreshScheduled = false;
         static readonly Stack<OrbTargetDummyObjectMarker> _availableLocalInstances = new Stack<OrbTargetDummyObjectMarker>();
 
         public static GameObject Prefab { get; private set; }
@@ -36,6 +37,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
             networkTransform.interpolateMovement = 0f;
 
             tmpPrefab.AddComponent<OrbTargetDummyObjectMarker>();
+            tmpPrefab.AddComponent<SetDontDestroyOnLoad>();
             Prefab = tmpPrefab.InstantiateClone(PREFAB_NAME);
             GameObject.Destroy(tmpPrefab);
         }
@@ -50,7 +52,31 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
         static void onRunStart(Run _)
         {
-            refillLocalInstances(MIN_ALLOWED_LOCAL_OBJECTS - _availableLocalInstances.Count);
+            _availableLocalInstances.Clear();
+            refillLocalInstances(MIN_ALLOWED_LOCAL_OBJECTS);
+        }
+
+        static void markLocalInstancesDirty()
+        {
+            if (_availableLocalInstancesRefreshScheduled)
+                return;
+
+            _availableLocalInstancesRefreshScheduled = true;
+            RoR2Application.onNextUpdate += static () =>
+            {
+                OrbTargetDummyObjectMarker[] markers = _availableLocalInstances.ToArray();
+                _availableLocalInstances.Clear();
+
+                foreach (OrbTargetDummyObjectMarker marker in markers)
+                {
+                    if (!marker)
+                        continue;
+
+                    _availableLocalInstances.Push(marker);
+                }
+
+                _availableLocalInstancesRefreshScheduled = false;
+            };
         }
 
         public static OrbTargetDummyObjectMarker GetMarker(Vector3 position, float? duration)
@@ -183,17 +209,26 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
             }
         }
 
-        float _timeToDestroy;
+        float _timeToDisable;
 
         void Awake()
         {
-            GameObject.DontDestroyOnLoad(gameObject);
-            Run.onRunDestroyGlobal += onRunEnd;
+            Run.onRunDestroyGlobal += Run_onRunDestroyGlobal;
         }
 
-        void onRunEnd(Run _)
+        void Run_onRunDestroyGlobal(Run obj)
         {
-            isInUse = false;
+            Destroy(gameObject);
+        }
+
+        void OnDestroy()
+        {
+            Run.onRunDestroyGlobal -= Run_onRunDestroyGlobal;
+
+            if (_availableLocalInstances.Contains(this))
+            {
+                markLocalInstancesDirty();
+            }
         }
 
         void setInUse(float? duration)
@@ -202,11 +237,11 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
 
             if (duration.HasValue)
             {
-                _timeToDestroy = Time.time + duration.Value;
+                _timeToDisable = Time.time + duration.Value;
             }
             else
             {
-                _timeToDestroy = -1f;
+                _timeToDisable = -1f;
             }
         }
 
@@ -221,11 +256,6 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
             }
         }
 
-        void OnDestroy()
-        {
-            Run.onRunDestroyGlobal -= onRunEnd;
-        }
-
         void Update()
         {
             if (!isAuthority)
@@ -233,7 +263,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs
             
             if (isInUse)
             {
-                if (_timeToDestroy > 0f && Time.time >= _timeToDestroy)
+                if (_timeToDisable > 0f && Time.time >= _timeToDisable)
                 {
                     isInUse = false;
                 }
