@@ -1,5 +1,6 @@
 ﻿#if DEBUG
 using HarmonyLib;
+using MonoMod.RuntimeDetour;
 using RoR2;
 using System;
 using System.Reflection;
@@ -17,7 +18,44 @@ namespace RoR2Randomizer.Patches.Debug
 
         static bool _enabled;
 
-        //static readonly Hook CostTypeCatalog_Init_b__5_10_Hook = new Hook(typeof(CostTypeCatalog).GetNestedType("<>c", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance).GetMethod("<Init>b__5_10", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly), CostTypeCatalog_Init_MI, new ILHookConfig { ManualApply = true });
+        delegate bool orig_CostTypeDef_IsAffordable(object self, CostTypeDef costTypeDef, CostTypeDef.IsAffordableContext context);
+        delegate void orig_CostTypeDef_PayCost(object self, CostTypeDef costTypeDef, CostTypeDef.PayCostContext context);
+
+        static readonly Hook[] _lunarCoinDelegateHooks = new Hook[2];
+
+        [SystemInitializer(typeof(CostTypeCatalog))]
+        static void InitCostTypeHooks()
+        {
+            CostTypeDef lunarCoinCostType = CostTypeCatalog.GetCostTypeDef(CostTypeIndex.LunarCoin);
+            if (lunarCoinCostType == null)
+            {
+                Log.Warning($"{nameof(lunarCoinCostType)} is null");
+                return;
+            }
+
+            CostTypeDef.IsAffordableDelegate isAffordable = lunarCoinCostType.isAffordable;
+            if (isAffordable != null)
+            {
+                _lunarCoinDelegateHooks[0] = new Hook(isAffordable.Method, (orig_CostTypeDef_IsAffordable orig, object self, CostTypeDef costTypeDef, CostTypeDef.IsAffordableContext context) =>
+                {
+                    return _enabled || orig(self, costTypeDef, context);
+                }, new HookConfig { ManualApply = true });
+                _lunarCoinDelegateHooks[0].Apply();
+            }
+
+            CostTypeDef.PayCostDelegate payCost = lunarCoinCostType.payCost;
+            if (payCost != null)
+            {
+                _lunarCoinDelegateHooks[1] = new Hook(payCost.Method, (orig_CostTypeDef_PayCost orig, object self, CostTypeDef costTypeDef, CostTypeDef.PayCostContext context) =>
+                {
+                    if (_enabled)
+                        return;
+
+                    orig(self, costTypeDef, context);
+                });
+                _lunarCoinDelegateHooks[1].Apply();
+            }
+        }
 
         static void Apply()
         {
@@ -25,7 +63,13 @@ namespace RoR2Randomizer.Patches.Debug
 
             On.RoR2.NetworkUser.RpcDeductLunarCoins += NetworkUser_RpcDeductLunarCoins;
 
-            //CostTypeCatalog_Init_b__5_10_Hook.Apply();
+            if (_lunarCoinDelegateHooks != null)
+            {
+                foreach (Hook hook in _lunarCoinDelegateHooks)
+                {
+                    hook?.Apply();
+        }
+            }
         }
 
         static void Cleanup()
@@ -34,12 +78,18 @@ namespace RoR2Randomizer.Patches.Debug
 
             On.RoR2.NetworkUser.RpcDeductLunarCoins -= NetworkUser_RpcDeductLunarCoins;
 
-            //CostTypeCatalog_Init_b__5_10_Hook.Undo();
+            if (_lunarCoinDelegateHooks != null)
+            {
+                foreach (Hook hook in _lunarCoinDelegateHooks)
+                {
+                    hook?.Undo();
+                }
+            }
         }
 
         static bool BazaarUpgradeInteraction_CanBeAffordedByInteractor(On.RoR2.BazaarUpgradeInteraction.orig_CanBeAffordedByInteractor orig, BazaarUpgradeInteraction self, Interactor activator)
         {
-            return orig(self, activator) || _enabled;
+            return _enabled || orig(self, activator);
         }
 
         static void NetworkUser_RpcDeductLunarCoins(On.RoR2.NetworkUser.orig_RpcDeductLunarCoins orig, NetworkUser self, uint count)
@@ -48,12 +98,6 @@ namespace RoR2Randomizer.Patches.Debug
                 return;
 
             orig(self, count);
-        }
-
-        static readonly MethodInfo CostTypeCatalog_Init_MI = SymbolExtensions.GetMethodInfo(() => CostTypeCatalog_Init(default, default, default, default));
-        static bool CostTypeCatalog_Init(Func<object, CostTypeDef, CostTypeDef.IsAffordableContext, bool> orig, object self, CostTypeDef costTypeDef, CostTypeDef.IsAffordableContext context)
-        {
-            return orig(self, costTypeDef, context) || _enabled;
         }
     }
 }
