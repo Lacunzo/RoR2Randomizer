@@ -8,7 +8,7 @@ namespace RoR2Randomizer.Utility
 {
     public abstract class GenericCatalog<TObjects, TIdentifier> : IEnumerable<TIdentifier> where TIdentifier : ICatalogIdentifier<TObjects, TIdentifier>
     {
-        static readonly string LOG_PREFIX_TYPE = $"({nameof(TObjects)}={typeof(TObjects).Name}, {nameof(TIdentifier)}={typeof(TIdentifier).Name}) ";
+        protected static readonly string LOG_PREFIX_TYPE = $"({nameof(TObjects)}={typeof(TObjects).Name}, {nameof(TIdentifier)}={typeof(TIdentifier).Name}) ";
 
         public delegate void IdentifierAppendedDelegate(in TIdentifier identifier);
 

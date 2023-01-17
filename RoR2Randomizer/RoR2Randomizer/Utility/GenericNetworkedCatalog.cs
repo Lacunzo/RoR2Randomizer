@@ -10,8 +10,6 @@ namespace RoR2Randomizer.Utility
 {
     public abstract class GenericNetworkedCatalog<TObject, TIdentifier> : GenericCatalog<TObject, TIdentifier>, INetMessageProvider where TIdentifier : ICatalogIdentifier<TObject, TIdentifier>
     {
-        static readonly string LOG_PREFIX_TYPE = $"{nameof(GenericNetworkedCatalog<TObject, TIdentifier>)}<{typeof(TObject).Name}, {typeof(TIdentifier).Name}>";
-
         protected GenericNetworkedCatalog() : base()
         {
             NetworkingManager.RegisterMessageProvider(this, MessageProviderFlags.Persistent);
