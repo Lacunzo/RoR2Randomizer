@@ -1,5 +1,11 @@
 ## Changelog
 
+**0.8.4 Changes:**
+
+* Projectile Randomizer:
+  * Fixed certain attacks possibly not having visuals for all players who aren't the attacker when joining and/or hosting several different servers in a single instance of the game running.
+  * Fixed a specific projectile breaking the projectile randomizer, requiring a game restart to fix.
+
 **0.8.3 Changes:**
 
 * Survivor Intro Animation Randomizer:
