@@ -59,7 +59,7 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile
                     DamageOrbIdentifier damageOrbIdentifier = DamageOrbCatalog.Instance.GetIdentifier(index);
                     if (damageOrbIdentifier.IsValid)
                     {
-                        return damageOrbIdentifier.CreateInstance().damageType;
+                        return damageOrbIdentifier.CreateInstance()?.damageType;
                     }
 
                     break;

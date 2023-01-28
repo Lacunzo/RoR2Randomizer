@@ -73,9 +73,28 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
             return OrbEffectIndex == EffectCatalog.FindEffectIndexFromPrefab(damageOrb.GetOrbEffect());
         }
 
-        public GenericDamageOrb CreateInstance()
+        public readonly GenericDamageOrb CreateInstance()
         {
-            GenericDamageOrb instance = (GenericDamageOrb)Activator.CreateInstance((Type)OrbType);
+            Type orbType = (Type)OrbType;
+
+            GenericDamageOrb instance;
+            if (orbType == typeof(ChainGunOrb))
+            {
+                instance = (GenericDamageOrb)Activator.CreateInstance(orbType, new object[] { EffectCatalog.GetEffectDef(OrbEffectIndex)?.prefab });
+            }
+            else
+            {
+                try
+                {
+                    instance = (GenericDamageOrb)Activator.CreateInstance(orbType);
+                }
+                catch (MissingMethodException)
+                {
+                    Log.Error($"No valid constructor found for orb type {orbType.FullName}");
+                    return null;
+                }
+            }
+
             return instance;
         }
 

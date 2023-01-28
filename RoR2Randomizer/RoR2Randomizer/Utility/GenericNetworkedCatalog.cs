@@ -15,14 +15,16 @@ namespace RoR2Randomizer.Utility
             NetworkingManager.RegisterMessageProvider(this, MessageProviderFlags.Persistent);
         }
 
-        protected abstract TIdentifier createIdentifierForObject(TObject obj);
+        protected abstract bool tryCreateIdentifierForObject(TObject obj, out TIdentifier identifier);
 
         public override TIdentifier GetIdentifier(TObject obj)
         {
             TIdentifier identifier = base.GetIdentifier(obj);
             if (!identifier.IsValid)
             {
-                identifier = createIdentifierForObject(obj);
+                if (!tryCreateIdentifierForObject(obj, out identifier))
+                    return InvalidIdentifier;
+
                 if (NetworkServer.active)
                 {
                     appendIdentifier(ref identifier, false);

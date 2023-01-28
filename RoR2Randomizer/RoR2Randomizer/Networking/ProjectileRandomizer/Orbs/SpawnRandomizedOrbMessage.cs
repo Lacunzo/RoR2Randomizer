@@ -168,6 +168,11 @@ namespace RoR2Randomizer.Networking.ProjectileRandomizer.Orbs
                     }
 
                     GenericDamageOrb damageOrb = damageOrbIdentifier.CreateInstance();
+                    if (damageOrb == null)
+                    {
+                        Log.Warning($"null {nameof(GenericDamageOrb)} instance returned from {damageOrbIdentifier}");
+                        return;
+                    }
 
                     damageOrb.damageValue = _damage;
                     damageOrb.attacker = _genericArgs.Owner;

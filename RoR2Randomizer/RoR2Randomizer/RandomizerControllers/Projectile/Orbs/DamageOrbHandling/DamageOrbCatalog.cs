@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
@@ -27,16 +29,26 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
         [SystemInitializer(typeof(EffectCatalog))]
         static void Init()
         {
+            static void initIdentifier(GenericDamageOrb damageOrb)
+            {
+                DamageOrbIdentifier identifier = new DamageOrbIdentifier(damageOrb);
+                Instance.appendIdentifier(ref identifier, true);
+            }
+
             static void initIdentifiersForType<T>() where T : GenericDamageOrb, new()
             {
-                static void initIdentifier(GenericDamageOrb damageOrb)
-                {
-                    DamageOrbIdentifier identifier = new DamageOrbIdentifier(damageOrb);
-                    Instance.appendIdentifier(ref identifier, true);
-                }
-
                 initIdentifier(new T());
                 initIdentifier(new T { isCrit = true });
+            }
+
+            static void initIdentifiersForType_Arg<T>(params object[] constructorParams) where T : GenericDamageOrb
+            {
+                T nonCritInstance = (T)Activator.CreateInstance(typeof(T), constructorParams);
+                initIdentifier(nonCritInstance);
+
+                T critInstance = (T)Activator.CreateInstance(typeof(T), constructorParams);
+                critInstance.isCrit = true;
+                initIdentifier(critInstance);
             }
 
             initIdentifiersForType<HuntressArrowOrb>();
@@ -46,13 +58,33 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.DamageOrbHandling
             initIdentifiersForType<MissileVoidOrb>();
             initIdentifiersForType<SimpleLightningStrikeOrb>();
             initIdentifiersForType<SquidOrb>();
+
+            GameObject chainGunOrbEffectPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/DroneWeapons/ChainGunOrbEffect.prefab").WaitForCompletion();
+            initIdentifiersForType_Arg<ChainGunOrb>(chainGunOrbEffectPrefab);
         }
 
         protected override DamageOrbIdentifier InvalidIdentifier => DamageOrbIdentifier.Invalid;
 
-        protected override DamageOrbIdentifier createIdentifierForObject(GenericDamageOrb damageOrb)
+        protected override bool tryCreateIdentifierForObject(GenericDamageOrb damageOrb, out DamageOrbIdentifier identifier)
         {
-            return new DamageOrbIdentifier(damageOrb);
+            if (damageOrb != null)
+            {
+                Type damageOrbType = damageOrb.GetType();
+                if (damageOrbType == typeof(ChainGunOrb) || damageOrbType.GetConstructor(Array.Empty<Type>()) != null)
+                {
+                    identifier = new DamageOrbIdentifier(damageOrb);
+                    return true;
+                }
+#if DEBUG
+                else
+                {
+                    Log.Debug($"Not including Orb {damageOrbType.FullName} due to: no valid constructor");
+                }
+#endif
+            }
+
+            identifier = DamageOrbIdentifier.Invalid;
+            return false;
         }
 
         protected override NetworkMessageBase getSyncIdentifierNeededMessage(in DamageOrbIdentifier identifier)

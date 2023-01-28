@@ -59,9 +59,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.Orbs.LightningOrbHandl
 
         protected override LightningOrbIdentifier InvalidIdentifier => LightningOrbIdentifier.Invalid;
 
-        protected override LightningOrbIdentifier createIdentifierForObject(LightningOrb lightningOrb)
+        protected override bool tryCreateIdentifierForObject(LightningOrb lightningOrb, out LightningOrbIdentifier identifier)
         {
-            return new LightningOrbIdentifier(lightningOrb);
+            identifier = new LightningOrbIdentifier(lightningOrb);
+            return true;
         }
 
         protected override NetworkMessageBase getSyncIdentifierNeededMessage(in LightningOrbIdentifier identifier)

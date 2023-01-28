@@ -169,9 +169,10 @@ namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling
 
         protected override BulletAttackIdentifier InvalidIdentifier => BulletAttackIdentifier.Invalid;
 
-        protected override BulletAttackIdentifier createIdentifierForObject(BulletAttack bulletAttack)
+        protected override bool tryCreateIdentifierForObject(BulletAttack bulletAttack, out BulletAttackIdentifier identifier)
         {
-            return new BulletAttackIdentifier(bulletAttack, BulletAttackFlags.None);
+            identifier = new BulletAttackIdentifier(bulletAttack, BulletAttackFlags.None);
+            return true;
         }
 
         protected override NetworkMessageBase getSyncIdentifierNeededMessage(in BulletAttackIdentifier identifier)
