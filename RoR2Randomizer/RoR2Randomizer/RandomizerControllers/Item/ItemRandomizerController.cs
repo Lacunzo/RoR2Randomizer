@@ -34,6 +34,14 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                              return false;
                                                          }
 
+                                                         if (pd.miscPickupIndex != MiscPickupIndex.None)
+                                                         {
+#if DEBUG
+                                                             Log.Debug($"excluding misc pickup {pd.pickupIndex}");
+#endif
+                                                             return false;
+                                                         }
+
                                                          if (pd.internalName.StartsWith("ItemTier."))
                                                          {
 #if DEBUG
