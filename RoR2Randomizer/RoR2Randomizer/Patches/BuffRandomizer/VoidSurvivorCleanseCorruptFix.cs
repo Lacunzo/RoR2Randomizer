@@ -50,7 +50,7 @@ namespace RoR2Randomizer.Patches.BuffRandomizer
                             {
                                 bool containsCorruptModeDOT(out int corruptModeDOTIndex)
                                 {
-                                    if (BuffRandomizerController.TryGetReplacementBuffIndex(Caches.Buffs.VoidSurvivorCorruptMode, out BuffIndex corruptModeReplacement))
+                                    if (BuffRandomizerController.TryGetReplacementBuffIndex(DLC1Content.Buffs.VoidSurvivorCorruptMode.buffIndex, out BuffIndex corruptModeReplacement))
                                     {
                                         for (int i = 0; i < controller.dotStackList.Count; i++)
                                         {

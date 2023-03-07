@@ -75,20 +75,6 @@ namespace RoR2Randomizer.Utility
             return false;
         });
 
-        public static class Buffs
-        {
-            public static BuffIndex VoidSurvivorCorruptMode { get; private set; } = BuffIndex.None;
-
-            [SystemInitializer(typeof(BuffCatalog))]
-            static void Init()
-            {
-                VoidSurvivorCorruptMode = BuffCatalog.FindBuffIndex(Constants.BuffNames.VOIDSURVIVOR_CORRUPT_MODE_NAME);
-#if DEBUG
-                if (VoidSurvivorCorruptMode == BuffIndex.None) Log.Warning($"Unable to find buff index '{Constants.BuffNames.VOIDSURVIVOR_CORRUPT_MODE_NAME}'");
-#endif
-            }
-        }
-
         public static class Masters
         {
             public static MasterCatalog.MasterIndex Gup { get; private set; } = MasterCatalog.MasterIndex.none;
