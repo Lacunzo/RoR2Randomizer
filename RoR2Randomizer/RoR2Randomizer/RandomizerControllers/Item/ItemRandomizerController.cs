@@ -29,7 +29,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                          if (pd.artifactIndex != ArtifactIndex.None)
                                                          {
 #if DEBUG
-                                                             Log.Debug(LOG_PREFIX + $"excluding artifact pickup {pd.pickupIndex}");
+                                                             Log.Debug($"excluding artifact pickup {pd.pickupIndex}");
 #endif
                                                              return false;
                                                          }
@@ -45,7 +45,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                          if (pd.internalName.StartsWith("ItemTier."))
                                                          {
 #if DEBUG
-                                                             Log.Debug(LOG_PREFIX + $"excluding {nameof(ItemTier)} pickup {pd.pickupIndex}");
+                                                             Log.Debug($"excluding {nameof(ItemTier)} pickup {pd.pickupIndex}");
 #endif
                                                              return false;
                                                          }
@@ -53,7 +53,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                          if (pd.equipmentIndex != EquipmentIndex.None && ReadOnlyArray<EquipmentIndex>.BinarySearch(CharacterReplacements.AvailableDroneEquipments, pd.equipmentIndex) < 0)
                                                          {
 #if DEBUG
-                                                             Log.Debug(LOG_PREFIX + $"excluding invalid equipment pickup {pd.pickupIndex}");
+                                                             Log.Debug($"excluding invalid equipment pickup {pd.pickupIndex}");
 #endif
                                                              return false;
                                                          }
@@ -61,7 +61,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                          if (!pd.dropletDisplayPrefab)
                                                          {
 #if DEBUG
-                                                             Log.Debug(LOG_PREFIX + $"excluding pickup {pd.pickupIndex} due to: null {nameof(PickupDef.dropletDisplayPrefab)}");
+                                                             Log.Debug($"excluding pickup {pd.pickupIndex} due to: null {nameof(PickupDef.dropletDisplayPrefab)}");
 #endif
                                                              return false;
                                                          }
@@ -69,7 +69,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                          if (!pd.displayPrefab || pd.displayPrefab.GetComponent<NullModelMarker>())
                                                          {
 #if DEBUG
-                                                             Log.Debug(LOG_PREFIX + $"excluding pickup {pd.pickupIndex} due to: null {nameof(PickupDef.displayPrefab)}");
+                                                             Log.Debug($"excluding pickup {pd.pickupIndex} due to: null {nameof(PickupDef.displayPrefab)}");
 #endif
                                                              return false;
                                                          }
@@ -77,7 +77,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                          if (string.IsNullOrEmpty(pd.nameToken) || Language.GetString(pd.nameToken) == pd.nameToken)
                                                          {
 #if DEBUG
-                                                             Log.Debug(LOG_PREFIX + $"excluding pickup {pd.pickupIndex} due to: invalid name token {pd.nameToken}");
+                                                             Log.Debug($"excluding pickup {pd.pickupIndex} due to: invalid name token {pd.nameToken}");
 #endif
                                                              return false;
                                                          }
