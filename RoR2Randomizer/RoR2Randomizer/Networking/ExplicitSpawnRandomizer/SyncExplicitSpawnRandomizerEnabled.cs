@@ -1,5 +1,5 @@
-﻿using RoR2Randomizer.Networking.Generic;
-using RoR2Randomizer.Utility;
+﻿using RoR2Randomizer.Extensions;
+using RoR2Randomizer.Networking.Generic;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Networking.ExplicitSpawnRandomizer

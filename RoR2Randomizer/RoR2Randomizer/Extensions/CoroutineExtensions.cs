@@ -1,10 +1,11 @@
 ﻿using System.Collections;
+using RoR2Randomizer.Utility;
 using UnityEngine;
 using UnityModdingUtility;
 
-namespace RoR2Randomizer.Utility
+namespace RoR2Randomizer.Extensions
 {
-    public static class CoroutineUtils
+    public static class CoroutineExtensions
     {
         public static IEnumerator AddTimeout(this IEnumerator baseRoutine, float timeout, CoroutineOut<TimeoutActionResult> result = null)
         {

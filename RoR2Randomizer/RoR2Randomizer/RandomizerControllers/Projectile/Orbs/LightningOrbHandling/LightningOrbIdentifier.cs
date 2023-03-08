@@ -1,6 +1,6 @@
 ﻿using RoR2;
 using RoR2.Orbs;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.Utility.Catalog;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 

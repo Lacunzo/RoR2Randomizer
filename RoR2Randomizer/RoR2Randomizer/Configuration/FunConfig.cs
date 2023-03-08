@@ -3,6 +3,7 @@ using RoR2;
 using RoR2.EntitlementManagement;
 using RoR2.ExpansionManagement;
 using RoR2Randomizer.Configuration.ConfigValue;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
 using System.Linq;
 

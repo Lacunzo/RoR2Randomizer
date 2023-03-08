@@ -1,5 +1,5 @@
 ﻿using RoR2;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.Utility.Catalog;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.RandomizerControllers.Projectile.BulletAttackHandling

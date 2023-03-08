@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RoR2Randomizer.Utility
+namespace RoR2Randomizer.Utility.Catalog
 {
     public abstract class GenericCatalog<TObjects, TIdentifier> : IEnumerable<TIdentifier> where TIdentifier : ICatalogIdentifier<TObjects, TIdentifier>
     {

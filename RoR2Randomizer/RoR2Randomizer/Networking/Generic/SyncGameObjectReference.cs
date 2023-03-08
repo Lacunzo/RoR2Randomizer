@@ -1,5 +1,5 @@
 ﻿using R2API.Networking;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.Extensions;
 using System;
 using System.Collections;
 using UnityEngine;

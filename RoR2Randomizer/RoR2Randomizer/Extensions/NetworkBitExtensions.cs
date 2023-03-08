@@ -3,9 +3,9 @@ using RoR2;
 using System;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.Utility
+namespace RoR2Randomizer.Extensions
 {
-    public static class NetworkUtils
+    public static class NetworkBitExtensions
     {
         static bool[] _sharedBitsArray = Array.Empty<bool>();
 

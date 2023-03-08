@@ -3,7 +3,7 @@ using RoR2Randomizer.Patches.Debug;
 using RoR2Randomizer.RandomizerControllers;
 using UnityEngine;
 
-namespace RoR2Randomizer.Utility
+namespace RoR2Randomizer.Utility.Debug
 {
     [RandomizerController]
     public class DebugButtonsManager : MonoBehaviour

@@ -5,7 +5,7 @@ using RoR2.Orbs;
 using RoR2Randomizer.Networking;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ProjectileRandomizer.Orbs.Lightning;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.Utility.Catalog;
 using System;
 using System.Collections.Generic;
 using System.Linq;

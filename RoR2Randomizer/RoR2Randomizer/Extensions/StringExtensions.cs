@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace RoR2Randomizer.Utility
+namespace RoR2Randomizer.Extensions
 {
-    public static class StringUtils
+    public static class StringExtensions
     {
         static readonly StringBuilder _stringBuilder = new StringBuilder();
 

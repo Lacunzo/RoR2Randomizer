@@ -1,6 +1,6 @@
 ﻿using EntityStates;
 using RoR2;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;

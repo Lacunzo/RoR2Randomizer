@@ -2,7 +2,7 @@
 using RoR2;
 using RoR2.Orbs;
 using RoR2Randomizer.Extensions;
-using RoR2Randomizer.Utility;
+using RoR2Randomizer.Utility.Catalog;
 using System;
 using UnityEngine.Networking;
 

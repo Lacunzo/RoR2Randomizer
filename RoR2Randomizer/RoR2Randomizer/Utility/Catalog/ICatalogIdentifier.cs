@@ -1,4 +1,4 @@
-﻿namespace RoR2Randomizer.Utility
+﻿namespace RoR2Randomizer.Utility.Catalog
 {
     public interface ICatalogIdentifier<T, TIdentifier>
     {

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-namespace RoR2Randomizer.Utility
+namespace RoR2Randomizer.Utility.Catalog
 {
     public abstract class GenericNetworkedCatalog<TObject, TIdentifier> : GenericCatalog<TObject, TIdentifier>, INetMessageProvider where TIdentifier : ICatalogIdentifier<TObject, TIdentifier>
     {
