@@ -6,14 +6,14 @@ namespace RoR2Randomizer.Extensions
 {
     public static class PickupExtensions
     {
-        public static void TryGrantTo(this PickupDef pickupDef, CharacterMaster master, int count = 1)
+        static bool tryGrantTo(this PickupDef pickupDef, Inventory inventory, int count, out bool notify)
         {
-            if (pickupDef == null || !master || count <= 0)
-                return;
+            if (pickupDef == null || !inventory || count <= 0)
+            {
+                notify = false;
+                return false;
+            }
 
-            Inventory inventory = master.inventory;
-
-            bool notify;
             if (pickupDef.itemIndex != ItemIndex.None)
             {
                 if (inventory)
@@ -66,39 +66,68 @@ namespace RoR2Randomizer.Extensions
                     notify = false;
                 }
             }
-            else if (pickupDef.miscPickupIndex != MiscPickupIndex.None)
-            {
-                notify = false;
-
-                IReadOnlyList<MiscPickupDef> miscPickupDefs = MiscPickupCatalog.miscPickupDefs;
-                if (miscPickupDefs != null)
-                {
-                    int miscPickupIndex = (int)pickupDef.miscPickupIndex;
-                    if (miscPickupIndex >= 0 && miscPickupIndex < miscPickupDefs.Count)
-                    {
-                        PickupDef.GrantContext context = new PickupDef.GrantContext { body = master.GetBody() };
-                        miscPickupDefs[miscPickupIndex].GrantPickup(ref context);
-
-                        notify = context.shouldNotify;
-                    }
-                }
-            }
             else
             {
                 Log.Warning($"pickup {pickupDef} not implemented");
-                return;
+                notify = false;
+                return false;
             }
 
-            if (notify)
+            return true;
+        }
+
+        public static bool TryGrantTo(this PickupDef pickupDef, Inventory inventory, int count = 1)
+        {
+            return pickupDef.tryGrantTo(inventory, count, out _);
+        }
+
+        public static bool TryGrantTo(this PickupDef pickupDef, CharacterMaster master, int count = 1)
+        {
+            if (master && pickupDef.tryGrantTo(master.inventory, count, out bool notify))
             {
-                GenericPickupController.SendPickupMessage(master, pickupDef.pickupIndex);
+                if (notify && master.playerCharacterMasterController)
+                {
+                    GenericPickupController.SendPickupMessage(master, pickupDef.pickupIndex);
+                }
+
+                return true;
             }
+
+            return false;
         }
 
         public static int GetPickupCount(this CharacterMaster master, PickupDef pickupDef)
         {
             if (pickupDef == null || !master)
                 return 0;
+
+            Inventory inventory = master.inventory;
+            if (pickupDef.itemIndex != ItemIndex.None)
+            {
+                if (inventory)
+                {
+                    return inventory.GetItemCount(pickupDef.itemIndex);
+                }
+            }
+            else if (pickupDef.equipmentIndex != EquipmentIndex.None)
+            {
+                if (inventory)
+                {
+                    int count = 0;
+
+                    int equipmentSlotCount = inventory.GetEquipmentSlotCount();
+                    for (uint i = 0; i < equipmentSlotCount; i++)
+                    {
+                        EquipmentDef equipmentDef = inventory.GetEquipment(i).equipmentDef;
+                        if (equipmentDef && equipmentDef.equipmentIndex == pickupDef.equipmentIndex)
+                        {
+                            count++;
+                        }
+                    }
+
+                    return count;
+                }
+            }
 
             return 0;
         }
