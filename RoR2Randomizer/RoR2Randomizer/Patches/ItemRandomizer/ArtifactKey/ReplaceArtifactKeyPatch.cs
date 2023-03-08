@@ -46,8 +46,6 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
 
         static void ArtifactTrialMissionController_RemoveAllMissionKeys(ILContext il)
         {
-            const string LOG_PREFIX = $"{nameof(ReplaceArtifactKeyPatch)}.{nameof(ArtifactTrialMissionController_RemoveAllMissionKeys)} ";
-
             ILCursor c = new ILCursor(il);
 
             ILCursor[] foundCursors;
@@ -73,13 +71,11 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                         PickupDef pickupDef = pickupIndex.pickupDef;
                         if (pickupDef != null)
                         {
+                            // Items will still be removed as usual
                             if (pickupDef.itemIndex != ItemIndex.None)
                             {
-                                if (pickupDef.miscPickupIndex == MiscPickupIndex.None) // Don't remove all coins
-                                {
-                                    pickupDef.TryDeductFrom(characterMaster, int.MaxValue);
-                                    return true;
-                                }
+                                pickupDef.TryDeductFrom(characterMaster, int.MaxValue);
+                                return true;
                             }
                         }
 
@@ -89,12 +85,12 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                 }
                 else
                 {
-                    Log.Warning(LOG_PREFIX + "unable to find CharacterMaster.readOnlyInstancesList foreach");
+                    Log.Warning("unable to find CharacterMaster.readOnlyInstancesList foreach");
                 }
             }
             else
             {
-                Log.Warning(LOG_PREFIX + "unable to find pickup index local index");
+                Log.Warning("unable to find pickup index local index");
             }
         }
 

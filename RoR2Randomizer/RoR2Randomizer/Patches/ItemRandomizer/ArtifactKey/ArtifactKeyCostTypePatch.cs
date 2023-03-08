@@ -1,17 +1,11 @@
 ﻿#if !DISABLE_ITEM_RANDOMIZER
-using HarmonyLib;
-using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RoR2;
+using RoR2.Items;
 using RoR2Randomizer.Extensions;
-using RoR2Randomizer.Patches.Fixes;
 using RoR2Randomizer.RandomizerControllers.Item;
-using RoR2Randomizer.Utility;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
 namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
 {
@@ -35,8 +29,12 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                 CostTypeDef.IsAffordableDelegate isAffordable = artifactKeyCostType.isAffordable;
                 if (isAffordable != null)
                 {
-                    _artifactKeyIsAffordableHook = new ILHook(isAffordable.Method, ArtifactKeyCostType_IsAffordable, new ILHookConfig { ManualApply = true });
-                    applyHookIfPatchClassActive(_artifactKeyIsAffordableHook);
+                    _artifactKeyIsAffordableILHook = new ILHook(isAffordable.Method, ArtifactKeyCostType_IsAffordable_IL, new ILHookConfig { ManualApply = true });
+
+                    applyHookIfPatchClassActive(_artifactKeyIsAffordableILHook);
+
+                    _artifactKeyIsAffordableOnHook = new Hook(isAffordable.Method, ArtifactKeyCostType_IsAffordable_On, new HookConfig { ManualApply = true });
+                    applyHookIfPatchClassActive(_artifactKeyIsAffordableOnHook);
                 }
 
                 CostTypeDef.PayCostDelegate payCost = artifactKeyCostType.payCost;
@@ -50,78 +48,65 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
 
         static bool _patchActive = false;
 
-        static ILHook _artifactKeyIsAffordableHook;
+        static ILHook _artifactKeyIsAffordableILHook;
+        static Hook _artifactKeyIsAffordableOnHook;
         static Hook _artifactKeyPayCostHook;
 
         static void Apply()
         {
-            _artifactKeyIsAffordableHook?.Apply();
+            _artifactKeyIsAffordableILHook?.Apply();
+            _artifactKeyIsAffordableOnHook?.Apply();
             _artifactKeyPayCostHook?.Apply();
             _patchActive = true;
         }
 
         static void Cleanup()
         {
-            _artifactKeyIsAffordableHook?.Undo();
+            _artifactKeyIsAffordableILHook?.Undo();
+            _artifactKeyIsAffordableOnHook?.Undo();
             _artifactKeyPayCostHook?.Undo();
             _patchActive = false;
         }
 
-        static PickupDef _artifactKeyReplacementPickup;
-
-        static void ArtifactKeyCostType_IsAffordable(ILContext il)
+        static bool ArtifactKeyCostType_IsAffordable_On(Func<object, CostTypeDef, CostTypeDef.IsAffordableContext, bool> orig, object self, CostTypeDef costTypeDef, CostTypeDef.IsAffordableContext context)
         {
-            ILCursor c = new ILCursor(il);
-
-            c.EmitDelegate(static () =>
+            if (ItemRandomizerController.IsEnabled)
             {
-                if (ItemRandomizerController.IsEnabled)
+                if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
                 {
-                    if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
+                    PickupDef artifactKeyReplacementPickup = artifactKeyReplacement.pickupDef;
+                    if (artifactKeyReplacementPickup.itemIndex == ItemIndex.None)
                     {
-                        _artifactKeyReplacementPickup = artifactKeyReplacement.pickupDef;
-                        if (_artifactKeyReplacementPickup.itemIndex == ItemIndex.None)
-                        {
-                            return true;
-                        }
+                        if (!context.activator)
+                            return false;
+
+                        if (!context.activator.TryGetComponent(out CharacterBody body))
+                            return false;
+
+                        CharacterMaster master = body.master;
+                        if (!master)
+                            return false;
+
+                        return master.GetPickupCount(artifactKeyReplacementPickup) >= context.cost;
                     }
                 }
+            }
 
-                _artifactKeyReplacementPickup = null;
-                return false;
-            });
+            return orig(self, costTypeDef, context);
+        }
 
-            ILLabel origLbl = il.DefineLabel();
-
-            c.Emit(OpCodes.Brfalse, origLbl);
-            c.Emit(OpCodes.Ldarg_2);
-            c.EmitDelegate(static (CostTypeDef.IsAffordableContext context) =>
-            {
-                if (!context.activator)
-                    return false;
-
-                if (!context.activator.TryGetComponent(out CharacterBody body))
-                    return false;
-
-                CharacterMaster master = body.master;
-                if (!master)
-                    return false;
-
-                return master.GetPickupCount(_artifactKeyReplacementPickup) >= context.cost;
-            });
-            c.Emit(OpCodes.Ret);
-
-            c.Index++;
-            origLbl.Target = c.Next;
+        static void ArtifactKeyCostType_IsAffordable_IL(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
 
             while (c.TryGotoNext(x => x.MatchLdsfld(typeof(RoR2Content.Items), nameof(RoR2Content.Items.ArtifactKey))))
             {
                 c.Index++;
                 c.EmitDelegate(static (ItemDef artifactKey) =>
                 {
-                    if (_artifactKeyReplacementPickup != null)
+                    if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(artifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
                     {
-                        return ItemCatalog.GetItemDef(_artifactKeyReplacementPickup.itemIndex);
+                        return ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(artifactKeyReplacement).itemIndex);
                     }
 
                     return artifactKey;
@@ -131,6 +116,20 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
 
         static void ArtifactKeyCostType_PayCost(Action<object, CostTypeDef, CostTypeDef.PayCostContext> orig, object self, CostTypeDef costTypeDef, CostTypeDef.PayCostContext context)
         {
+            if (ItemRandomizerController.IsEnabled)
+            {
+                if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
+                {
+                    PickupDef artifactKeyReplacementPickup = artifactKeyReplacement.pickupDef;
+                    if (artifactKeyReplacementPickup.itemIndex == ItemIndex.None)
+                    {
+                        artifactKeyReplacementPickup.TryDeductFrom(context.activatorMaster, context.cost);
+                        MultiShopCardUtils.OnNonMoneyPurchase(context);
+                        return;
+                    }
+                }
+            }
+
             orig(self, costTypeDef, context);
         }
     }

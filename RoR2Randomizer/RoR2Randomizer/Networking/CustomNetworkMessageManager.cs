@@ -5,6 +5,7 @@ using RoR2Randomizer.Networking.DamageOrbTargetDummy;
 using RoR2Randomizer.Networking.EffectRandomizer;
 using RoR2Randomizer.Networking.ExplicitSpawnRandomizer;
 using RoR2Randomizer.Networking.Generic.Chunking;
+using RoR2Randomizer.Networking.ItemRandomizer;
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
 using RoR2Randomizer.Networking.HoldoutZoneRandomizer;
 #endif
@@ -60,6 +61,8 @@ namespace RoR2Randomizer.Networking
 #if !DISABLE_HOLDOUT_ZONE_RANDOMIZER
             NetworkingAPI.RegisterMessageType<SyncHoldoutZoneReplacements>();
 #endif
+
+            NetworkingAPI.RegisterMessageType<SyncItemReplacements>();
 
 #if DEBUG
             NetworkingAPI.RegisterMessageType<Debug.SyncConsoleLog>();

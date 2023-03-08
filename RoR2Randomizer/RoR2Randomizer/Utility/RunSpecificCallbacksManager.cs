@@ -73,6 +73,16 @@ namespace RoR2Randomizer.Utility
             }
         }
 
+        public static ulong AddEntry(Action onStart, Action onEnd, int priority)
+        {
+            static Action<Run> convertToRunCallback(Action original)
+            {
+                return original != null ? _ => original() : null;
+            }
+
+            return AddEntry(convertToRunCallback(onStart), convertToRunCallback(onEnd), priority);
+        }
+
         public static ulong AddEntry(Action<Run> onStart, Action<Run> onEnd, int priority)
         {
             CallbackEntry entry = new CallbackEntry(priority, onStart, onEnd);

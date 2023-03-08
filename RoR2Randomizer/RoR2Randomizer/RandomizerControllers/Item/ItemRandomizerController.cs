@@ -1,8 +1,10 @@
 ﻿#if !DISABLE_ITEM_RANDOMIZER
 using HG;
+using R2API;
 using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Networking.Generic;
+using RoR2Randomizer.Networking.ItemRandomizer;
 using RoR2Randomizer.PrefabMarkers;
 using RoR2Randomizer.Utility;
 using System.Collections.Generic;
@@ -17,6 +19,13 @@ namespace RoR2Randomizer.RandomizerControllers.Item
         static ItemRandomizerController _instance;
 
         static int[] _pickupIndicesToRandomize;
+
+        static readonly ulong _registerItemNameLanguageOverlaysCallbackHandle;
+
+        static ItemRandomizerController()
+        {
+            _registerItemNameLanguageOverlaysCallbackHandle = RunSpecificCallbacksManager.AddEntry(registerItemNameLanguageOverlays, null, -1);
+        }
 
         [SystemInitializer(typeof(PickupCatalog), typeof(NullModelMarker))]
         static void Init()
@@ -90,7 +99,9 @@ namespace RoR2Randomizer.RandomizerControllers.Item
 
         public override bool IsRandomizerEnabled => IsEnabled;
 
-        public static bool IsEnabled => NetworkServer.active && ConfigManager.ItemRandomizer.Enabled;
+        public static bool IsEnabled => (NetworkClient.active && _hasReceivedPickupIndexReplacementsFromServer) || (NetworkServer.active && ConfigManager.ItemRandomizer.Enabled);
+
+        static readonly RunSpecific<bool> _hasReceivedPickupIndexReplacementsFromServer = new RunSpecific<bool>();
 
         static readonly RunSpecific<IndexReplacementsCollection> _pickupIndexReplacements = new RunSpecific<IndexReplacementsCollection>(static (out IndexReplacementsCollection result) =>
         {
@@ -110,13 +121,14 @@ namespace RoR2Randomizer.RandomizerControllers.Item
 
         protected override IEnumerable<NetworkMessageBase> getNetMessages()
         {
-            Log.Warning("TODO: Add item randomizer net message");
-            yield break;
+            yield return new SyncItemReplacements(_pickupIndexReplacements);
         }
 
         protected override void Awake()
         {
             base.Awake();
+
+            SyncItemReplacements.OnReceive += SyncItemReplacements_OnReceive;
 
             SingletonHelper.Assign(ref _instance, this);
         }
@@ -127,7 +139,42 @@ namespace RoR2Randomizer.RandomizerControllers.Item
 
             _pickupIndexReplacements.Dispose();
 
+            RunSpecificCallbacksManager.RemoveEntry(_registerItemNameLanguageOverlaysCallbackHandle);
+
+            SyncItemReplacements.OnReceive -= SyncItemReplacements_OnReceive;
+
             SingletonHelper.Unassign(ref _instance, this);
+        }
+
+        static void SyncItemReplacements_OnReceive(in IndexReplacementsCollection itemIndexReplacements)
+        {
+            _pickupIndexReplacements.Value = itemIndexReplacements;
+            _hasReceivedPickupIndexReplacementsFromServer.Value = true;
+
+            registerItemNameLanguageOverlays();
+        }
+
+        static void registerItemNameLanguageOverlays()
+        {
+            if (!IsEnabled)
+                return;
+
+#if DEBUG
+            Log.Debug("Registering item name replacements");
+#endif
+
+            PickupIndex artifactKeyIndex = PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex);
+            if (TryGetReplacementPickupIndex(artifactKeyIndex, out PickupIndex artifactKeyReplacementIndex))
+            {
+                PickupDef articactKeyReplacementPickup = PickupCatalog.GetPickupDef(artifactKeyReplacementIndex);
+
+                foreach (Language lang in Language.GetAllLanguages())
+                {
+                    LanguageAPI.LanguageOverlay overlay = LanguageAPI.AddOverlay("COST_ARTIFACTSHELLKILLERITEM_FORMAT", $"{{0}} {lang.GetLocalizedStringByToken(articactKeyReplacementPickup.nameToken)}", lang.name);
+
+                    RunSpecificLanguageOverlay.AddRunLanguageOverlay(overlay);
+                }
+            }
         }
 
         public static bool TryGetReplacementPickupIndex(in PickupIndex original, out PickupIndex replacement)
