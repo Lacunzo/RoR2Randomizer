@@ -28,10 +28,8 @@ namespace RoR2Randomizer.RandomizerControllers.Item
         }
 
         [SystemInitializer(typeof(PickupCatalog), typeof(NullModelMarker))]
-        static void Init()
+        static void InitPickupIndicesToRandomize()
         {
-            const string LOG_PREFIX = $"{nameof(ItemRandomizerController)}.{nameof(Init)} ";
-
             _pickupIndicesToRandomize = PickupCatalog.allPickups
                                                      .Where(static pd =>
                                                      {
