@@ -33,10 +33,10 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
             {
                 targetMaster.inventory.CopyEquipmentFrom(self.inventory);
 
-                if (targetMaster.inventory.currentEquipmentIndex != EquipmentIndex.None && targetMaster.inventory.GetItemCount(RoR2Content.Items.AutoCastEquipment) == 0)
+                if (targetMaster.inventory.currentEquipmentIndex != EquipmentIndex.None)
                 {
                     // You wanted AI to activate equipment? Too bad, can't be bothered B)
-                    targetMaster.inventory.GiveItem(RoR2Content.Items.AutoCastEquipment);
+                    targetMaster.inventory.GiveItemIfMissing(RoR2Content.Items.AutoCastEquipment);
                 }
             }
         }

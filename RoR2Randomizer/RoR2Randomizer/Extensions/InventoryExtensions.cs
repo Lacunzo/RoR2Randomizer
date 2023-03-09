@@ -36,5 +36,19 @@ namespace RoR2Randomizer.Extensions
         {
             return givePickupsOnStart.equipmentDef || !string.IsNullOrEmpty(givePickupsOnStart.equipmentString);
         }
+
+        public static void GiveItemIfMissing(this Inventory inventory, ItemDef item, int count = 1)
+        {
+            inventory.GiveItemIfMissing(item.itemIndex, count);
+        }
+
+        public static void GiveItemIfMissing(this Inventory inventory, ItemIndex item, int count = 1)
+        {
+            int currentItemCount = inventory.GetItemCount(item);
+            if (currentItemCount < count)
+            {
+                inventory.GiveItem(item, count - currentItemCount);
+            }
+        }
     }
 }
