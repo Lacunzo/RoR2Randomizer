@@ -55,10 +55,6 @@ namespace RoR2Randomizer.Patches.Item
 
                 c.Index = cursor.Index + 1;
             }
-
-#if DEBUG
-            Log.Debug(il.ToString());
-#endif
         }
     }
 }
