@@ -34,6 +34,10 @@ namespace RoR2Randomizer.Patches.EnemyInfoPanelEquipmentDisplay
                     shouldDisplay |= TrySetEquipmentsPatch.GetAllInventoryProviderEquipments(hud.targetMaster.teamIndex).Any();
                 });
             }
+            else
+            {
+                Log.Error("Failed to find patch location");
+            }
         }
     }
 }
