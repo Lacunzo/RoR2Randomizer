@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2.Artifacts;
+using RoR2Randomizer.CustomContent;
 using RoR2Randomizer.Extensions;
 
 namespace RoR2Randomizer.Patches.ItemRandomizer
@@ -78,7 +79,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                     if (characterMaster.inventory.currentEquipmentIndex != EquipmentIndex.None)
                     {
                         // You wanted AI to activate equipment? Too bad, can't be bothered B)
-                        characterMaster.inventory.GiveItemIfMissing(RoR2Content.Items.AutoCastEquipment);
+                        characterMaster.inventory.GiveItemIfMissing(ContentPackManager.Items.MonsterUseEquipmentDummyItem);
                     }
                 }
             }
