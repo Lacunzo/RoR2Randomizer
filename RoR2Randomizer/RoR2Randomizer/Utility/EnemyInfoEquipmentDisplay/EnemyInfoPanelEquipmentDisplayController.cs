@@ -41,7 +41,7 @@ namespace RoR2Randomizer.Utility.EnemyInfoEquipmentDisplay
 
             Transform equipmentDisplay = _equipmentContainer.transform.Find("InventoryDisplay");
             equipmentDisplay.name = "EquipmentDisplay";
-            Destroy(equipmentDisplay.GetComponent<EquipmentInventoryDisplay>());
+            Destroy(equipmentDisplay.GetComponent<ItemInventoryDisplay>());
             _equipmentDisplay = equipmentDisplay.gameObject.AddComponent<EquipmentInventoryDisplay>();
 
             _equipmentContainer.SetActive(false);
