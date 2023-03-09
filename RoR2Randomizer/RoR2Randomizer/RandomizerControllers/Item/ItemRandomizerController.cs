@@ -27,7 +27,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
             _registerItemNameLanguageOverlaysCallbackHandle = RunSpecificCallbacksManager.AddEntry(registerItemNameLanguageOverlays, null, -1);
         }
 
-        [SystemInitializer(typeof(PickupCatalog), typeof(NullModelMarker))]
+        [SystemInitializer(typeof(PickupCatalog), typeof(ItemCatalog), typeof(NullModelMarker))]
         static void InitPickupIndicesToRandomize()
         {
             _pickupIndicesToRandomize = PickupCatalog.allPickups
@@ -87,6 +87,18 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                              Log.Debug($"excluding pickup {pd.pickupIndex} due to: invalid name token {pd.nameToken}");
 #endif
                                                              return false;
+                                                         }
+
+                                                         if (pd.itemIndex != ItemIndex.None)
+                                                         {
+                                                             ItemDef itemDef = ItemCatalog.GetItemDef(pd.itemIndex);
+                                                             if (itemDef == null || itemDef.hidden)
+                                                             {
+#if DEBUG
+                                                                 Log.Debug($"excluding pickup {pd.pickupIndex} due to: hidden item ({itemDef.name})");
+#endif
+                                                                 return false;
+                                                             }
                                                          }
 
                                                          return true;
