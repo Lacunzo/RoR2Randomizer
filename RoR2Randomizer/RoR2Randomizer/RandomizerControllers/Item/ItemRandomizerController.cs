@@ -95,7 +95,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                              if (itemDef == null || itemDef.hidden)
                                                              {
 #if DEBUG
-                                                                 Log.Debug($"excluding pickup {pd.pickupIndex} due to: hidden item ({itemDef.name})");
+                                                                 Log.Debug($"excluding pickup {pd.pickupIndex} due to: hidden item ({itemDef})");
 #endif
                                                                  return false;
                                                              }
