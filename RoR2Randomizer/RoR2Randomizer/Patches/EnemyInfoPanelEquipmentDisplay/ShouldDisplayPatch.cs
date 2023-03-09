@@ -27,12 +27,13 @@ namespace RoR2Randomizer.Patches.EnemyInfoPanelEquipmentDisplay
             // Just assume shouldDisplay is first local, not ideal, but it works for now and is unlikely to change
             if (c.TryGotoNext(MoveType.After, x => x.MatchStloc(SHOULD_DISPLAY_LOCAL_INDEX)))
             {
-                c.Emit(OpCodes.Ldloca, SHOULD_DISPLAY_LOCAL_INDEX);
+                c.Emit(OpCodes.Ldloc, SHOULD_DISPLAY_LOCAL_INDEX);
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate((ref bool shouldDisplay, HUD hud) =>
+                c.EmitDelegate((bool shouldDisplay, HUD hud) =>
                 {
-                    shouldDisplay |= TrySetEquipmentsPatch.GetAllInventoryProviderEquipments(hud.targetMaster.teamIndex).Any();
+                    return shouldDisplay || TrySetEquipmentsPatch.GetAllInventoryProviderEquipments(hud.targetMaster.teamIndex).Any();
                 });
+                c.Emit(OpCodes.Stloc, SHOULD_DISPLAY_LOCAL_INDEX);
             }
             else
             {
