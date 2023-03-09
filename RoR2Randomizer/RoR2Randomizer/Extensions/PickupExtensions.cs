@@ -6,7 +6,7 @@ namespace RoR2Randomizer.Extensions
 {
     public static class PickupExtensions
     {
-        static bool tryGrantTo(this PickupDef pickupDef, Inventory inventory, int count, out bool notify)
+        static bool tryGrantTo(this PickupDef pickupDef, Inventory inventory, int count, bool forceOverrideEquipment, out bool notify)
         {
             if (pickupDef == null || !inventory || count <= 0)
             {
@@ -30,33 +30,43 @@ namespace RoR2Randomizer.Extensions
             {
                 if (inventory)
                 {
-                    int slotCount = inventory.GetEquipmentSlotCount();
-
-                    void giveEquipments(bool requireEmpty)
+                    if (forceOverrideEquipment)
                     {
-                        if (count <= 0)
-                            return;
-
-                        for (uint i = 0; i < slotCount; i++)
+                        for (uint i = 0; i < count; i++)
                         {
-                            EquipmentState equipmentState = inventory.GetEquipment(i);
-                            if (equipmentState.equipmentDef && (requireEmpty ? equipmentState.equipmentDef.equipmentIndex == EquipmentIndex.None
-                                                                             : equipmentState.equipmentDef.equipmentIndex != pickupDef.equipmentIndex))
-                            {
-                                count--;
-                                inventory.SetEquipmentIndexForSlot(pickupDef.equipmentIndex, i);
-
-                                if (count <= 0)
-                                    break;
-                            }
+                            inventory.SetEquipmentIndexForSlot(pickupDef.equipmentIndex, i);
                         }
                     }
-
-                    giveEquipments(true);
-
-                    if (count > 0)
+                    else
                     {
-                        giveEquipments(false);
+                        uint slotCount = (uint)inventory.GetEquipmentSlotCount();
+
+                        bool giveEquipments(bool requireEmpty)
+                        {
+                            if (count <= 0)
+                                return false;
+
+                            for (uint i = 0; i < slotCount; i++)
+                            {
+                                EquipmentState equipmentState = inventory.GetEquipment(i);
+                                if (equipmentState.equipmentDef && (requireEmpty ? equipmentState.equipmentDef.equipmentIndex == EquipmentIndex.None
+                                                                                 : equipmentState.equipmentDef.equipmentIndex != pickupDef.equipmentIndex))
+                                {
+                                    count--;
+                                    inventory.SetEquipmentIndexForSlot(pickupDef.equipmentIndex, i);
+
+                                    if (count <= 0)
+                                        return true;
+                                }
+                            }
+
+                            return false;
+                        }
+
+                        if (!giveEquipments(true))
+                        {
+                            giveEquipments(false);
+                        }
                     }
 
                     notify = true;
@@ -76,14 +86,14 @@ namespace RoR2Randomizer.Extensions
             return true;
         }
 
-        public static bool TryGrantTo(this PickupDef pickupDef, Inventory inventory, int count = 1)
+        public static bool TryGrantTo(this PickupDef pickupDef, Inventory inventory, int count = 1, bool forceOverrideEquipment = false)
         {
-            return pickupDef.tryGrantTo(inventory, count, out _);
+            return pickupDef.tryGrantTo(inventory, count, forceOverrideEquipment, out _);
         }
 
-        public static bool TryGrantTo(this PickupDef pickupDef, CharacterMaster master, int count = 1)
+        public static bool TryGrantTo(this PickupDef pickupDef, CharacterMaster master, int count = 1, bool forceOverrideEquipment = false)
         {
-            if (master && pickupDef.tryGrantTo(master.inventory, count, out bool notify))
+            if (master && pickupDef.tryGrantTo(master.inventory, count, forceOverrideEquipment, out bool notify))
             {
                 if (notify && master.playerCharacterMasterController)
                 {

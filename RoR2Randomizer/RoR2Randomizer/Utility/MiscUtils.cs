@@ -28,6 +28,28 @@ namespace RoR2Randomizer.Utility
             }
         }
 
+        public static bool ArrayEqual<T>(T[] a, T[] b, IEqualityComparer<T> equalityComparer = null)
+        {
+            if (a is null)
+                throw new ArgumentNullException(nameof(a));
+
+            if (b is null)
+                throw new ArgumentNullException(nameof(b));
+
+            equalityComparer ??= EqualityComparer<T>.Default;
+
+            if (a.Length != b.Length)
+                return false;
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (!equalityComparer.Equals(a[i], b[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
 #if DEBUG
         public static void TryNetworkLog(string message, LogLevel type)
         {
