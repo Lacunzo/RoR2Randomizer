@@ -22,6 +22,20 @@ namespace RoR2Randomizer.Patches.EnemyInfoPanelEquipmentDisplay
             IL.RoR2.UI.EnemyInfoPanel.SetDisplayDataForViewer -= EnemyInfoPanel_SetDisplayDataForViewer_TrySetEqipments;
         }
 
+        internal static IEnumerable<EquipmentIndex> GetAllInventoryProviderEquipments(TeamIndex viewerTeam)
+        {
+            return InstanceTracker.GetInstancesList<EnemyInfoPanelInventoryProvider>().SelectMany(inventoryProvider =>
+            {
+                if (inventoryProvider.teamFilter.teamIndex == viewerTeam)
+                    return Enumerable.Empty<EquipmentIndex>();
+
+                Inventory inventory = inventoryProvider.inventory;
+                return Enumerable.Range(0, inventory.GetEquipmentSlotCount())
+                                 .Select(i => inventory.GetEquipment((uint)i).equipmentIndex)
+                                 .Where(static ei => ei != EquipmentIndex.None);
+            }).Distinct();
+        }
+
         static void EnemyInfoPanel_SetDisplayDataForViewer_TrySetEqipments(ILContext il)
         {
             ILCursor c = new ILCursor(il);
@@ -48,20 +62,7 @@ namespace RoR2Randomizer.Patches.EnemyInfoPanelEquipmentDisplay
 
                         TeamIndex targetMasterTeamIndex = enemyInfoPanel.hud.targetMaster.teamIndex;
 
-                        List<EnemyInfoPanelInventoryProvider> inventoryProviders = InstanceTracker.GetInstancesList<EnemyInfoPanelInventoryProvider>();
-
-                        EquipmentIndex[] equipments = inventoryProviders.SelectMany(inventoryProvider =>
-                        {
-                            if (inventoryProvider.teamFilter.teamIndex == targetMasterTeamIndex)
-                                return Enumerable.Empty<EquipmentIndex>();
-
-                            Inventory inventory = inventoryProvider.inventory;
-                            return Enumerable.Range(0, inventory.GetEquipmentSlotCount())
-                                             .Select(i => inventory.GetEquipment((uint)i).equipmentIndex)
-                                             .Where(static ei => ei != EquipmentIndex.None);
-                        }).ToArray();
-
-                        equipmentDisplayController.TrySetEquipments(equipments);
+                        equipmentDisplayController.TrySetEquipments(GetAllInventoryProviderEquipments(targetMasterTeamIndex).ToArray());
                     });
                 }
                 else
