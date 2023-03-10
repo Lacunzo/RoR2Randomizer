@@ -36,7 +36,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
         {
             orig(self);
 
-            if (self.dropPickup.isValid && self.dropPickup.pickupDef.equipmentIndex != EquipmentIndex.None)
+            if (self.dropPickup.isValid && self.dropPickup.pickupDef.IsEquipment())
             {
                 self.itemsToGrant = 1;
             }
@@ -92,7 +92,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                     if (instance == null || pickupDef == null)
                         return false;
 
-                    if (pickupDef.itemIndex != ItemIndex.None) // If it's an item, use default implementation
+                    if (pickupDef.IsItem()) // If it's an item, use default implementation
                         return false;
 
                     CharacterBody body = instance.characterBody;
@@ -166,13 +166,13 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                 cursor.EmitDelegate((ScavengerItemGranter instance, PickupDef pickupDef, ScavengerItemGranter.StackRollData stackRollData) =>
                 {
                     if (pickupDef == null ||
-                        pickupDef.itemIndex != ItemIndex.None) // Pickup is an item: Use default code for granting it
+                        pickupDef.IsItem()) // Pickup is an item: Use default code for granting it
                     {
                         return false;
                     }
 
                     int pickupCount;
-                    if (pickupDef.equipmentIndex != EquipmentIndex.None)
+                    if (pickupDef.IsEquipment())
                     {
                         pickupCount = 1;
                     }

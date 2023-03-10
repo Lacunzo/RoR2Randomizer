@@ -72,7 +72,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                         if (pickupDef != null)
                         {
                             // Items will still be removed as usual
-                            if (pickupDef.itemIndex != ItemIndex.None)
+                            if (!pickupDef.IsItem())
                             {
                                 pickupDef.TryDeductFrom(characterMaster, int.MaxValue);
                                 return true;

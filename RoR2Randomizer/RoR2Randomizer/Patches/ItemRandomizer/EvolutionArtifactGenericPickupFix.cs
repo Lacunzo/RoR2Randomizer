@@ -51,7 +51,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                     cursor.EmitDelegate((PickupDef pickup) =>
                     {
                         if (pickup == null ||
-                            pickup.itemIndex != ItemIndex.None) // If item: Use default code
+                            pickup.IsItem()) // If item: Use default code
                         {
                             return false;
                         }

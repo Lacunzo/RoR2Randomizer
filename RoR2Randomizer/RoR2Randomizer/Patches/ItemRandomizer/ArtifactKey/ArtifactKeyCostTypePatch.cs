@@ -75,7 +75,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                 if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
                 {
                     PickupDef artifactKeyReplacementPickup = artifactKeyReplacement.pickupDef;
-                    if (artifactKeyReplacementPickup.itemIndex == ItemIndex.None)
+                    if (!artifactKeyReplacementPickup.IsItem())
                     {
                         if (!context.activator)
                             return false;
@@ -121,7 +121,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                 if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
                 {
                     PickupDef artifactKeyReplacementPickup = artifactKeyReplacement.pickupDef;
-                    if (artifactKeyReplacementPickup.itemIndex == ItemIndex.None)
+                    if (!artifactKeyReplacementPickup.IsItem())
                     {
                         artifactKeyReplacementPickup.TryDeductFrom(context.activatorMaster, context.cost);
                         MultiShopCardUtils.OnNonMoneyPurchase(context);

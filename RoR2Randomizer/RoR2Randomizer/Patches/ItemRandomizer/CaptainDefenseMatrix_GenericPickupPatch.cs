@@ -49,13 +49,13 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
 
             PickupDef defenseMatrixReplacement = PickupCatalog.GetPickupDef(defenseMatrixReplacementIndex);
             if (defenseMatrixReplacement == null ||
-                defenseMatrixReplacement.itemIndex != ItemIndex.None) // If Item: Use default code
+                defenseMatrixReplacement.IsItem()) // If Item: Use default code
             {
                 return false;
             }
 
             int count;
-            if (defenseMatrixReplacement.equipmentIndex != EquipmentIndex.None)
+            if (defenseMatrixReplacement.IsEquipment())
             {
                 count = 1;
             }
@@ -83,7 +83,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                 return defenseMatrixItemDef;
 
             PickupDef defenseMatrixReplacementPickup = PickupCatalog.GetPickupDef(defenseMatrixReplacementIndex);
-            if (defenseMatrixReplacementPickup.itemIndex == ItemIndex.None)
+            if (!defenseMatrixReplacementPickup.IsItem())
             {
                 Log.Warning("TryGrant returned false, but replacement is not an item, using original item");
                 return defenseMatrixItemDef;

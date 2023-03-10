@@ -58,7 +58,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                 cursor.EmitDelegate((ArenaMissionController instance, PickupDef pickupDef) =>
                 {
                     if (pickupDef == null ||
-                        pickupDef.itemIndex != ItemIndex.None) // Item: Use unmodified method code
+                        pickupDef.IsItem()) // Item: Use unmodified method code
                     {
                         return false;
                     }
@@ -71,7 +71,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                         return false;
 
                     int grantCount;
-                    if (pickupDef.equipmentIndex != EquipmentIndex.None)
+                    if (pickupDef.IsEquipment())
                     {
                         grantCount = 1;
                     }

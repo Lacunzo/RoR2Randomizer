@@ -59,7 +59,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                              return false;
                                                          }
 
-                                                         if (pd.equipmentIndex != EquipmentIndex.None && ReadOnlyArray<EquipmentIndex>.BinarySearch(CharacterReplacements.AvailableDroneEquipments, pd.equipmentIndex) < 0)
+                                                         if (pd.IsEquipment() && ReadOnlyArray<EquipmentIndex>.BinarySearch(CharacterReplacements.AvailableDroneEquipments, pd.equipmentIndex) < 0)
                                                          {
 #if DEBUG
                                                              Log.Debug($"excluding invalid equipment pickup {pd.pickupIndex}");
@@ -91,7 +91,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
                                                              return false;
                                                          }
 
-                                                         if (pd.itemIndex != ItemIndex.None)
+                                                         if (pd.IsItem())
                                                          {
                                                              ItemDef itemDef = ItemCatalog.GetItemDef(pd.itemIndex);
                                                              if (itemDef == null || itemDef.hidden)

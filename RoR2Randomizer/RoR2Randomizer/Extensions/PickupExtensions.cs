@@ -1,5 +1,6 @@
 ﻿using RoR2;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace RoR2Randomizer.Extensions
@@ -14,7 +15,7 @@ namespace RoR2Randomizer.Extensions
                 return false;
             }
 
-            if (pickupDef.itemIndex != ItemIndex.None)
+            if (pickupDef.IsItem())
             {
                 if (inventory)
                 {
@@ -26,7 +27,7 @@ namespace RoR2Randomizer.Extensions
                     notify = false;
                 }
             }
-            else if (pickupDef.equipmentIndex != EquipmentIndex.None)
+            else if (pickupDef.IsEquipment())
             {
                 if (inventory)
                 {
@@ -119,14 +120,14 @@ namespace RoR2Randomizer.Extensions
             if (pickupDef == null || !inventory)
                 return 0;
 
-            if (pickupDef.itemIndex != ItemIndex.None)
+            if (pickupDef.IsItem())
             {
                 if (inventory)
                 {
                     return inventory.GetItemCount(pickupDef.itemIndex);
                 }
             }
-            else if (pickupDef.equipmentIndex != EquipmentIndex.None)
+            else if (pickupDef.IsEquipment())
             {
                 if (inventory)
                 {
@@ -155,7 +156,7 @@ namespace RoR2Randomizer.Extensions
                 return;
 
             Inventory inventory = master.inventory;
-            if (pickupDef.itemIndex != ItemIndex.None)
+            if (pickupDef.IsItem())
             {
                 if (inventory)
                 {
@@ -166,7 +167,7 @@ namespace RoR2Randomizer.Extensions
                     }
                 }
             }
-            else if (pickupDef.equipmentIndex != EquipmentIndex.None)
+            else if (pickupDef.IsEquipment())
             {
                 if (inventory)
                 {
@@ -218,6 +219,18 @@ namespace RoR2Randomizer.Extensions
             {
                 Log.Warning($"pickup {pickupDef} not implemented");
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsItem(this PickupDef pickupDef)
+        {
+            return pickupDef.itemIndex != ItemIndex.None;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsEquipment(this PickupDef pickupDef)
+        {
+            return pickupDef.equipmentIndex != EquipmentIndex.None;
         }
     }
 }

@@ -86,13 +86,13 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                 cursor.EmitDelegate((InfiniteTowerRun.EnemyItemEntry itemEntry, PickupDef pickup, InfiniteTowerRun instance) =>
                 {
                     if (pickup == null ||
-                        pickup.itemIndex != ItemIndex.None) // If Item: Use default code
+                        pickup.IsItem()) // If Item: Use default code
                     {
                         return false;
                     }
 
                     int count;
-                    if (pickup.equipmentIndex != EquipmentIndex.None)
+                    if (pickup.IsEquipment())
                     {
                         count = 1;
                     }

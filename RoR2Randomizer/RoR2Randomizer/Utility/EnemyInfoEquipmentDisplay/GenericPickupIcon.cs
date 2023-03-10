@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using RoR2.UI;
 using TMPro;
 using UnityEngine.AddressableAssets;
+using RoR2Randomizer.Extensions;
 
 namespace RoR2Randomizer.Utility.EnemyInfoEquipmentDisplay
 {
@@ -96,7 +97,7 @@ namespace RoR2Randomizer.Utility.EnemyInfoEquipmentDisplay
                 titleColor = pickupDef.darkColor;
 
                 bodyToken = "???";
-                if (pickupDef.itemIndex != ItemIndex.None)
+                if (pickupDef.IsItem())
                 {
                     ItemDef itemDef = ItemCatalog.GetItemDef(pickupDef.itemIndex);
                     if (itemDef != null)
@@ -104,7 +105,7 @@ namespace RoR2Randomizer.Utility.EnemyInfoEquipmentDisplay
                         bodyToken = itemDef.pickupToken;
                     }
                 }
-                else if (pickupDef.equipmentIndex != EquipmentIndex.None)
+                else if (pickupDef.IsEquipment())
                 {
                     EquipmentDef equipmentDef = EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex);
                     if (equipmentDef != null)
