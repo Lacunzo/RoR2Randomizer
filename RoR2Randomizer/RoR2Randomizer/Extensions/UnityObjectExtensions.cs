@@ -1,5 +1,7 @@
 ﻿using RoR2;
+using RoR2Randomizer.Utility;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace RoR2Randomizer.Extensions
@@ -66,6 +68,11 @@ namespace RoR2Randomizer.Extensions
                 bounds = default;
                 return false;
             }
+        }
+
+        public static string GetScenePath(this Transform transform)
+        {
+            return string.Join("/", MiscUtils.CreateReverseLinkedListFromLinks(transform, t => t.parent).Select(t => t.name));
         }
     }
 }
