@@ -14,6 +14,7 @@ Current Features:
 Current Randomizers:
 * Stage Randomizer: Swaps every stage for a random playable map.
 * Boss Randomizer: Randomizes the character types of bosses. Currently includes [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers, Alloy Worship Unit and Teleporter Bosses.
+* Item Randomizer: Randomizes items and equipments
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
 * Projectile Randomizer: Randomizes projectiles.
