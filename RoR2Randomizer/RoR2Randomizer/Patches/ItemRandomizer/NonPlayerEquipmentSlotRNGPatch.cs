@@ -38,6 +38,10 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                     return seed;
                 });
             }
+            else
+            {
+                Log.Error("Failed to find patch location");
+            }
         }
     }
 }
