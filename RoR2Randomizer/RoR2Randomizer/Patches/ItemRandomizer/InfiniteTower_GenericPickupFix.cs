@@ -124,10 +124,6 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                 Log.Error("Failed to find patch location");
                 return;
             }
-
-#if DEBUG
-            Log.Debug(il.ToString());
-#endif
         }
     }
 }
