@@ -178,7 +178,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item
             PickupIndex artifactKeyIndex = PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex);
             if (TryGetReplacementPickupIndex(artifactKeyIndex, out PickupIndex artifactKeyReplacementIndex))
             {
-                PickupDef articactKeyReplacementPickup = PickupCatalog.GetPickupDef(artifactKeyReplacementIndex);
+                PickupDef articactKeyReplacementPickup = artifactKeyReplacementIndex.pickupDef;
 
                 foreach (Language lang in Language.GetAllLanguages())
                 {

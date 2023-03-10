@@ -78,7 +78,7 @@ namespace RoR2Randomizer.Utility.EnemyInfoEquipmentDisplay
             Color titleColor = Color.white;
             Color bodyColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 
-            PickupDef pickupDef = PickupCatalog.GetPickupDef(_pickupIndex);
+            PickupDef pickupDef = _pickupIndex.pickupDef;
             if (pickupDef != null)
             {
                 _image.texture = pickupDef.iconTexture;

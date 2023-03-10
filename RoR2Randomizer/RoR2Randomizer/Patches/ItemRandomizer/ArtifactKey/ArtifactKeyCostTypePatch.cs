@@ -106,7 +106,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer.ArtifactKey
                 {
                     if (ItemRandomizerController.TryGetReplacementPickupIndex(PickupCatalog.FindPickupIndex(artifactKey.itemIndex), out PickupIndex artifactKeyReplacement))
                     {
-                        return ItemCatalog.GetItemDef(PickupCatalog.GetPickupDef(artifactKeyReplacement).itemIndex);
+                        return ItemCatalog.GetItemDef(artifactKeyReplacement.pickupDef.itemIndex);
                     }
 
                     return artifactKey;

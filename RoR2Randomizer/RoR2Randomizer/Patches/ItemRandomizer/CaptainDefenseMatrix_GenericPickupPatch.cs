@@ -47,7 +47,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
             if (!ItemRandomizerController.TryGetReplacementPickupIndex(_defenseMatrixPickupIndex, out PickupIndex defenseMatrixReplacementIndex))
                 return false;
 
-            PickupDef defenseMatrixReplacement = PickupCatalog.GetPickupDef(defenseMatrixReplacementIndex);
+            PickupDef defenseMatrixReplacement = defenseMatrixReplacementIndex.pickupDef;
             if (defenseMatrixReplacement == null ||
                 defenseMatrixReplacement.IsItem()) // If Item: Use default code
             {
@@ -82,7 +82,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
             if (!ItemRandomizerController.TryGetReplacementPickupIndex(defenseMatrixPickupIndex, out PickupIndex defenseMatrixReplacementIndex))
                 return defenseMatrixItemDef;
 
-            PickupDef defenseMatrixReplacementPickup = PickupCatalog.GetPickupDef(defenseMatrixReplacementIndex);
+            PickupDef defenseMatrixReplacementPickup = defenseMatrixReplacementIndex.pickupDef;
             if (!defenseMatrixReplacementPickup.IsItem())
             {
                 Log.Warning("TryGrant returned false, but replacement is not an item, using original item");
@@ -168,7 +168,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
                     if (!ItemRandomizerController.TryGetReplacementPickupIndex(_defenseMatrixPickupIndex, out PickupIndex defenseMatrixReplacementIndex))
                         return defenseMatrixItemCount;
 
-                    return inventory.GetPickupCount(PickupCatalog.GetPickupDef(defenseMatrixReplacementIndex));
+                    return inventory.GetPickupCount(defenseMatrixReplacementIndex.pickupDef);
                 });
 
                 c.Index = cursor.Index + 1;
