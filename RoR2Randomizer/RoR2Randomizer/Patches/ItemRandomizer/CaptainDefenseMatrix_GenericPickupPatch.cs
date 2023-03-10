@@ -138,10 +138,6 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
             {
                 Log.Error("Failed to find patch location");
             }
-
-#if DEBUG
-            Log.Debug(il.ToString());
-#endif
         }
 
         static void CaptainDefenseMatrixController_TryGrantItem(ILContext il)
