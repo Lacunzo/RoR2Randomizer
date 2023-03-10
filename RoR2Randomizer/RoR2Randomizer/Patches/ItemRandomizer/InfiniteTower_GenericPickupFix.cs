@@ -4,6 +4,7 @@ using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.CustomContent;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.RandomizerControllers.Item;
 using UnityEngine.Networking;
 
 namespace RoR2Randomizer.Patches.ItemRandomizer
@@ -31,10 +32,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
             {
                 master.inventory.CopyEquipmentFrom(self.enemyInventory);
 
-                if (master.inventory.currentEquipmentIndex != EquipmentIndex.None)
-                {
-                    master.inventory.GiveItemIfMissing(ContentPackManager.Items.MonsterUseEquipmentDummyItem);
-                }
+                ItemRandomizerController.HandleCharacterGrantedRandomizedEquipment(master);
             }
         }
 

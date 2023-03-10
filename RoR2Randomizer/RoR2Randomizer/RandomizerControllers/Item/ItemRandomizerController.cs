@@ -3,6 +3,8 @@ using HG;
 using R2API;
 using RoR2;
 using RoR2Randomizer.Configuration;
+using RoR2Randomizer.CustomContent;
+using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Networking.Generic;
 using RoR2Randomizer.Networking.ItemRandomizer;
 using RoR2Randomizer.PrefabMarkers;
@@ -215,6 +217,22 @@ namespace RoR2Randomizer.RandomizerControllers.Item
             {
                 return pickupIndex;
             }
+        }
+
+        public static void HandleCharacterGrantedRandomizedEquipment(CharacterMaster master)
+        {
+            if (!master || !IsEnabled)
+                return;
+
+            if (master.playerCharacterMasterController)
+                return;
+
+            Inventory inventory = master.inventory;
+            if (!inventory || inventory.currentEquipmentIndex == EquipmentIndex.None)
+                return;
+
+            // You wanted AI to activate equipment? Too bad, can't be bothered B)
+            inventory.GiveItemIfMissing(ContentPackManager.Items.MonsterUseEquipmentDummyItem);
         }
     }
 }

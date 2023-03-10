@@ -4,6 +4,7 @@ using MonoMod.Cil;
 using RoR2;
 using RoR2Randomizer.CustomContent;
 using RoR2Randomizer.Extensions;
+using RoR2Randomizer.RandomizerControllers.Item;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
@@ -34,11 +35,7 @@ namespace RoR2Randomizer.Patches.ItemRandomizer
             {
                 targetMaster.inventory.CopyEquipmentFrom(self.inventory);
 
-                if (targetMaster.inventory.currentEquipmentIndex != EquipmentIndex.None)
-                {
-                    // You wanted AI to activate equipment? Too bad, can't be bothered B)
-                    targetMaster.inventory.GiveItemIfMissing(ContentPackManager.Items.MonsterUseEquipmentDummyItem);
-                }
+                ItemRandomizerController.HandleCharacterGrantedRandomizedEquipment(targetMaster);
             }
         }
 
