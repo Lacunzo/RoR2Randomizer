@@ -2,7 +2,7 @@
 
 A randomizer mod for Risk of Rain 2!
 
-It is *highly* recommended to take a look over the mod settings before starting a run. By default most randomizers are enabled, which can be a bit much to take in at once.
+It is *highly* recommended to take a look over the mod config before starting a run. By default almost all randomizers are enabled, which is utter chaos, which you may or may not want.
 
 Because I'm such a narcissist, this mod has a dedicated [Discord Server](https://discord.gg/29PTeWaKCj)! Join if you're into that.
 
@@ -11,7 +11,7 @@ Current features:
 * Compatibile with Risk of Options for easy configuration in-game.
 * Stage Randomizer: Swaps every stage for a random playable map.
   * Each stage is paired one-to-one with a replacement stage (for example bazaar will always be randomized to the same stage during the course of a run)
-* Boss Randomizer: Randomizes the character types of bosses. Currently [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers and Alloy Worship Unit are implemented.
+* Boss Randomizer: Randomizes the character types of bosses. Currently includes [Mithrix](https://youtu.be/EZLbivjyFMk), [Voidling](https://youtu.be/HAH9Rxyl2lU), Aurelionite, Twisted Scavengers, Alloy Worship Unit and Teleporter Bosses.
 * Status Effect Randomizer: Randomizes all buffs/debuffs applied to characters.
 * Survivor Starting Animation Randomizer: Randomizes the first stage spawn animation of all survivors. ![randomspawnpod](https://cdn.discordapp.com/attachments/526159007442927648/1025178769675264061/randomspawnpod.gif)
 * Projectile Randomizer: Randomizes projectiles.
