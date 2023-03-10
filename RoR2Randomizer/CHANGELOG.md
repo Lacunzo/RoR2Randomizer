@@ -1,5 +1,17 @@
 ## Changelog
 
+**0.9.0 Changes:**
+
+* Added Item Randomizer:
+  * Every item and equipment is replaced by a random item or equipment.
+  * Chest drops
+  * Output of scrappers
+  * Artifact Key
+  * Scavengers finding items
+  * Enemies gaining items (Void fields, Artifact of Evolution, Simulacrum)
+  * Captain starting item
+  * "World-spawn" items (Fuel Array in spawn pod, Preon on Rallypoint, etc.)
+
 **0.8.4 Changes:**
 
 * Projectile Randomizer:
