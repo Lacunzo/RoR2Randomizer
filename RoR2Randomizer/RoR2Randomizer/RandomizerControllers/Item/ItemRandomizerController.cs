@@ -175,18 +175,26 @@ namespace RoR2Randomizer.RandomizerControllers.Item
             Log.Debug("Registering item name replacements");
 #endif
 
-            PickupIndex artifactKeyIndex = PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex);
-            if (TryGetReplacementPickupIndex(artifactKeyIndex, out PickupIndex artifactKeyReplacementIndex))
+            static void createCostTypeOverlays(PickupIndex originalPickupIndex, string key)
             {
-                PickupDef articactKeyReplacementPickup = artifactKeyReplacementIndex.pickupDef;
-
-                foreach (Language lang in Language.GetAllLanguages())
+                if (TryGetReplacementPickupIndex(originalPickupIndex, out PickupIndex replacementPickupIndex))
                 {
-                    LanguageAPI.LanguageOverlay overlay = LanguageAPI.AddOverlay("COST_ARTIFACTSHELLKILLERITEM_FORMAT", $"{{0}} {lang.GetLocalizedStringByToken(articactKeyReplacementPickup.nameToken)}", lang.name);
+                    PickupDef replacementPickup = replacementPickupIndex.pickupDef;
 
-                    RunSpecificLanguageOverlay.AddRunLanguageOverlay(overlay);
+                    foreach (Language lang in Language.GetAllLanguages())
+                    {
+                        LanguageAPI.LanguageOverlay overlay = LanguageAPI.AddOverlay(key, $"{{0}} {lang.GetLocalizedStringByToken(replacementPickup.nameToken)}", lang.name);
+
+                        RunSpecificLanguageOverlay.AddRunLanguageOverlay(overlay);
+                    }
                 }
             }
+
+            PickupIndex artifactKeyIndex = PickupCatalog.FindPickupIndex(RoR2Content.Items.ArtifactKey.itemIndex);
+            createCostTypeOverlays(artifactKeyIndex, "COST_ARTIFACTSHELLKILLERITEM_FORMAT");
+
+            PickupIndex fuelArrayIndex = PickupCatalog.FindPickupIndex(RoR2Content.Equipment.QuestVolatileBattery.equipmentIndex);
+            createCostTypeOverlays(fuelArrayIndex, "COST_VOLATILEBATTERY_FORMAT");
         }
 
         public static bool TryGetReplacementPickupIndex(in PickupIndex original, out PickupIndex replacement)
