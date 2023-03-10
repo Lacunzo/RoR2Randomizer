@@ -111,7 +111,14 @@ namespace RoR2Randomizer.Extensions
             if (pickupDef == null || !master)
                 return 0;
 
-            Inventory inventory = master.inventory;
+            return master.inventory.GetPickupCount(pickupDef);
+        }
+
+        public static int GetPickupCount(this Inventory inventory, PickupDef pickupDef)
+        {
+            if (pickupDef == null || !inventory)
+                return 0;
+
             if (pickupDef.itemIndex != ItemIndex.None)
             {
                 if (inventory)
