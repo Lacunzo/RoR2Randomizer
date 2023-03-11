@@ -117,7 +117,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item_Tier
                     if (!itemDef)
                         return false;
 
-                    if (ConfigManager.ItemTierRandomizer.ExcludeScrap && (itemDef.ContainsTag(ItemTag.PriorityScrap) || itemDef.ContainsTag(ItemTag.Scrap)))
+                    if (!ConfigManager.ItemTierRandomizer.RandomizeScrap && (itemDef.ContainsTag(ItemTag.PriorityScrap) || itemDef.ContainsTag(ItemTag.Scrap)))
                         return false;
 
                     return true;

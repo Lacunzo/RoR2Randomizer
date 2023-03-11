@@ -6,11 +6,11 @@ namespace RoR2Randomizer.RandomizerControllers.Item_Tier
 {
     public sealed class ItemTierRandomizerConfig : BaseRandomizerConfig
     {
-        public readonly BoolConfigValue ExcludeScrap;
+        public readonly BoolConfigValue RandomizeScrap;
 
         public ItemTierRandomizerConfig(ConfigFile file) : base("Item Tier", file)
         {
-            ExcludeScrap = new BoolConfigValue(getEntry("Exclude Scrap", new ConfigDescription("If the item tiers of scrap should not be randomized"), false));
+            RandomizeScrap = new BoolConfigValue(getEntry("Randomize Scrap", new ConfigDescription("If the tiers of scrap items should be randomized"), true));
         }
     }
 }
