@@ -286,7 +286,7 @@ namespace RoR2Randomizer.Networking.Generic.Chunking
                 Header = header;
 
                 int chunkSize = Mathf.Min((int)count, data.Length - (int)startIndex);
-                Data = new byte[count];
+                Data = new byte[chunkSize];
                 Array.Copy(data, startIndex, Data, 0, chunkSize);
             }
 
