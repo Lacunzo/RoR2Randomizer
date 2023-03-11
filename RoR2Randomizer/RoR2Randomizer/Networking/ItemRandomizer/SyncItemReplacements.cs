@@ -33,6 +33,13 @@ namespace RoR2Randomizer.Networking.ItemRandomizer
 
         public override void OnReceived()
         {
+            if (NetworkServer.active)
+                return;
+
+#if DEBUG
+            Log.Debug("Received item replacements from server");
+#endif
+
             OnReceive?.Invoke(_itemIndexReplacements);
         }
     }

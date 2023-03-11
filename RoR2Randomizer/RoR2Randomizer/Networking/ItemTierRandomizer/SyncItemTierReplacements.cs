@@ -60,6 +60,13 @@ namespace RoR2Randomizer.Networking.ItemTierRandomizer
 
         public override void OnReceived()
         {
+            if (NetworkServer.active)
+                return;
+
+#if DEBUG
+            Log.Debug("Received item tier replacements from server");
+#endif
+
             OnReceive?.Invoke(_itemTierOverrides);
         }
     }
