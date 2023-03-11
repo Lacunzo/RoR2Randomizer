@@ -93,5 +93,10 @@ namespace RoR2Randomizer.Extensions
             list.RemoveAt(index);
             return result;
         }
+
+        public static T GetAndRemoveRandom<T>(this IList<T> list, Xoroshiro128Plus rng)
+        {
+            return list.GetAndRemoveAt(rng.RangeInt(0, list.Count));
+        }
     }
 }
