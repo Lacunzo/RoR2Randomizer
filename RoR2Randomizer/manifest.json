@@ -2,7 +2,7 @@
 	"name": "RoR2Randomizer",
 	"authorName": "Gorakh",
 	"displayName": "Risk of Rain 2 Randomizer",
-	"version_number": "0.8.4",
+	"version_number": "0.9.0",
 	"website_url": "https://github.com/Goorakh/RoR2Randomizer",
 	"description": "A Risk of Rain 2 randomizer",
 	"dependencies": [

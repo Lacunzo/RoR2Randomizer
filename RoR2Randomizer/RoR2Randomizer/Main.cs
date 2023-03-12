@@ -1,5 +1,4 @@
 using BepInEx;
-using R2API;
 using R2API.Utils;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.CustomContent;
@@ -24,7 +23,7 @@ namespace RoR2Randomizer
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "Gorakh";
         public const string PluginName = "RoR2Randomizer";
-        public const string PluginVersion = "0.8.4";
+        public const string PluginVersion = "0.9.0";
 
         public static Main Instance { get; private set; }
 
