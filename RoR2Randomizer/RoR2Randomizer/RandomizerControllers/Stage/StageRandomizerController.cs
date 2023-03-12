@@ -212,7 +212,20 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                 // HACK: The run started callback is not invoked yet at this point, so Instance.RNG is null. Just use the run seed directly
                 Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.seed);
 
-                _stageIndexReplacements = IndexReplacementsCollection.Create(ReplacementDictionary<SceneIndex>.CreateFrom(_stages, rng, s => s.SceneIndex, (key, value) =>
+                IEnumerable<StageRandomizingInfo> stagesToRandomzie = _stages.Where(stageInfo =>
+                {
+                    if (ConfigManager.StageRandomizer.IsStageBlacklisted(stageInfo.SceneIndex))
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding stage {stageInfo} due to: Config blacklist");
+#endif
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                _stageIndexReplacements = IndexReplacementsCollection.Create(ReplacementDictionary<SceneIndex>.CreateFrom(stagesToRandomzie, rng, s => s.SceneIndex, (key, value) =>
                 {
                     if (ConfigManager.StageRandomizer.FirstStageBlacklistEnabled && firstStageIndex != SceneIndex.Invalid && key.SceneIndex == firstStageIndex && (value.Flags & StageFlags.FirstStageBlacklist) != 0)
                     {

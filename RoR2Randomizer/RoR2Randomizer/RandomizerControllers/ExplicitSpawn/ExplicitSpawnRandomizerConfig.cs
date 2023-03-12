@@ -1,11 +1,24 @@
 ﻿using BepInEx.Configuration;
+using HG;
+using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Configuration.ConfigValue;
+using RoR2Randomizer.Configuration.ConfigValue.ParsedList;
+using RoR2Randomizer.Utility.Comparers;
+using System;
+using System.Linq;
 
 namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 {
     public sealed class ExplicitSpawnRandomizerConfig : BaseRandomizerConfig
     {
+        readonly ParsedMasterIndexListConfigValue _masterBlacklist;
+
+        public bool IsBlacklisted(MasterCatalog.MasterIndex index)
+        {
+            return _masterBlacklist.BinarySearch(index, MasterIndexComparer.Instance) >= 0;
+        }
+
         public readonly BoolConfigValue RandomizeDirectorSpawns;
 
         public readonly BoolConfigValue RandomizeAbandonedAqueductRingEvent;
@@ -48,6 +61,8 @@ namespace RoR2Randomizer.RandomizerControllers.ExplicitSpawn
 
         public ExplicitSpawnRandomizerConfig(ConfigFile file) : base("Summon", file)
         {
+            _masterBlacklist = new ParsedMasterIndexListConfigValue(getEntry("Character Blacklist", "A comma-separated list of characters to exclude from the summon randomizer.\n\nUse the internal master names for this field", string.Empty));
+
             // RandomizeAbandonedAqueductRingEvent = new BoolConfigValue(getEntry("Randomize Runald & Kjaro", "Randomizes the character types of Runald and Kjaro on Abandoned Aqueduct.", true));
 
             RandomizeBeetleQueenSummonGuards = new BoolConfigValue(getEntry("Randomize Beetle Queen Guards", "Randomizes the character types of Beetle Guards spawned by Beetle Queens", true));

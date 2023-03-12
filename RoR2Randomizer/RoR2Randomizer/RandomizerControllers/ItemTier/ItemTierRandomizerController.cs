@@ -117,6 +117,14 @@ namespace RoR2Randomizer.RandomizerControllers.Item_Tier
                     if (!itemDef)
                         return false;
 
+                    if (ConfigManager.ItemTierRandomizer.IsBlacklisted(i))
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding item {itemDef.name} due to: config blacklist");
+#endif
+                        return false;
+                    }
+
                     if (!ConfigManager.ItemTierRandomizer.RandomizeScrap && (itemDef.ContainsTag(ItemTag.PriorityScrap) || itemDef.ContainsTag(ItemTag.Scrap)))
                         return false;
 

@@ -1,6 +1,11 @@
 ﻿using BepInEx.Configuration;
+using HG;
+using RoR2;
 using RoR2Randomizer.Configuration;
 using RoR2Randomizer.Configuration.ConfigValue;
+using RoR2Randomizer.Configuration.ConfigValue.ParsedList;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace RoR2Randomizer.RandomizerControllers.Buff
@@ -15,6 +20,13 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
         public BoolConfigValue ExcludeInvincibility;
 
         public BoolConfigValue ExcludeEliteBuffs;
+
+        readonly ParsedBuffIndexListConfigValue _buffBlacklist;
+
+        public bool IsBlacklisted(BuffIndex buffIndex)
+        {
+            return _buffBlacklist.BinarySearch(buffIndex) >= 0;
+        }
 
 #if DEBUG
         public readonly EnumConfigValue<DebugMode> BuffDebugMode;
@@ -31,6 +43,8 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             ExcludeInvincibility = new BoolConfigValue(getEntry("Blacklist Invincibility Effects", "Disables randomization (both from and to) of status effects that make the user invincible. Turning this off can potentially softlock a run due to a boss becoming invincible.", true));
 
             ExcludeEliteBuffs = new BoolConfigValue(getEntry("Blacklist Elite aspects", "Disables randomization (both from and to) of status effects that are associated with an elite aspect", false));
+
+            _buffBlacklist = new ParsedBuffIndexListConfigValue(getEntry("Status Effect Blacklist", "Comma separated list of status effects to exclude from the randomizer\n\nList of status effects: https://riskofrain2.fandom.com/wiki/Status_Effects (use the \"Internal Name\" of the effect for this value)\n\nExample value: \"ElementalRingVoidReady,BearVoidCooldown\" will make the randomizer not change Singularity Band Ready and Safer Spaces cooldown", string.Empty));
 
 #if DEBUG
             BuffDebugMode = new EnumConfigValue<DebugMode>(getEntry("Debug Mode", DebugMode.None));

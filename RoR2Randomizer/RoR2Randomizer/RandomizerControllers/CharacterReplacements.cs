@@ -44,6 +44,66 @@ namespace RoR2Randomizer.RandomizerControllers
         static bool _hasInvokedReplacementsInitialized = false;
         static ulong _invokeReplacementsInitializedRunCallbackHandle;
 
+        public static bool ShouldRandomizeMaster(CharacterMaster masterPrefab)
+        {
+            if (!masterPrefab)
+                return false;
+
+            if (!masterPrefab.bodyPrefab)
+            {
+#if DEBUG
+                Log.Debug($"excluding master {masterPrefab.name}: no {nameof(CharacterMaster.bodyPrefab)}");
+#endif
+
+                return false;
+            }
+
+            if (!masterPrefab.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
+            {
+#if DEBUG
+                Log.Debug($"excluding master {masterPrefab.name}: no {nameof(CharacterMaster.bodyPrefab)} {nameof(CharacterBody)} component");
+#endif
+
+                return false;
+            }
+
+            Transform modelTransform;
+            if (!body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator) || !(modelTransform = modelLocator.modelTransform))
+            {
+#if DEBUG
+                Log.Debug($"excluding master {masterPrefab.name}: no model");
+#endif
+
+                return false;
+            }
+
+            if (modelTransform.childCount == 0)
+            {
+#if DEBUG
+                Log.Debug($"excluding master {masterPrefab.name}: empty model");
+#endif
+
+                return false;
+            }
+
+            switch (masterPrefab.name)
+            {
+                case "AncientWispMaster": // Does nothing
+                case "ArtifactShellMaster": // No model, does not attack, cannot be damaged
+                case "ClaymanMaster": // No hitboxes
+                case "EngiBeamTurretMaster": // Seems to ignore the player
+                case "MinorConstructAttachableMaster": // Instantly dies
+                case "VoidRaidCrabJointMaster": // Balls
+                case "VoidRaidCrabMaster": // Beta voidling, half invisible
+#if DEBUG
+                    Log.Debug($"excluding master {masterPrefab.name}: blacklist");
+#endif
+                    return false;
+            }
+
+            return true;
+        }
+
         [SystemInitializer(typeof(EquipmentCatalog), typeof(MasterCatalog))]
         static void Init()
         {
@@ -84,59 +144,7 @@ namespace RoR2Randomizer.RandomizerControllers
                     return false;
                 }
 
-                if (!masterComponent.bodyPrefab)
-                {
-#if DEBUG
-                    Log.Debug($"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)}");
-#endif
-
-                    return false;
-                }
-
-                if (!masterComponent.bodyPrefab.TryGetComponent<CharacterBody>(out CharacterBody body))
-                {
-#if DEBUG
-                    Log.Debug($"excluding master {master.name}: no {nameof(CharacterMaster.bodyPrefab)} {nameof(CharacterBody)} component");
-#endif
-
-                    return false;
-                }
-
-                Transform modelTransform;
-                if (!body.TryGetComponent<ModelLocator>(out ModelLocator modelLocator) || !(modelTransform = modelLocator.modelTransform))
-                {
-#if DEBUG
-                    Log.Debug($"excluding master {master.name}: no model");
-#endif
-
-                    return false;
-                }
-
-                if (modelTransform.childCount == 0)
-                {
-#if DEBUG
-                    Log.Debug($"excluding master {master.name}: empty model");
-#endif
-
-                    return false;
-                }
-
-                switch (master.name)
-                {
-                    case "AncientWispMaster": // Does nothing
-                    case "ArtifactShellMaster": // No model, does not attack, cannot be damaged
-                    case "ClaymanMaster": // No hitboxes
-                    case "EngiBeamTurretMaster": // Seems to ignore the player
-                    case "MinorConstructAttachableMaster": // Instantly dies
-                    case "VoidRaidCrabJointMaster": // Balls
-                    case "VoidRaidCrabMaster": // Beta voidling, half invisible
-#if DEBUG
-                        Log.Debug($"excluding master {master.name}: blacklist");
-#endif
-                        return false;
-                }
-
-                return true;
+                return ShouldRandomizeMaster(masterComponent);
             }).Distinct().Select(go => (int)MasterCatalog.FindMasterIndex(go)).ToArray();
 
             _instance = new CharacterReplacements();
@@ -180,7 +188,20 @@ namespace RoR2Randomizer.RandomizerControllers
         {
             if (NetworkServer.active && _replacementMode.Value == CharacterReplacementMode.Random)
             {
-                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_masterIndicesToRandomize, _rng, (key, value) =>
+                IEnumerable<int> masterIndicesToRandomize = _masterIndicesToRandomize.Where(i =>
+                {
+                    if (ConfigManager.ExplicitSpawnRandomizer.IsBlacklisted((MasterCatalog.MasterIndex)i))
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding master {MasterCatalog.GetMasterPrefab((MasterCatalog.MasterIndex)i)?.name ?? "null"} due to: config blacklist");
+#endif
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(masterIndicesToRandomize, _rng, (key, value) =>
                 {
                     if (Caches.Masters.Heretic.isValid && key == Caches.Masters.Heretic.i)
                     {
@@ -438,6 +459,9 @@ namespace RoR2Randomizer.RandomizerControllers
 
         public static MasterCatalog.MasterIndex GetReplacementForMasterIndex(MasterCatalog.MasterIndex original)
         {
+            if (NetworkServer.active && ConfigManager.ExplicitSpawnRandomizer.IsBlacklisted(original))
+                return MasterCatalog.MasterIndex.none;
+
             if (original.isValid && IsEnabled)
             {
 #if DEBUG

@@ -72,6 +72,14 @@ namespace RoR2Randomizer.RandomizerControllers.Buff
             {
                 IEnumerable<BuffDef> buffsToRandomize = _validBuffDefs.Where(b =>
                 {
+                    if (ConfigManager.BuffRandomizer.IsBlacklisted(b.buffIndex))
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding buff {b} due to: Config blacklist");
+#endif
+                        return false;
+                    }
+
                     if (ConfigManager.BuffRandomizer.ExcludeInvincibility && Array.BinarySearch(_invincibilityBuffs, b.buffIndex) >= 0)
                     {
 #if DEBUG

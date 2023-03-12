@@ -119,7 +119,20 @@ namespace RoR2Randomizer.RandomizerControllers.Item
         {
             if (IsEnabled)
             {
-                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(_pickupIndicesToRandomize, _instance.RNG), PickupCatalog.pickupCount);
+                IEnumerable<int> pickupIndicesToRandomize = _pickupIndicesToRandomize.Where(i =>
+                {
+                    if (ConfigManager.ItemRandomizer.IsBlacklisted(new PickupIndex(i)))
+                    {
+#if DEBUG
+                        Log.Debug($"Excluding pickup {new PickupIndex(i)} due to: config blacklist");
+#endif
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                result = new IndexReplacementsCollection(ReplacementDictionary<int>.CreateFrom(pickupIndicesToRandomize, _instance.RNG), PickupCatalog.pickupCount);
                 return true;
             }
             else
