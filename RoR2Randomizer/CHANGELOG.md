@@ -12,6 +12,15 @@
   * Captain starting item
   * "World-spawn" items (Fuel Array in spawn pod, Preon on Rallypoint, etc.)
 
+* Added Item Tier Randomizer:
+  * Randomizes which tier every item is in.
+
+* Config:
+  * Added options to manually exclude specific status effects, summons, items or stages from the randomizer.
+
+* Misc:
+  * Minor networking fixes
+
 **0.8.4 Changes:**
 
 * Projectile Randomizer:
