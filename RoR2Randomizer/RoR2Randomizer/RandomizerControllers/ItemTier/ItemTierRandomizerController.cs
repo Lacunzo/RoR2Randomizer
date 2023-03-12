@@ -348,6 +348,7 @@ namespace RoR2Randomizer.RandomizerControllers.Item_Tier
                 refreshPickupDef(itemDef);
             }
 
+            ContagiousItemManager._transformationInfos = Array.Empty<ContagiousItemManager.TransformationInfo>();
             ContagiousItemManager.InitTransformationTable();
         }
 
