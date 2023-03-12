@@ -10,6 +10,7 @@ using RoR2Randomizer.Extensions;
 using RoR2Randomizer.Utility;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -75,6 +76,13 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
                                   
                                       return new StageRandomizingInfo(index, flags);
                                   }).ToArray();
+
+#if DEBUG
+            foreach (SceneDef nonStageScene in SceneCatalog.allSceneDefs.Where(s => Array.FindIndex(_stages, st => st.SceneIndex == s.sceneDefIndex) == -1))
+            {
+                Log.Debug($"Excluded scene: {nonStageScene.cachedName}");
+            }
+#endif
 
             _isInitialized = true;
         }
@@ -196,11 +204,6 @@ namespace RoR2Randomizer.RandomizerControllers.Stage
             {
 #if DEBUG
                 Log.Debug($"First stage: {firstStageSceneName}");
-
-                foreach (SceneDef nonStageScene in SceneCatalog.allSceneDefs.Where(s => Array.FindIndex(_stages, st => st.SceneIndex == s.sceneDefIndex) == -1))
-                {
-                    Log.Debug($"Excluded scene: {nonStageScene.cachedName}");
-                }
 #endif
 
                 SceneIndex firstStageIndex = SceneCatalog.FindSceneIndex(firstStageSceneName);
